@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import type { GrammarTopic } from "@/lib/grammar";
+import { useEffect, useMemo, useState } from "react";
+import type { GrammarStudyTopic } from "@/lib/grammar";
 import { grammarQuizzes, type GrammarQuizQuestion } from "@/lib/grammar/quizzes";
 import styles from "./grammar-browser.module.css";
 
 type GrammarBrowserProps = {
-  topics: GrammarTopic[];
+  topics: GrammarStudyTopic[];
 };
 
 function MiniQuiz({ questions }: { questions: GrammarQuizQuestion[] }) {
@@ -96,73 +96,154 @@ function MiniQuiz({ questions }: { questions: GrammarQuizQuestion[] }) {
   );
 }
 
+function normaliseQuizKey(slug: string) {
+  if (slug === "countable-uncountable-nouns-articles") return "countable-and-uncountable-nouns-articles";
+  if (slug === "the-passive") return "passive";
+  return slug;
+}
+
+function formatUnits(units: number[]) {
+  if (units.length === 1) return `Unit ${String(units[0]).padStart(2, "0")}`;
+  return `Units ${units.map((unit) => String(unit).padStart(2, "0")).join(" · ")}`;
+}
+
+function sidebarUnitLabel(units: number[]) {
+  return `U${units.map((unit) => String(unit).padStart(2, "0")).join("/")}`;
+}
+
 export function GrammarBrowser({ topics }: GrammarBrowserProps) {
   const [activeSlug, setActiveSlug] = useState(topics[0]?.slug ?? "");
+  const [expandedTopics, setExpandedTopics] = useState<Set<string>>(() => new Set(topics[0] ? [topics[0].slug] : []));
+  const [pendingAnchor, setPendingAnchor] = useState<string | null>(null);
   const activeTopic = topics.find((topic) => topic.slug === activeSlug) ?? topics[0];
+
+  useEffect(() => {
+    if (!pendingAnchor) return;
+
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(pendingAnchor)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setPendingAnchor(null);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [activeSlug, pendingAnchor]);
+
+  const quizQuestions = useMemo(() => {
+    if (!activeTopic) return [];
+    return activeTopic.sourceSlugs.flatMap((slug) => grammarQuizzes[normaliseQuizKey(slug)] ?? []);
+  }, [activeTopic]);
 
   if (!activeTopic) return null;
 
   const activeIndex = topics.findIndex((topic) => topic.slug === activeTopic.slug);
   const unitTraps = Array.from(new Set(activeTopic.sections.flatMap((section) => section.traps ?? [])));
-  const quizKey = activeTopic.slug === "countable-uncountable-nouns-articles"
-    ? "countable-and-uncountable-nouns-articles"
-    : activeTopic.slug === "the-passive"
-      ? "passive"
-      : activeTopic.slug;
-  const quizQuestions = grammarQuizzes[quizKey] ?? [];
+
+  const expandTopic = (slug: string) => {
+    setExpandedTopics((current) => {
+      const next = new Set(current);
+      if (next.has(slug)) next.delete(slug);
+      else next.add(slug);
+      return next;
+    });
+  };
+
+  const openTopic = (slug: string) => {
+    setExpandedTopics((current) => new Set(current).add(slug));
+    setActiveSlug(slug);
+    setPendingAnchor(`topic-${slug}`);
+  };
+
+  const openSection = (topicSlug: string, sectionId: string) => {
+    setExpandedTopics((current) => new Set(current).add(topicSlug));
+    setActiveSlug(topicSlug);
+    setPendingAnchor(sectionId);
+  };
 
   return (
     <div className={styles.layout}>
-      <aside className={styles.sidebar} aria-label="Unidades de gramática B2">
+      <aside className={styles.sidebar} aria-label="Temas de gramática B2">
         <div className={styles.sidebarHeading}>
           <div>
             <span className="eyebrow">Grammar syllabus</span>
             <strong>Cambridge B2</strong>
           </div>
-          <span>{topics.length} unidades</span>
+          <span>{topics.length} temas · 24 unidades</span>
         </div>
 
-        <nav className={styles.nav} aria-label="Las 24 unidades del libro">
+        <nav className={styles.nav} aria-label="Temas y subapartados de gramática">
           {topics.map((topic) => {
             const isActive = topic.slug === activeTopic.slug;
+            const isExpanded = expandedTopics.has(topic.slug);
+            const subnavId = `nav-${topic.slug}`;
 
             return (
-              <button
-                type="button"
-                className={`${styles.topicButton}${isActive ? ` ${styles.active}` : ""}`}
-                key={topic.slug}
-                onClick={() => setActiveSlug(topic.slug)}
-                aria-current={isActive ? "page" : undefined}
-              >
-                <span className={styles.number}>{String(topic.unit).padStart(2, "0")}</span>
-                <span className={styles.copy}>
-                  <strong>{topic.title}</strong>
-                  <small>{topic.sections.length} apartados · {topic.level}</small>
-                </span>
-              </button>
+              <div className={styles.topicGroup} key={topic.slug}>
+                <div className={`${styles.topicRow}${isActive ? ` ${styles.active}` : ""}`}>
+                  <button
+                    type="button"
+                    className={styles.topicButton}
+                    onClick={() => openTopic(topic.slug)}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    <span className={styles.number}>{sidebarUnitLabel(topic.units)}</span>
+                    <span className={styles.copy}>
+                      <strong>{topic.title}</strong>
+                      <small>{topic.sections.length} subapartados</small>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.expandButton}${isExpanded ? ` ${styles.expanded}` : ""}`}
+                    onClick={() => expandTopic(topic.slug)}
+                    aria-expanded={isExpanded}
+                    aria-controls={subnavId}
+                    aria-label={`${isExpanded ? "Contraer" : "Desplegar"} ${topic.title}`}
+                  >
+                    <span aria-hidden="true">⌄</span>
+                  </button>
+                </div>
+
+                {isExpanded && (
+                  <div className={styles.subnav} id={subnavId}>
+                    {topic.sections.map((section) => (
+                      <button
+                        type="button"
+                        key={section.id}
+                        className={styles.subtopicButton}
+                        onClick={() => openSection(topic.slug, section.id)}
+                      >
+                        <span>U{String(section.sourceUnit).padStart(2, "0")}</span>
+                        <strong>{section.title}</strong>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             );
           })}
         </nav>
 
         <div className={styles.sidebarFooter}>
-          <span>01</span>
+          <span>1</span>
           <div aria-hidden="true"><span style={{ width: `${((activeIndex + 1) / topics.length) * 100}%` }} /></div>
-          <span>24</span>
+          <span>{topics.length}</span>
         </div>
       </aside>
 
       <main className={styles.content} aria-live="polite">
         <article className={styles.lessonCard} key={activeTopic.slug}>
-          <header className={styles.lessonHeader}>
+          <header className={styles.lessonHeader} id={`topic-${activeTopic.slug}`}>
             <div className={styles.lessonMeta}>
-              <span className={styles.unitLabel}>Unit {String(activeTopic.unit).padStart(2, "0")} · {activeIndex + 1}/{topics.length}</span>
+              <span className={styles.unitLabel}>{formatUnits(activeTopic.units)} · tema {activeIndex + 1}/{topics.length}</span>
               <span className="level-pill">{activeTopic.level}</span>
             </div>
             <h2>{activeTopic.title}</h2>
             <p className={styles.summary}>{activeTopic.summary}</p>
-            <div className={styles.examBadge}>
+            <div className={styles.examBadges}>
               <span>Exam practice del libro</span>
-              <strong>{activeTopic.examPractice}</strong>
+              <div>
+                {activeTopic.examPractice.map((practice) => <strong key={practice}>{practice}</strong>)}
+              </div>
             </div>
           </header>
 
@@ -172,13 +253,14 @@ export function GrammarBrowser({ topics }: GrammarBrowserProps) {
                 <span className="eyebrow">Vista de estudio</span>
                 <h3 id={`${activeTopic.slug}-overview`}>Primero entiende el mapa del tema.</h3>
               </div>
-              <p>Usa esta parte para comparar estructuras antes de entrar en la explicación detallada.</p>
+              <p>Todos los apartados relacionados están juntos, aunque el libro los reparta entre varias unidades.</p>
             </div>
 
             <div className={styles.comparisonTableWrap}>
               <table className={styles.comparisonTable}>
                 <thead>
                   <tr>
+                    <th>Unidad</th>
                     <th>Bloque</th>
                     <th>Forma clave</th>
                     <th>Idea que debes reconocer</th>
@@ -186,7 +268,8 @@ export function GrammarBrowser({ topics }: GrammarBrowserProps) {
                 </thead>
                 <tbody>
                   {activeTopic.sections.map((section) => (
-                    <tr key={`compare-${section.title}`}>
+                    <tr key={`compare-${section.id}`}>
+                      <td><span className={styles.sourceUnit}>U{String(section.sourceUnit).padStart(2, "0")}</span></td>
                       <td><strong>{section.title}</strong></td>
                       <td><code>{section.forms?.[0] ?? "—"}</code></td>
                       <td>{section.intro ?? section.rules[0]}</td>
@@ -204,20 +287,25 @@ export function GrammarBrowser({ topics }: GrammarBrowserProps) {
               </div>
               <div className={styles.decisionBranches}>
                 {activeTopic.sections.map((section, index) => (
-                  <div className={styles.decisionBranch} key={`decision-${section.title}`}>
+                  <button
+                    type="button"
+                    className={styles.decisionBranch}
+                    key={`decision-${section.id}`}
+                    onClick={() => openSection(activeTopic.slug, section.id)}
+                  >
                     <span>{String(index + 1).padStart(2, "0")}</span>
                     <div>
                       <strong>{section.title}</strong>
                       <p>{section.rules[0]}</p>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
 
             {unitTraps.length > 0 && (
               <div className={styles.unitTraps}>
-                <span className="eyebrow">Cambridge traps de la unidad</span>
+                <span className="eyebrow">Cambridge traps del tema</span>
                 <div>
                   {unitTraps.map((trap) => <p key={trap}>{trap}</p>)}
                 </div>
@@ -227,7 +315,8 @@ export function GrammarBrowser({ topics }: GrammarBrowserProps) {
 
           <div className={styles.sectionList}>
             {activeTopic.sections.map((section, sectionIndex) => (
-              <section className={styles.grammarSection} key={`${activeTopic.slug}-${section.title}`}>
+              <section className={styles.grammarSection} id={section.id} key={section.id}>
+                <div className={styles.sectionSource}>Unit {String(section.sourceUnit).padStart(2, "0")} · {section.sourceTitle}</div>
                 <div className={styles.sectionTitleRow}>
                   <span>{String(sectionIndex + 1).padStart(2, "0")}</span>
                   <h3>{section.title}</h3>
@@ -278,7 +367,7 @@ export function GrammarBrowser({ topics }: GrammarBrowserProps) {
             <div className={styles.miniTestHeading}>
               <span className="eyebrow">Recuperación activa</span>
               <h3>Mini test · {activeTopic.title}</h3>
-              <p>Tres preguntas rápidas. Responde antes de volver a mirar la teoría.</p>
+              <p>{quizQuestions.length} preguntas de las unidades del libro incluidas en este tema.</p>
             </div>
             <MiniQuiz key={activeTopic.slug} questions={quizQuestions} />
           </section>
