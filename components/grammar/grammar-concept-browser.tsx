@@ -242,57 +242,53 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
             <div className={styles.overviewHeading}>
               <div>
                 <span className="eyebrow">Modo foco</span>
-                <h3 id={`${activeTopic.slug}-overview`}>Entiende primero. Memoriza después.</h3>
+                <h3 id={`${activeTopic.slug}-overview`}>Primero la explicación. Después la memoria.</h3>
               </div>
-              <p>Empieza por la pregunta clave y el atajo mental. Después compara solo las opciones que realmente compiten entre sí.</p>
+              <p>Lee qué significa cada estructura y cuándo se usa. Después mira la forma, fija la idea con ejemplos y termina con las trampas de Cambridge.</p>
             </div>
 
             <div className={styles.attentionStrip}>
               <div className={styles.attentionCard}>
-                <span>1 · Pregunta clave</span>
+                <span>1 · Pregunta guía</span>
                 <strong>{activeTopic.studyQuestion}</strong>
               </div>
               <div className={styles.attentionCard}>
-                <span>2 · Atajo mental</span>
+                <span>2 · Regla para recordar</span>
                 <strong>{activeTopic.memoryHook}</strong>
               </div>
               <div className={styles.attentionCard}>
-                <span>3 · Método</span>
-                <strong>Intención → forma → ejemplo → trap.</strong>
+                <span>3 · Orden de estudio</span>
+                <strong>Explicación → forma → ejemplos → trap.</strong>
               </div>
             </div>
 
             <div className={styles.quickMapHeading}>
-              <span className="eyebrow">Mapa visual</span>
-              <h3>¿Qué opciones existen dentro de este concepto?</h3>
+              <span className="eyebrow">Mapa de explicaciones</span>
+              <h3>¿Qué significa cada apartado y cuándo se usa?</h3>
             </div>
 
             <div className={styles.quickMap}>
-              {activeTopic.sections.map((section, index) => {
-                const example = section.examples?.[0];
-                return (
-                  <button
-                    type="button"
-                    className={styles.quickCard}
-                    key={section.id}
-                    onClick={() => openSection(activeTopic.slug, section.id)}
-                  >
-                    <div className={styles.quickCardTop}>
-                      <span>{String(index + 1).padStart(2, "0")}</span>
-                      <strong>{section.title}</strong>
+              {activeTopic.sections.map((section, index) => (
+                <button
+                  type="button"
+                  className={styles.quickCard}
+                  key={section.id}
+                  onClick={() => openSection(activeTopic.slug, section.id)}
+                >
+                  <div className={styles.quickCardTop}>
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <strong>{section.title}</strong>
+                  </div>
+                  <p>{section.intro ?? section.rules[0]}</p>
+                  {section.rules.length > 1 && (
+                    <div className={styles.quickExample}>
+                      <span>También debes saber</span>
+                      <b>{section.rules[1]}</b>
                     </div>
-                    {section.forms?.[0] && <code>{section.forms[0]}</code>}
-                    <p>{section.intro ?? section.rules[0]}</p>
-                    {example && (
-                      <div className={styles.quickExample}>
-                        <span>Ejemplo</span>
-                        <b>{example.english}</b>
-                        {example.note && <small>→ {example.note}</small>}
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
+                  )}
+                  {section.forms?.[0] && <code>{section.forms[0]}</code>}
+                </button>
+              ))}
             </div>
 
             {conceptTraps.length > 0 && (
@@ -311,7 +307,11 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
                   <h3>{section.title}</h3>
                 </div>
 
-                {section.intro && <p className={styles.sectionIntro}>{section.intro}</p>}
+                <div className={styles.rulesBox}>
+                  <strong>Explicación</strong>
+                  {section.intro && <p>{section.intro}</p>}
+                  <ul>{section.rules.map((rule) => <li key={rule}>{rule}</li>)}</ul>
+                </div>
 
                 {section.forms && section.forms.length > 0 && (
                   <div className={styles.forms} aria-label="Estructuras">
@@ -321,7 +321,7 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
 
                 {section.examples && section.examples.length > 0 && (
                   <div className={styles.examplesBlock}>
-                    <strong>Ve el patrón en contexto</strong>
+                    <strong>Ejemplos</strong>
                     <div className={styles.examplesGrid}>
                       {section.examples.map((example) => (
                         <div className={styles.example} key={`${example.english}-${example.note ?? ""}`}>
@@ -332,11 +332,6 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
                     </div>
                   </div>
                 )}
-
-                <div className={styles.rulesBox}>
-                  <strong>Por qué funciona así</strong>
-                  <ul>{section.rules.map((rule) => <li key={rule}>{rule}</li>)}</ul>
-                </div>
 
                 {section.traps && section.traps.length > 0 && (
                   <div className={styles.trapBox}>
