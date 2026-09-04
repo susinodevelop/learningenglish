@@ -1,0 +1,165 @@
+.layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.sidebar {
+  position: sticky;
+  top: 102px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+
+.sidebarHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sidebarHeading > strong {
+  color: var(--muted);
+  font-size: .78rem;
+}
+
+.nav {
+  display: grid;
+  padding: 8px;
+}
+
+.topicButton {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 13px 12px;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: background .18s ease, color .18s ease;
+}
+
+.topicButton:hover {
+  background: var(--soft);
+}
+
+.topicButton.active {
+  background: var(--green);
+  color: white;
+}
+
+.number {
+  color: var(--muted);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: .82rem;
+}
+
+.topicButton.active .number,
+.topicButton.active .copy small {
+  color: rgba(255, 255, 255, .72);
+}
+
+.copy {
+  min-width: 0;
+}
+
+.copy strong,
+.copy small {
+  display: block;
+}
+
+.copy strong {
+  overflow: hidden;
+  font-size: .92rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+.content {
+  min-width: 0;
+}
+
+.lessonCard {
+  min-height: 470px;
+  padding: clamp(26px, 4vw, 48px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+  box-shadow: var(--shadow);
+  animation: reveal .2s ease;
+}
+
+.lessonMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.lessonCard h2 {
+  margin: 0 0 10px;
+  font-size: clamp(2.25rem, 5vw, 4.25rem);
+  line-height: .98;
+  letter-spacing: -.055em;
+}
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+
+  .nav {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(190px, 230px);
+    overflow-x: auto;
+    padding: 8px;
+    scrollbar-width: thin;
+  }
+}
+
+@media (max-width: 640px) {
+  .layout {
+    gap: 18px;
+  }
+
+  .sidebarHeading {
+    padding: 16px;
+  }
+
+  .nav {
+    grid-auto-columns: minmax(170px, 76vw);
+  }
+
+  .lessonCard {
+    min-height: 0;
+    padding: 24px 20px;
+  }
+}
