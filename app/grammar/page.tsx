@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { GrammarBrowser } from "@/components/grammar-browser";
-import { grammarTopics } from "@/lib/grammar";
+import { grammarStudyTopics } from "@/lib/grammar";
 
 export const metadata: Metadata = {
   title: "Gramática B2",
@@ -12,14 +12,14 @@ export default function GrammarPage() {
     <div className="shell page-shell">
       <header className="page-header grammar-page-header">
         <span className="eyebrow">Gramática · Cambridge B2</span>
-        <h1>Todo el temario gramatical del B2, tema a tema.</h1>
+        <h1>Todo el temario gramatical del B2, agrupado por temas.</h1>
         <p>
-          Las 24 unidades gramaticales del libro de estudio están organizadas en el menú lateral.
-          Selecciona una unidad para ver sus estructuras, usos, diferencias, excepciones, ejemplos y trampas de examen.
+          Las 24 unidades gramaticales del libro están reunidas en temas de estudio para evitar separar contenido que pertenece al mismo bloque.
+          Abre un tema en el menú lateral para saltar directamente a cualquiera de sus subapartados.
         </p>
       </header>
 
-      <GrammarBrowser topics={grammarTopics} />
+      <GrammarBrowser topics={grammarStudyTopics} />
     </div>
   );
 }
