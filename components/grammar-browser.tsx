@@ -129,7 +129,7 @@ export function GrammarBrowser({ topics }: GrammarBrowserProps) {
             return (
               <button
                 type="button"
-                className={`${styles.topicButton}${isActive ? ` ${styles.active}` : ""}`
+                className={`${styles.topicButton}${isActive ? ` ${styles.active}` : ""}`}
                 key={topic.slug}
                 onClick={() => setActiveSlug(topic.slug)}
                 aria-current={isActive ? "page" : undefined}
