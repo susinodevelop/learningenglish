@@ -1,6 +1,6 @@
 .layout {
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-columns: 320px minmax(0, 1fr);
   gap: 28px;
   align-items: start;
 }
@@ -37,22 +37,21 @@
 }
 
 .sidebarHeading > span {
-  flex: 0 0 auto;
+  max-width: 110px;
   color: var(--muted);
-  font-size: .72rem;
+  font-size: .7rem;
   font-weight: 800;
+  line-height: 1.35;
+  text-align: right;
 }
 
 .nav {
   min-height: 0;
   flex: 1 1 auto;
-  display: grid;
-  align-content: start;
-  overflow-y: scroll;
+  overflow-y: auto;
   overscroll-behavior: contain;
   padding: 8px 5px 8px 8px;
   scrollbar-gutter: stable;
-  scrollbar-width: auto;
   scrollbar-color: #9baa9f #eef3ed;
 }
 
@@ -71,43 +70,57 @@
   background: #9baa9f;
 }
 
-.nav::-webkit-scrollbar-thumb:hover {
-  background: #718078;
+.topicGroup + .topicGroup {
+  margin-top: 3px;
 }
 
-.topicButton {
-  width: 100%;
+.topicRow {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  gap: 10px;
-  align-items: center;
-  padding: 12px;
-  border: 0;
+  grid-template-columns: minmax(0, 1fr) 36px;
+  align-items: stretch;
   border-radius: 13px;
-  background: transparent;
-  color: var(--ink);
-  cursor: pointer;
-  text-align: left;
-  transition: background .18s ease, color .18s ease, transform .18s ease;
+  transition: background .18s ease, color .18s ease;
 }
 
-.topicButton:hover {
+.topicRow:hover {
   background: var(--soft);
 }
 
-.topicButton.active {
+.topicRow.active {
   background: var(--green);
   color: white;
 }
 
-.number {
-  color: var(--muted);
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: .82rem;
+.topicButton,
+.expandButton,
+.subtopicButton,
+.decisionBranch {
+  border: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
-.topicButton.active .number,
-.topicButton.active .copy small {
+.topicButton {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  padding: 11px 7px 11px 11px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.number {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .68rem;
+  font-weight: 800;
+}
+
+.topicRow.active .number,
+.topicRow.active .copy small {
   color: rgba(255, 255, 255, .72);
 }
 
@@ -121,8 +134,8 @@
 }
 
 .copy strong {
-  font-size: .89rem;
-  line-height: 1.25;
+  font-size: .9rem;
+  line-height: 1.22;
 }
 
 .copy small {
@@ -130,6 +143,70 @@
   color: var(--muted);
   font-size: .68rem;
   font-weight: 700;
+}
+
+.expandButton {
+  width: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+}
+
+.expandButton:hover {
+  background: rgba(0, 0, 0, .05);
+}
+
+.topicRow.active .expandButton:hover {
+  background: rgba(255, 255, 255, .12);
+}
+
+.expandButton span {
+  display: inline-block;
+  font-size: 1rem;
+  transition: transform .18s ease;
+}
+
+.expandButton.expanded span {
+  transform: rotate(180deg);
+}
+
+.subnav {
+  display: grid;
+  gap: 2px;
+  margin: 4px 0 8px 24px;
+  padding: 5px 0 5px 13px;
+  border-left: 1px solid #d9e2d8;
+}
+
+.subtopicButton {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 8px;
+  align-items: baseline;
+  padding: 8px 9px;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+
+.subtopicButton:hover {
+  background: #f1f5ef;
+}
+
+.subtopicButton > span {
+  color: var(--green);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .61rem;
+  font-weight: 850;
+}
+
+.subtopicButton > strong {
+  font-size: .76rem;
+  line-height: 1.3;
 }
 
 .sidebarFooter {
@@ -153,7 +230,8 @@
   background: var(--soft);
 }
 
-.sidebarFooter > div span {
+.sidebarFooter > div span,
+.quizProgress span {
   display: block;
   height: 100%;
   border-radius: inherit;
@@ -166,12 +244,17 @@
 
 .lessonCard {
   min-height: 520px;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--white);
   box-shadow: var(--shadow);
-  overflow: hidden;
   animation: reveal .2s ease;
+}
+
+.lessonHeader,
+.grammarSection {
+  scroll-margin-top: 96px;
 }
 
 .lessonHeader {
@@ -203,31 +286,42 @@
 }
 
 .summary {
-  max-width: 760px;
+  max-width: 800px;
   margin: 0;
   color: var(--muted);
   font-size: 1.05rem;
 }
 
-.examBadge {
+.examBadges {
   width: fit-content;
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 10px;
+  align-items: center;
   margin-top: 24px;
   padding: 9px 12px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 14px;
   background: var(--white);
   font-size: .75rem;
 }
 
-.examBadge span {
+.examBadges > span {
   color: var(--muted);
 }
 
-.examBadge strong {
+.examBadges > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.examBadges strong {
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: var(--soft);
   color: var(--green-dark);
+  font-size: .7rem;
 }
 
 .studyOverview {
@@ -238,7 +332,7 @@
 
 .overviewHeading {
   display: grid;
-  grid-template-columns: 1fr .7fr;
+  grid-template-columns: 1fr .72fr;
   gap: 32px;
   align-items: end;
   margin-bottom: 24px;
@@ -267,7 +361,7 @@
 
 .comparisonTable {
   width: 100%;
-  min-width: 720px;
+  min-width: 840px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -295,18 +389,21 @@
   font-size: .86rem;
 }
 
-.comparisonTable td:first-child {
-  width: 24%;
-}
-
-.comparisonTable td:nth-child(2) {
-  width: 30%;
-}
-
 .comparisonTable code {
   color: var(--green-dark);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: .76rem;
+}
+
+.sourceUnit {
+  display: inline-flex;
+  padding: 4px 7px;
+  border-radius: 7px;
+  background: var(--soft);
+  color: var(--green);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .7rem;
+  font-weight: 850;
 }
 
 .decisionPanel {
@@ -347,12 +444,19 @@
 }
 
 .decisionBranch {
+  width: 100%;
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr);
   gap: 10px;
   padding: 12px;
   border-radius: 12px;
   background: var(--soft);
+  color: var(--ink);
+  text-align: left;
+}
+
+.decisionBranch:hover {
+  background: #e8efe5;
 }
 
 .decisionBranch > span {
@@ -395,7 +499,6 @@
 
 .sectionList {
   display: grid;
-  gap: 0;
 }
 
 .grammarSection {
@@ -403,8 +506,13 @@
   border-bottom: 1px solid var(--line);
 }
 
-.grammarSection:last-child {
-  border-bottom: 0;
+.sectionSource {
+  margin: 0 0 9px 50px;
+  color: var(--green);
+  font-size: .67rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: .08em;
 }
 
 .sectionTitleRow {
@@ -570,13 +678,6 @@
   background: var(--soft);
 }
 
-.quizProgress span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--green);
-}
-
 .quizCard h4 {
   margin: 0 0 20px;
   font-size: clamp(1.3rem, 2.5vw, 1.8rem);
@@ -612,64 +713,53 @@
   place-items: center;
   border-radius: 8px;
   background: var(--soft);
-  color: var(--green);
+  color: var(--green-dark);
   font-size: .72rem;
 }
 
-.quizAnswer:not(:disabled):hover {
-  border-color: var(--green);
-  background: #f9fbf8;
+.quizAnswer:disabled {
+  cursor: default;
 }
 
 .quizAnswer.correct {
-  border-color: #75a37f;
-  background: #e8f4ea;
+  border-color: #9bc6a0;
+  background: #eef8ef;
 }
 
 .quizAnswer.wrong {
-  border-color: #ca877a;
-  background: #fae9e6;
+  border-color: #ddb1ab;
+  background: #fff1ef;
 }
 
 .quizFeedback {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 22px;
+  gap: 18px;
   margin-top: 20px;
   padding-top: 18px;
   border-top: 1px solid var(--line);
 }
 
-.quizFeedback strong {
-  display: block;
-  margin-bottom: 4px;
-}
-
 .quizFeedback p {
-  max-width: 650px;
-  margin: 0;
+  max-width: 680px;
+  margin: 5px 0 0;
   color: var(--muted);
-  font-size: .86rem;
 }
 
 .quizResult {
-  min-height: 250px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
+  text-align: center;
 }
 
 .quizResult > strong {
-  margin: 7px 0;
+  display: block;
+  margin: 8px 0;
   color: var(--green);
-  font-size: 3.4rem;
-  line-height: 1;
-  letter-spacing: -.05em;
+  font-size: 3rem;
 }
 
 .quizResult p {
+  margin: 0 auto 18px;
   max-width: 560px;
   color: var(--muted);
 }
@@ -677,6 +767,17 @@
 @keyframes reveal {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: 285px minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .topicButton {
+    grid-template-columns: 54px minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 900px) {
@@ -688,20 +789,11 @@
     position: static;
     height: auto;
     min-height: 0;
+    max-height: 520px;
   }
 
   .nav {
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(205px, 245px);
-    flex: none;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding: 8px;
-    scrollbar-gutter: auto;
-  }
-
-  .sidebarFooter {
-    display: none;
+    max-height: 400px;
   }
 
   .overviewHeading,
@@ -723,8 +815,16 @@
     padding: 16px;
   }
 
-  .nav {
-    grid-auto-columns: minmax(185px, 78vw);
+  .sidebarHeading > span {
+    max-width: 95px;
+  }
+
+  .topicButton {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+
+  .subnav {
+    margin-left: 14px;
   }
 
   .lessonHeader,
@@ -738,19 +838,16 @@
     font-size: clamp(2.2rem, 12vw, 3.5rem);
   }
 
-  .examBadge {
+  .examBadges {
     width: 100%;
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 2px;
-    border-radius: 13px;
+    grid-template-columns: 1fr;
   }
 
-  .sectionTitleRow {
-    grid-template-columns: 30px minmax(0, 1fr);
-    gap: 8px;
+  .comparisonTable {
+    min-width: 760px;
   }
 
+  .sectionSource,
   .sectionIntro,
   .forms,
   .rulesBox,
@@ -759,22 +856,13 @@
     margin-left: 38px;
   }
 
-  .comparisonTableWrap {
-    margin-right: -20px;
-  }
-
-  .decisionPanel,
-  .quizCard,
-  .quizResult {
-    padding: 18px;
+  .sectionTitleRow {
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 8px;
   }
 
   .quizFeedback {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .quizFeedback .button {
-    width: 100%;
   }
 }
