@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 import { GrammarBrowser } from "@/components/grammar-browser";
-import { grammarTopics } from "@/lib/content";
+import { grammarTopics } from "@/lib/grammar";
 
 export const metadata: Metadata = {
-  title: "Gramática",
-  description: "Gramática inglesa explicada de forma lógica y organizada por niveles.",
+  title: "Gramática B2",
+  description: "Temario completo de gramática B2 basado en Grammar and Vocabulary for First, explicado de forma clara y práctica.",
 };
 
 export default function GrammarPage() {
   return (
     <div className="shell page-shell">
       <header className="page-header grammar-page-header">
-        <span className="eyebrow">Gramática · A2 → C1</span>
-        <h1>Entiende la estructura antes de memorizarla.</h1>
+        <span className="eyebrow">Gramática · Cambridge B2</span>
+        <h1>Todo el temario gramatical del B2, tema a tema.</h1>
         <p>
-          Elige un tema en el menú lateral. Verás únicamente esa explicación,
-          su lógica y ejemplos reutilizables para estudiar sin distracciones.
+          Las 24 unidades gramaticales del libro de estudio están organizadas en el menú lateral.
+          Selecciona una unidad para ver sus estructuras, usos, diferencias, excepciones, ejemplos y trampas de examen.
         </p>
       </header>
 
