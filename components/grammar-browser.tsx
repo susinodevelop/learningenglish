@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { GrammarTopic } from "@/lib/content";
+import styles from "./grammar-browser.module.css";
 
 type GrammarBrowserProps = {
   topics: GrammarTopic[];
@@ -15,27 +16,27 @@ export function GrammarBrowser({ topics }: GrammarBrowserProps) {
   if (!activeTopic) return null;
 
   return (
-    <div className="grammar-layout">
-      <aside className="grammar-sidebar" aria-label="Temas de gramática">
-        <div className="grammar-sidebar-heading">
+    <div className={styles.layout}>
+      <aside className={styles.sidebar} aria-label="Temas de gramática">
+        <div className={styles.sidebarHeading}>
           <span className="eyebrow">Temario</span>
           <strong>{topics.length} temas</strong>
         </div>
 
-        <nav className="grammar-sidebar-nav">
+        <nav className={styles.nav}>
           {topics.map((topic, index) => {
             const isActive = topic.slug === activeTopic.slug;
 
             return (
               <button
                 type="button"
-                className={`grammar-topic-button${isActive ? " active" : ""}`}
+                className={`${styles.topicButton}${isActive ? ` ${styles.active}` : ""}`}
                 key={topic.slug}
                 onClick={() => setActiveSlug(topic.slug)}
                 aria-current={isActive ? "page" : undefined}
               >
-                <span className="grammar-topic-number">{String(index + 1).padStart(2, "0")}</span>
-                <span className="grammar-topic-copy">
+                <span className={styles.number}>{String(index + 1).padStart(2, "0")}</span>
+                <span className={styles.copy}>
                   <strong>{topic.title}</strong>
                   <small>{topic.level}</small>
                 </span>
@@ -45,9 +46,9 @@ export function GrammarBrowser({ topics }: GrammarBrowserProps) {
         </nav>
       </aside>
 
-      <main className="grammar-content" aria-live="polite">
-        <article className="grammar-lesson-card" key={activeTopic.slug}>
-          <div className="grammar-lesson-meta">
+      <main className={styles.content} aria-live="polite">
+        <article className={styles.lessonCard} key={activeTopic.slug}>
+          <div className={styles.lessonMeta}>
             <span className="lesson-number">{String(activeIndex + 1).padStart(2, "0")}</span>
             <span className="level-pill">{activeTopic.level}</span>
           </div>
