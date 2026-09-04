@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { GrammarBrowser } from "@/components/grammar-browser";
-import { grammarStudyTopics } from "@/lib/grammar";
+import { GrammarConceptBrowser } from "@/components/grammar/grammar-concept-browser";
+import { grammarConcepts } from "@/lib/grammar";
 
 export const metadata: Metadata = {
-  title: "Gramática B2",
-  description: "Temario completo de gramática B2 basado en Grammar and Vocabulary for First, explicado de forma clara y práctica.",
+  title: "Gramática B2 por conceptos",
+  description: "Gramática Cambridge B2 reorganizada por conceptos relacionados, con mapas visuales, ejemplos, lógica, traps y práctica activa.",
 };
 
 export default function GrammarPage() {
@@ -12,14 +12,15 @@ export default function GrammarPage() {
     <div className="shell page-shell">
       <header className="page-header grammar-page-header">
         <span className="eyebrow">Gramática · Cambridge B2</span>
-        <h1>Todo el temario gramatical del B2, agrupado por temas.</h1>
+        <h1>Estudia conceptos, no unidades.</h1>
         <p>
-          Las 24 unidades gramaticales del libro están reunidas en temas de estudio para evitar separar contenido que pertenece al mismo bloque.
-          Abre un tema en el menú lateral para saltar directamente a cualquiera de sus subapartados.
+          La gramática está reordenada por relaciones reales: tiempos verbales, construcción de frases,
+          intención del verbo y conexión de ideas. Cada tema empieza con una pregunta guía, un atajo mental
+          y ejemplos visuales para reducir la carga de memoria.
         </p>
       </header>
 
-      <GrammarBrowser topics={grammarStudyTopics} />
+      <GrammarConceptBrowser topics={grammarConcepts} />
     </div>
   );
 }
