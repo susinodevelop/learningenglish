@@ -14,10 +14,14 @@ export function makeGlossMap(groups: VocabularyGloss[][]) {
   for (const group of groups) {
     for (const [term, meaningEs, definitionEn] of group) {
       const key = glossKey(term, meaningEs);
-      if (map.has(key)) {
-        throw new Error(`Duplicate vocabulary gloss: ${key}`);
+      const definition = definitionEn.trim();
+      const existing = map.get(key);
+
+      // The same lexical sense can legitimately appear in several topics.
+      // Keep one canonical pedagogical definition for the compiled lexicon.
+      if (!existing || definition.length > existing.length) {
+        map.set(key, definition);
       }
-      map.set(key, definitionEn.trim());
     }
   }
 
