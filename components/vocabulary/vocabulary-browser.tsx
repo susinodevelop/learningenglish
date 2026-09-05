@@ -9,6 +9,7 @@ import type {
   VocabularyStudyTopic,
 } from "@/lib/vocabulary";
 import styles from "./vocabulary-browser.module.css";
+import richStyles from "./vocabulary-rich.module.css";
 
 type VocabularyBrowserProps = {
   categories: VocabularyCategory[];
@@ -181,12 +182,12 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
                   key={`${topic.slug}-${section.title}-${entry.id}-${index}`}
                 >
                   <span>{topic.title} · {kindLabels[section.kind]}</span>
-                  <div className={styles.entryHeading}>
+                  <div className={richStyles.entryHeading}>
                     <strong>{entry.term}</strong>
                     <em>{typeLabels[entry.type]}</em>
                   </div>
-                  <p className={styles.englishDefinition}>{entry.meaning.en}</p>
-                  <p className={!showMeanings ? styles.hiddenMeaning : styles.spanishMeaning}>
+                  <p className={richStyles.englishDefinition}>{entry.meaning.en}</p>
+                  <p className={!showMeanings ? styles.hiddenMeaning : richStyles.spanishMeaning}>
                     {showMeanings ? entry.meaning.es : "Significado en español oculto"}
                   </p>
                 </button>
@@ -246,17 +247,17 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
 
                       return (
                         <article className={styles.entry} key={`${entry.id}-${index}`}>
-                          <div className={styles.entryHeading}>
+                          <div className={richStyles.entryHeading}>
                             <strong>{entry.term}</strong>
                             <em>{typeLabels[entry.type]}</em>
                           </div>
 
-                          <div className={styles.definitionBlock}>
+                          <div className={richStyles.definitionBlock}>
                             <span>EN</span>
                             <p>{entry.meaning.en}</p>
                           </div>
 
-                          <div className={styles.definitionBlock}>
+                          <div className={richStyles.definitionBlock}>
                             <span>ES</span>
                             <p className={!showMeanings ? styles.hiddenMeaning : ""}>
                               {showMeanings ? entry.meaning.es : "••••••••"}
@@ -264,7 +265,7 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
                           </div>
 
                           {entry.members.length > 1 ? (
-                            <div className={styles.memberList}>
+                            <div className={richStyles.memberList}>
                               {entry.members.map((member) => (
                                 <span key={`${entry.id}-${member.term}`}>
                                   <b>{member.term}</b>
@@ -275,7 +276,7 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
                           ) : null}
 
                           {visibleRelations.length > 0 ? (
-                            <div className={styles.relations}>
+                            <div className={richStyles.relations}>
                               {visibleRelations.map(([label, values]) => (
                                 <div key={`${entry.id}-${label}`}>
                                   <span>{label}</span>
