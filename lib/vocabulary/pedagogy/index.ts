@@ -4,10 +4,12 @@ import { peopleGlosses } from "./people-glosses";
 import { placesGlosses } from "./places-glosses";
 import { studyWorkGlosses } from "./study-work-glosses";
 import { timeGlosses } from "./time-glosses";
+import { worldExtraGlosses } from "./world-extra-glosses";
 import { worldGlosses } from "./world-glosses";
 
 const glossMap = makeGlossMap([
   worldGlosses,
+  worldExtraGlosses,
   peopleGlosses,
   cultureGlosses,
   placesGlosses,
