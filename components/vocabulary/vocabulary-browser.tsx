@@ -1,12 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { VocabularyCategory, VocabularySectionKind, VocabularyTopic } from "@/lib/vocabulary";
+import type {
+  VocabularyCategory,
+  VocabularyEntryType,
+  VocabularyLexeme,
+  VocabularySectionKind,
+  VocabularyStudyTopic,
+} from "@/lib/vocabulary";
 import styles from "./vocabulary-browser.module.css";
 
 type VocabularyBrowserProps = {
   categories: VocabularyCategory[];
-  topics: VocabularyTopic[];
+  topics: VocabularyStudyTopic[];
   entryCount: number;
 };
 
@@ -17,6 +23,41 @@ const kindLabels: Record<VocabularySectionKind, string> = {
   "word-family": "Word building",
   contrast: "Diferencias / traps",
 };
+
+const typeLabels: Record<VocabularyEntryType, string> = {
+  word: "Word",
+  expression: "Expression",
+  collocation: "Collocation",
+  "phrasal-verb": "Phrasal verb",
+  "word-family": "Word family",
+};
+
+function searchableText(entry: VocabularyLexeme) {
+  return [
+    entry.term,
+    entry.meaning.es,
+    entry.meaning.en,
+    ...entry.notes,
+    ...entry.members.flatMap((member) => [member.term, member.meaning.es, member.meaning.en]),
+    ...entry.relations.collocations,
+    ...entry.relations.patterns,
+    ...entry.relations.synonyms,
+    ...entry.relations.antonyms,
+    ...entry.relations.confusedWith,
+    ...entry.relations.wordFamily,
+  ].join(" ");
+}
+
+function relationGroups(entry: VocabularyLexeme) {
+  return [
+    ["Collocations", entry.relations.collocations],
+    ["Patterns", entry.relations.patterns],
+    ["Synonyms", entry.relations.synonyms],
+    ["Antonyms", entry.relations.antonyms],
+    ["Confusables", entry.relations.confusedWith],
+    ["Word family", entry.relations.wordFamily],
+  ] as const;
+}
 
 export function VocabularyBrowser({ categories, topics, entryCount }: VocabularyBrowserProps) {
   const [activeSlug, setActiveSlug] = useState(topics[0]?.slug ?? "");
@@ -32,8 +73,8 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
     return topics.flatMap((topic) =>
       topic.sections.flatMap((section) =>
         section.entries
-          .filter(([term, meaning, note]) =>
-            [term, meaning, note ?? "", topic.title, section.title]
+          .filter((entry) =>
+            [searchableText(entry), topic.title, section.title, kindLabels[section.kind]]
               .join(" ")
               .toLocaleLowerCase()
               .includes(normalised),
@@ -70,7 +111,7 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="word, significado, phrasal…"
+              placeholder="word, definición, significado…"
               aria-label="Buscar vocabulario"
             />
           </label>
@@ -108,8 +149,8 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
         <div className={styles.toolbar}>
           <div className={styles.statLine}>
             <span>B2 Cambridge</span>
-            <span>Concept-first</span>
-            <span>Libro completo · vocabulario clave</span>
+            <span>EN definition + ES meaning</span>
+            <span>Preparado para juegos</span>
           </div>
           <button
             className={styles.meaningToggle}
@@ -125,28 +166,31 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
             <header className={styles.topicHeader}>
               <span className="eyebrow">Resultados</span>
               <h2>{searchResults.length} coincidencias para “{query.trim()}”</h2>
-              <p>Busca tanto por la palabra inglesa como por su significado, tema o tipo de vocabulario.</p>
+              <p>
+                Busca por término, traducción, definición inglesa, familia léxica, collocation,
+                phrasal verb o tema.
+              </p>
             </header>
 
             <div className={styles.resultGrid}>
-              {visibleSearchResults.map(({ topic, section, entry }, index) => {
-                const [term, meaning, note] = entry;
-                return (
-                  <button
-                    type="button"
-                    className={styles.resultCard}
-                    onClick={() => openTopic(topic.slug)}
-                    key={`${topic.slug}-${section.title}-${term}-${index}`}
-                  >
-                    <span>{topic.title} · {kindLabels[section.kind]}</span>
-                    <strong>{term}</strong>
-                    <p className={!showMeanings ? styles.hiddenMeaning : ""}>
-                      {showMeanings ? meaning : "Significado oculto"}
-                    </p>
-                    {note && showMeanings ? <small>{note}</small> : null}
-                  </button>
-                );
-              })}
+              {visibleSearchResults.map(({ topic, section, entry }, index) => (
+                <button
+                  type="button"
+                  className={styles.resultCard}
+                  onClick={() => openTopic(topic.slug)}
+                  key={`${topic.slug}-${section.title}-${entry.id}-${index}`}
+                >
+                  <span>{topic.title} · {kindLabels[section.kind]}</span>
+                  <div className={styles.entryHeading}>
+                    <strong>{entry.term}</strong>
+                    <em>{typeLabels[entry.type]}</em>
+                  </div>
+                  <p className={styles.englishDefinition}>{entry.meaning.en}</p>
+                  <p className={!showMeanings ? styles.hiddenMeaning : styles.spanishMeaning}>
+                    {showMeanings ? entry.meaning.es : "Significado en español oculto"}
+                  </p>
+                </button>
+              ))}
             </div>
 
             {searchResults.length > visibleSearchResults.length ? (
@@ -175,8 +219,9 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
             <div className={styles.studyHint}>
               <strong>Cómo estudiarlo</strong>
               <p>
-                Aprende primero los chunks y contrastes como una sola pieza. Usa “Ocultar español” para hacer
-                recuperación activa en vez de releer.
+                Lee primero la definición en inglés e intenta recuperar la palabra o el significado.
+                Después comprueba el español. Las familias, collocations y confusables se guardan como
+                relaciones reutilizables para los futuros juegos.
               </p>
             </div>
 
@@ -196,15 +241,56 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
                   </summary>
 
                   <div className={styles.entryGrid}>
-                    {section.entries.map(([term, meaning, note], index) => (
-                      <article className={styles.entry} key={`${term}-${index}`}>
-                        <strong>{term}</strong>
-                        <p className={!showMeanings ? styles.hiddenMeaning : ""}>
-                          {showMeanings ? meaning : "••••••••"}
-                        </p>
-                        {note && showMeanings ? <small>{note}</small> : null}
-                      </article>
-                    ))}
+                    {section.entries.map((entry, index) => {
+                      const visibleRelations = relationGroups(entry).filter(([, values]) => values.length > 0);
+
+                      return (
+                        <article className={styles.entry} key={`${entry.id}-${index}`}>
+                          <div className={styles.entryHeading}>
+                            <strong>{entry.term}</strong>
+                            <em>{typeLabels[entry.type]}</em>
+                          </div>
+
+                          <div className={styles.definitionBlock}>
+                            <span>EN</span>
+                            <p>{entry.meaning.en}</p>
+                          </div>
+
+                          <div className={styles.definitionBlock}>
+                            <span>ES</span>
+                            <p className={!showMeanings ? styles.hiddenMeaning : ""}>
+                              {showMeanings ? entry.meaning.es : "••••••••"}
+                            </p>
+                          </div>
+
+                          {entry.members.length > 1 ? (
+                            <div className={styles.memberList}>
+                              {entry.members.map((member) => (
+                                <span key={`${entry.id}-${member.term}`}>
+                                  <b>{member.term}</b>
+                                  {showMeanings ? ` · ${member.meaning.es}` : ""}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
+
+                          {visibleRelations.length > 0 ? (
+                            <div className={styles.relations}>
+                              {visibleRelations.map(([label, values]) => (
+                                <div key={`${entry.id}-${label}`}>
+                                  <span>{label}</span>
+                                  <p>{values.join(" · ")}</p>
+                                </div>
+                              ))}
+                            </div>
+                          ) : null}
+
+                          {entry.notes.length > 0 && showMeanings ? (
+                            <small>{entry.notes.join(" · ")}</small>
+                          ) : null}
+                        </article>
+                      );
+                    })}
                   </div>
                 </details>
               ))}
