@@ -173,9 +173,13 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   const [finished, setFinished] = useState(false);
 
   useEffect(() => {
-    setUserGroups(safeReadGroups(window.localStorage.getItem(STUDY_GROUPS_STORAGE_KEY)));
-    setProgress(safeReadProgress(window.localStorage.getItem(VOCABULARY_PROGRESS_STORAGE_KEY)));
-    setHydrated(true);
+    const frame = window.requestAnimationFrame(() => {
+      setUserGroups(safeReadGroups(window.localStorage.getItem(STUDY_GROUPS_STORAGE_KEY)));
+      setProgress(safeReadProgress(window.localStorage.getItem(VOCABULARY_PROGRESS_STORAGE_KEY)));
+      setHydrated(true);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   const groups = useMemo(() => [...systemStudyGroups, ...userGroups], [userGroups]);
@@ -188,7 +192,10 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   );
 
   const activeGroup = groups.find((group) => group.id === activeGroupId) ?? groups[0];
-  const activeEntries = resolvedGroups.get(activeGroup.id) ?? [];
+  const activeEntries = useMemo(
+    () => resolvedGroups.get(activeGroup.id) ?? [],
+    [activeGroup.id, resolvedGroups],
+  );
 
   const staticCandidates = useMemo(() => {
     const query = normaliseAnswer(staticQuery);
