@@ -1,3 +1,4 @@
+import { compileVocabulary } from "./compiler";
 import type { VocabularyCategory, VocabularyTopic } from "./types";
 import { worldVocabularyTopics } from "./data/world";
 import { peopleVocabularyTopics } from "./data/people";
@@ -8,9 +9,17 @@ import { studyWorkVocabularyTopics } from "./data/study-work";
 
 export type {
   VocabularyCategory,
-  VocabularyEntry,
+  VocabularyEntryType,
+  VocabularyExample,
+  VocabularyLexeme,
+  VocabularyLexicalMember,
+  VocabularyMeaning,
+  VocabularyRelations,
+  VocabularySeedEntry,
   VocabularySection,
   VocabularySectionKind,
+  VocabularyStudySection,
+  VocabularyStudyTopic,
   VocabularyTopic,
 } from "./types";
 
@@ -23,7 +32,7 @@ export const vocabularyCategories: VocabularyCategory[] = [
   { id: "study-work", label: "Estudio y trabajo", description: "Escuela, empleo, universidad y opinión." },
 ];
 
-export const vocabularyTopics: VocabularyTopic[] = [
+const sourceVocabularyTopics: VocabularyTopic[] = [
   ...worldVocabularyTopics,
   ...peopleVocabularyTopics,
   ...cultureVocabularyTopics,
@@ -32,8 +41,20 @@ export const vocabularyTopics: VocabularyTopic[] = [
   ...studyWorkVocabularyTopics,
 ];
 
+const compiledVocabulary = compileVocabulary(sourceVocabularyTopics);
+
+/** Learner-facing, rich topics. */
+export const vocabularyTopics = compiledVocabulary.topics;
+
+/** Canonical lexical senses reusable by quizzes and future games. */
+export const vocabularyLexicon = compiledVocabulary.lexicon;
+
+/** Number of source study cards shown across all topic sections. */
 export const vocabularyEntryCount = vocabularyTopics.reduce(
   (total, topic) =>
     total + topic.sections.reduce((sectionTotal, section) => sectionTotal + section.entries.length, 0),
   0,
 );
+
+/** Number of unique lexical senses after cross-topic deduplication. */
+export const vocabularySenseCount = vocabularyLexicon.length;
