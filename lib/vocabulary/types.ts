@@ -47,6 +47,11 @@ export type VocabularyMeaning = {
   en: string;
 };
 
+export type VocabularyLexicalMember = {
+  term: string;
+  meaning: VocabularyMeaning;
+};
+
 export type VocabularyRelations = {
   collocations: string[];
   patterns: string[];
@@ -67,6 +72,7 @@ export type VocabularyLexeme = {
   type: VocabularyEntryType;
   cefr: "B2";
   meaning: VocabularyMeaning;
+  members: VocabularyLexicalMember[];
   examples: VocabularyExample[];
   topics: string[];
   sourceUnits: number[];
