@@ -33,11 +33,11 @@ export default function VocabularyPage() {
 
       <section className="cta-panel">
         <div>
-          <span className="eyebrow">Recuperación activa</span>
-          <h2>Cuando ya reconozcas las fichas, comprueba si puedes recuperarlas sin pistas.</h2>
+          <span className="eyebrow">Grupos de estudio</span>
+          <h2>Crea una lista para un examen o deja que un grupo dinámico reúna automáticamente lo que necesitas repasar.</h2>
         </div>
         <Link className="button button-primary" href="/games">
-          Abrir quiz de vocabulario
+          Crear grupo y estudiar
         </Link>
       </section>
     </div>
