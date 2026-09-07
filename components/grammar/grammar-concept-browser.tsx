@@ -3,10 +3,16 @@
 import { useEffect, useMemo, useState } from "react";
 import type { GrammarConcept } from "@/lib/grammar";
 import { grammarQuizzes, type GrammarQuizQuestion } from "@/lib/grammar/quizzes";
+import { c1GrammarQuizzes } from "@/lib/grammar/c1-quizzes";
 import styles from "./grammar-concept-browser.module.css";
 
 type GrammarConceptBrowserProps = {
   topics: GrammarConcept[];
+};
+
+const allGrammarQuizzes: Record<string, GrammarQuizQuestion[]> = {
+  ...grammarQuizzes,
+  ...c1GrammarQuizzes,
 };
 
 function MiniQuiz({ questions }: { questions: GrammarQuizQuestion[] }) {
@@ -70,7 +76,7 @@ function MiniQuiz({ questions }: { questions: GrammarQuizQuestion[] }) {
             <button
               type="button"
               key={option}
-              className={`${styles.quizAnswer}${isCorrect ? ` ${styles.correct}` : ""}${isWrong ? ` ${styles.wrong}` : ""}`}
+              className={`${styles.quizAnswer}${isCorrect ? ` ${styles.correct}` : ""}${isWrong ? ` ${styles.wrong}` : ""}`
               onClick={() => chooseAnswer(optionIndex)}
               disabled={selected !== null}
             >
@@ -118,7 +124,7 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
 
   const quizQuestions = useMemo(() => {
     if (!activeTopic) return [];
-    return activeTopic.sourceSlugs.flatMap((slug) => grammarQuizzes[normaliseQuizKey(slug)] ?? []);
+    return activeTopic.sourceSlugs.flatMap((slug) => allGrammarQuizzes[normaliseQuizKey(slug)] ?? []);
   }, [activeTopic]);
 
   if (!activeTopic) return null;
