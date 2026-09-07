@@ -55,7 +55,7 @@ export function defineGrammarConcept(definition: ConceptDefinition): GrammarConc
     }),
   );
 
-  const levels = Array.from(new Set(sourceTopics.map((topic) => topic.level));
+  const levels = Array.from(new Set(sourceTopics.map((topic) => topic.level)));
   const level = levels.length > 1 ? "B2 + C1" : levels[0];
 
   return {
