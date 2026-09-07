@@ -1,5 +1,9 @@
 import { grammarConcepts } from "./concepts";
 import { grammarApplicationSeeds, type GrammarExerciseKind } from "./exercise-bank";
+import {
+  applyGrammarApplicationQuality,
+  grammarApplicationQualityErrors,
+} from "./exercise-quality";
 import { grammarQuizzes } from "./quizzes";
 import type { GrammarConcept, GrammarConceptSection, GrammarLevel } from "./types";
 
@@ -34,6 +38,7 @@ export type GrammarExerciseSection = {
   conceptTitle: string;
   sourceTopic: string;
   questionCount: number;
+  applicationCount: number;
 };
 
 export type GrammarExerciseConcept = {
@@ -44,6 +49,7 @@ export type GrammarExerciseConcept = {
   categoryLabel: string;
   sectionCount: number;
   questionCount: number;
+  applicationCount: number;
   questionCountByLevel: Record<GrammarLevel, number>;
 };
 
@@ -82,16 +88,19 @@ function unique(values: string[]) {
   return Array.from(new Set(values.filter(Boolean)));
 }
 
+const genericFallbackOptions = [
+  "Esta regla pertenece a otro contraste gramatical.",
+  "Esta forma no corresponde a este subapartado.",
+  "La estructura no se usa con esta función.",
+];
+
 function rotatedOptions(correct: string, distractors: string[], seed: string) {
-  const alternatives = unique(distractors.filter((candidate) => normalise(candidate) !== normalise(correct))).slice(0, 3);
-  const fallbacks = [
-    "Esta regla pertenece a otro contraste gramatical.",
-    "Esta forma no corresponde a este subapartado.",
-    "La estructura no se usa con esta función.",
-  ];
+  const alternatives = unique(
+    distractors.filter((candidate) => normalise(candidate) !== normalise(correct)),
+  ).slice(0, 3);
 
   while (alternatives.length < 3) {
-    const fallback = fallbacks[alternatives.length];
+    const fallback = genericFallbackOptions[alternatives.length];
     if (!alternatives.includes(fallback)) alternatives.push(fallback);
   }
 
@@ -101,20 +110,43 @@ function rotatedOptions(correct: string, distractors: string[], seed: string) {
   return { options, answerIndex };
 }
 
+function relatedConcepts(concept: GrammarConcept) {
+  const sameCategory = grammarConcepts.filter((candidate) => candidate.category === concept.category);
+  return sameCategory.length > 1 ? sameCategory : grammarConcepts;
+}
+
 function theoryRulePool(concept: GrammarConcept) {
-  return unique(concept.sections.flatMap((section) => section.rules));
+  return unique(
+    relatedConcepts(concept).flatMap((candidate) =>
+      candidate.sections.flatMap((section) => section.rules),
+    ),
+  );
 }
 
 function theoryFormPool(concept: GrammarConcept) {
-  return unique(concept.sections.flatMap((section) => section.forms ?? []));
+  return unique(
+    relatedConcepts(concept).flatMap((candidate) =>
+      candidate.sections.flatMap((section) => section.forms ?? []),
+    ),
+  );
 }
 
 function theoryExamplePool(concept: GrammarConcept) {
-  return unique(concept.sections.flatMap((section) => (section.examples ?? []).map((example) => example.english)));
+  return unique(
+    relatedConcepts(concept).flatMap((candidate) =>
+      candidate.sections.flatMap((section) =>
+        (section.examples ?? []).map((example) => example.english),
+      ),
+    ),
+  );
 }
 
 function theoryTrapPool(concept: GrammarConcept) {
-  return unique(concept.sections.flatMap((section) => section.traps ?? []));
+  return unique(
+    relatedConcepts(concept).flatMap((candidate) =>
+      candidate.sections.flatMap((section) => section.traps ?? []),
+    ),
+  );
 }
 
 function makeTheoryQuestion(
@@ -214,7 +246,7 @@ function generatedQuestionsForSection(
         `trap-${index + 1}`,
         `¿Qué trampa o advertencia es correcta en «${section.title}»?`,
         trap,
-        trapPool.length > 1 ? trapPool : rulePool,
+        trapPool.length > 3 ? trapPool : rulePool,
         `Esta advertencia evita uno de los errores típicos del subapartado «${section.title}».`,
       ),
     );
@@ -224,7 +256,11 @@ function generatedQuestionsForSection(
     ...section.rules.map((value) => ({ type: "regla", value, pool: rulePool })),
     ...(section.examples ?? []).map((example) => ({ type: "ejemplo", value: example.english, pool: examplePool })),
     ...(section.forms ?? []).map((value) => ({ type: "forma", value, pool: formPool })),
-    ...(section.traps ?? []).map((value) => ({ type: "trampa", value, pool: trapPool.length > 1 ? trapPool : rulePool })),
+    ...(section.traps ?? []).map((value) => ({
+      type: "trampa",
+      value,
+      pool: trapPool.length > 3 ? trapPool : rulePool,
+    })),
   ];
 
   if (reinforcementSources.length === 0) {
@@ -263,12 +299,19 @@ function generatedQuestionsForSection(
   return questions;
 }
 
-function closestSection(concept: GrammarConcept, hint?: string) {
+function closestSection(
+  concept: GrammarConcept,
+  hint: string | undefined,
+  level: GrammarLevel,
+) {
   if (!hint) return null;
   const wanted = normalise(hint);
-  return concept.sections.find((section) => {
+  const sameLevel = concept.sections.filter((section) => section.level === level);
+  const candidates = sameLevel.length > 0 ? sameLevel : concept.sections;
+
+  return candidates.find((section) => {
     const title = normalise(section.title);
-    return title.includes(wanted) || wanted.includes(title);
+    return title === wanted || title.includes(wanted) || wanted.includes(title);
   }) ?? null;
 }
 
@@ -315,10 +358,20 @@ const generatedSectionQuestions = grammarConcepts.flatMap((concept) =>
   concept.sections.flatMap((section) => generatedQuestionsForSection(concept, section)),
 );
 
-const applicationQuestions: GrammarExerciseQuestion[] = grammarApplicationSeeds.map((seed, index) => {
+const unresolvedApplicationSections: string[] = [];
+const qualityApplicationSeeds = grammarApplicationSeeds.map(applyGrammarApplicationQuality);
+
+const applicationQuestions: GrammarExerciseQuestion[] = qualityApplicationSeeds.map((seed, index) => {
   const concept = grammarConcepts.find((candidate) => candidate.slug === seed.conceptSlug);
   if (!concept) throw new Error(`Grammar application seed references unknown concept: ${seed.conceptSlug}`);
-  const section = closestSection(concept, seed.sectionHint);
+
+  const section = closestSection(concept, seed.sectionHint, seed.level);
+  if (seed.sectionHint && !section) {
+    unresolvedApplicationSections.push(
+      `${seed.conceptSlug} · ${seed.level} · ${seed.sectionHint} · ${seed.prompt}`,
+    );
+  }
+
   return {
     id: `application-${seed.conceptSlug}-${String(index + 1).padStart(3, "0")}`,
     kind: seed.kind,
@@ -349,6 +402,22 @@ export const grammarExerciseQuestions: GrammarExerciseQuestion[] = [
 
 const validationErrors: string[] = [];
 const ids = new Set<string>();
+const applicationPromptKeys = new Set<string>();
+
+qualityApplicationSeeds.forEach((seed, index) => {
+  validationErrors.push(...grammarApplicationQualityErrors(seed, index));
+  const promptKey = `${seed.conceptSlug}::${normalise(seed.prompt)}`;
+  if (applicationPromptKeys.has(promptKey)) {
+    validationErrors.push(`Duplicate application prompt: ${seed.conceptSlug} → ${seed.prompt}`);
+  }
+  applicationPromptKeys.add(promptKey);
+});
+
+if (unresolvedApplicationSections.length > 0) {
+  validationErrors.push(
+    `Application exercises without a resolved theory subsection (${unresolvedApplicationSections.length}):\n${unresolvedApplicationSections.join("\n")}`,
+  );
+}
 
 for (const question of grammarExerciseQuestions) {
   if (ids.has(question.id)) validationErrors.push(`Duplicate exercise id: ${question.id}`);
@@ -364,6 +433,10 @@ for (const question of grammarExerciseQuestions) {
     } else if (question.answerIndex < 0 || question.answerIndex >= question.options.length) {
       validationErrors.push(`Invalid answer index: ${question.id}`);
     }
+
+    if (question.options?.some((option) => genericFallbackOptions.includes(option))) {
+      validationErrors.push(`Generic theory distractor leaked into ${question.id}`);
+    }
   } else if (!question.acceptedAnswers?.length || !question.modelAnswer) {
     validationErrors.push(`Typed exercise without accepted/model answer: ${question.id}`);
   }
@@ -371,18 +444,36 @@ for (const question of grammarExerciseQuestions) {
 
 for (const concept of grammarConcepts) {
   const conceptQuestions = grammarExerciseQuestions.filter((question) => question.conceptSlug === concept.slug);
+  const conceptApplications = applicationQuestions.filter((question) => question.conceptSlug === concept.slug);
+
   if (conceptQuestions.length < 10) {
     validationErrors.push(`Concept has fewer than 10 exercises: ${concept.slug} (${conceptQuestions.length})`);
+  }
+  if (conceptApplications.length < 4) {
+    validationErrors.push(
+      `Concept has fewer than 4 application exercises: ${concept.slug} (${conceptApplications.length})`,
+    );
   }
 
   for (const section of concept.sections) {
     const sectionQuestions = grammarExerciseQuestions.filter((question) => question.sectionId === section.id);
+    const sectionApplications = applicationQuestions.filter((question) => question.sectionId === section.id);
+
     if (sectionQuestions.length < 8) {
       validationErrors.push(
         `Theory subsection has fewer than 8 exercises: ${concept.slug} → ${section.title} (${sectionQuestions.length})`,
       );
     }
+    if (sectionApplications.length < 1) {
+      validationErrors.push(
+        `Theory subsection has no application exercise: ${concept.slug} → ${section.title}`,
+      );
+    }
   }
+}
+
+if (applicationQuestions.length < 130) {
+  validationErrors.push(`Application bank is unexpectedly small: ${applicationQuestions.length} exercises`);
 }
 
 if (grammarExerciseQuestions.length < 600) {
@@ -402,11 +493,13 @@ export const grammarExerciseSections: GrammarExerciseSection[] = grammarConcepts
     conceptTitle: concept.title,
     sourceTopic: section.sourceTopic,
     questionCount: grammarExerciseQuestions.filter((question) => question.sectionId === section.id).length,
+    applicationCount: applicationQuestions.filter((question) => question.sectionId === section.id).length,
   })),
 );
 
 export const grammarExerciseConcepts: GrammarExerciseConcept[] = grammarConcepts.map((concept) => {
   const questions = grammarExerciseQuestions.filter((question) => question.conceptSlug === concept.slug);
+  const applications = applicationQuestions.filter((question) => question.conceptSlug === concept.slug);
   return {
     slug: concept.slug,
     title: concept.title,
@@ -415,6 +508,7 @@ export const grammarExerciseConcepts: GrammarExerciseConcept[] = grammarConcepts
     categoryLabel: concept.categoryLabel,
     sectionCount: concept.sections.length,
     questionCount: questions.length,
+    applicationCount: applications.length,
     questionCountByLevel: {
       B2: questions.filter((question) => question.level === "B2").length,
       C1: questions.filter((question) => question.level === "C1").length,
