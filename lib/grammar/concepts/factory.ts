@@ -16,6 +16,7 @@ type ConceptDefinition = {
   memoryHook: string;
   studyQuestion: string;
   sourceSlugs: string[];
+  additionalTopics?: GrammarTopic[];
 };
 
 function slugify(value: string) {
@@ -34,7 +35,11 @@ function findSourceTopic(slug: string): GrammarTopic {
 }
 
 export function defineGrammarConcept(definition: ConceptDefinition): GrammarConcept {
-  const sourceTopics = definition.sourceSlugs.map(findSourceTopic);
+  const { additionalTopics = [], ...conceptDefinition } = definition;
+  const sourceTopics = [
+    ...conceptDefinition.sourceSlugs.map(findSourceTopic),
+    ...additionalTopics,
+  ];
   let sequence = 0;
 
   const sections: GrammarConceptSection[] = sourceTopics.flatMap((topic) =>
@@ -50,11 +55,12 @@ export function defineGrammarConcept(definition: ConceptDefinition): GrammarConc
     }),
   );
 
-  const levels = Array.from(new Set(sourceTopics.map((topic) => topic.level)));
+  const levels = Array.from(new Set(sourceTopics.map((topic) => topic.level));
   const level = levels.length > 1 ? "B2 + C1" : levels[0];
 
   return {
-    ...definition,
+    ...conceptDefinition,
+    sourceSlugs: sourceTopics.map((topic) => topic.slug),
     level,
     levels,
     categoryLabel: categoryLabels[definition.category],
