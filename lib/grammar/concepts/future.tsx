@@ -4,8 +4,8 @@ export const future = defineGrammarConcept({
   slug: "future",
   title: "Future",
   category: "tenses",
-  sourceSlugs: ["future-1", "future-2"],
-  summary: "Todas las formas de futuro juntas para comparar horarios, planes, decisiones, predicciones, acciones en progreso y acciones completadas antes de un punto futuro.",
-  memoryHook: "HORARIO · PLAN · DECISIÓN · EVIDENCIA · EN PROGRESO · YA TERMINADO.",
-  studyQuestion: "¿El futuro está programado, decidido, predicho por evidencia o lo miras desde un punto futuro concreto?",
+  sourceSlugs: ["future-1", "future-2", "c1-future-forms", "c1-future-in-the-past"],
+  summary: "Formas de futuro B2 y C1: horarios, planes, decisiones, predicciones, future continuous/perfect y cómo mirar el futuro desde un punto pasado.",
+  memoryHook: "¿DESDE CUÁNDO MIRAS? presente → futuro · pasado → futuro en el pasado.",
+  studyQuestion: "¿Hablas de un futuro desde ahora o de algo que todavía era futuro desde un momento pasado?",
 });
