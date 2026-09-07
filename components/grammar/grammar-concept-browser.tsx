@@ -150,11 +150,11 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
 
   return (
     <div className={styles.layout}>
-      <aside className={styles.sidebar} aria-label="Conceptos de gramática B2">
+      <aside className={styles.sidebar} aria-label="Conceptos de gramática Cambridge B2 y C1">
         <div className={styles.sidebarHeading}>
           <div>
             <span className="eyebrow">Grammar map</span>
-            <strong>Cambridge B2</strong>
+            <strong>Cambridge B2 · C1</strong>
           </div>
           <span>{topics.length} conceptos</span>
         </div>
@@ -182,7 +182,7 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
                           <span className={styles.number}>{String(topicIndex + 1).padStart(2, "0")}</span>
                           <span className={styles.copy}>
                             <strong>{topic.title}</strong>
-                            <small>{topic.sections.length} ideas relacionadas</small>
+                            <small>{topic.level} · {topic.sections.length} ideas relacionadas</small>
                           </span>
                         </button>
                         <button
@@ -199,14 +199,14 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
 
                       {isExpanded && (
                         <div className={styles.subnav} id={subnavId}>
-                          {topic.sections.map((section, sectionIndex) => (
+                          {topic.sections.map((section) => (
                             <button
                               type="button"
                               key={section.id}
                               className={styles.subtopicButton}
                               onClick={() => openSection(topic.slug, section.id)}
                             >
-                              <span>{String(sectionIndex + 1).padStart(2, "0")}</span>
+                              <span>{section.level}</span>
                               <strong>{section.title}</strong>
                             </button>
                           ))}
@@ -276,7 +276,7 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
                   onClick={() => openSection(activeTopic.slug, section.id)}
                 >
                   <div className={styles.quickCardTop}>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <span>{section.level} · {String(index + 1).padStart(2, "0")}</span>
                     <strong>{section.title}</strong>
                   </div>
                   <p>{section.intro ?? section.rules[0]}</p>
@@ -303,7 +303,7 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
             {activeTopic.sections.map((section, sectionIndex) => (
               <section className={styles.grammarSection} id={section.id} key={section.id}>
                 <div className={styles.sectionTitleRow}>
-                  <span>{String(sectionIndex + 1).padStart(2, "0")}</span>
+                  <span>{section.level} · {String(sectionIndex + 1).padStart(2, "0")}</span>
                   <h3>{section.title}</h3>
                 </div>
 
@@ -343,14 +343,16 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
             ))}
           </div>
 
-          <section className={styles.miniTestSection}>
-            <div className={styles.miniTestHeading}>
-              <span className="eyebrow">Recuperación activa</span>
-              <h3>Mini test · {activeTopic.title}</h3>
-              <p>{quizQuestions.length} preguntas mezcladas del concepto. Responde sin volver arriba.</p>
-            </div>
-            <MiniQuiz key={activeTopic.slug} questions={quizQuestions} />
-          </section>
+          {quizQuestions.length > 0 && (
+            <section className={styles.miniTestSection}>
+              <div className={styles.miniTestHeading}>
+                <span className="eyebrow">Recuperación activa</span>
+                <h3>Mini test · {activeTopic.title}</h3>
+                <p>{quizQuestions.length} preguntas mezcladas del concepto. Responde sin volver arriba.</p>
+              </div>
+              <MiniQuiz key={activeTopic.slug} questions={quizQuestions} />
+            </section>
+          )}
         </article>
       </main>
     </div>
