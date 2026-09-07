@@ -4,6 +4,7 @@ import { future } from "./future";
 import { questions } from "./questions";
 import { nounsAndArticles } from "./nouns-and-articles";
 import { pronounsAndDeterminers } from "./pronouns-and-determiners";
+import { introductoryIt } from "./introductory-it";
 import { adjectives } from "./adjectives";
 import { adverbs } from "./adverbs";
 import { modals } from "./modals";
@@ -24,6 +25,7 @@ export const grammarConcepts = [
   questions,
   nounsAndArticles,
   pronounsAndDeterminers,
+  introductoryIt,
   adjectives,
   adverbs,
   modals,
