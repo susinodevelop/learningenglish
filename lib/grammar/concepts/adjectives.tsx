@@ -2,10 +2,10 @@ import { defineGrammarConcept } from "./factory";
 
 export const adjectives = defineGrammarConcept({
   slug: "adjectives",
-  title: "Adjectives",
+  title: "Adjectives & comparison",
   category: "sentence-building",
-  sourceSlugs: ["adjectives"],
-  summary: "Comparativos, superlativos, -ed/-ing, posición y orden de adjetivos en un único mapa visual.",
-  memoryHook: "DESCRIBE AL NOMBRE · -ING causa · -ED siente.",
-  studyQuestion: "¿Estás describiendo una cosa/persona, comparándola o explicando qué causa una emoción y quién la siente?",
+  sourceSlugs: ["adjectives", "c1-comparing"],
+  summary: "Adjetivos B2 y comparación C1: forma, posición, -ed/-ing, comparativos, superlativos e intensificación avanzada de diferencias y equivalencias.",
+  memoryHook: "DESCRIBE · COMPARA · MIDE LA DISTANCIA.",
+  studyQuestion: "¿Solo describes algo o necesitas decir exactamente cuánto se parece, supera o se aleja de otra cosa?",
 });
