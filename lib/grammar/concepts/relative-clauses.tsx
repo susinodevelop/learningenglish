@@ -14,14 +14,16 @@ const c1Topics: GrammarTopic[] = [
         title: "Defining vs non-defining at C1",
         rules: [
           "Una defining relative identifica el referente y no lleva comas; una non-defining añade información extra y sí lleva comas.",
+          "Una defining relative puede identificar una persona, cosa, tiempo, lugar o razón.",
           "That puede sustituir a who/which en defining clauses, pero no en non-defining clauses.",
           "El pronombre relativo puede omitirse en defining clauses si funciona como objeto; no si funciona como sujeto.",
+          "La información de una non-defining relative es adicional y puede eliminarse sin perder la identificación del referente.",
           "Quitar las comas a una non-defining clause puede cambiar el significado y restringir el referente.",
           "Después de quantifiers como everything, something y all, el libro señala que normalmente preferimos that frente a which en defining relative clauses.",
         ],
         examples: [
           { english: "The consultant who called yesterday is waiting outside." },
-          { english: "The consultant, who called yesterday, is waiting outside.", note: "solo hay un consultor relevante" },
+          { english: "The consultant, who called yesterday, is waiting outside.", note: "información adicional" },
           { english: "Everything that we discussed remains confidential.", note: "that tras quantifier" },
         ],
       },
@@ -63,9 +65,9 @@ const c1Topics: GrammarTopic[] = [
         title: "Free relatives and additional meanings",
         rules: [
           "Whatever puede funcionar como pronoun/determiner con el significado 'anything that/any thing which'.",
-          "Whatsoever es una variante muy formal y enfática de whatever en ciertos contextos.",
-          "Whenever puede significar 'at any time/every time' o indicar que el momento exacto no importa/no se recuerda.",
-          "Wherever y whoever también pueden funcionar como free relatives con significado abierto: any place/person that....",
+          "Whatsoever es una alternativa muy formal a whatever en este uso.",
+          "Whenever puede significar 'at any time/every time' o indicar que no sabemos exactamente cuándo ocurrió algo.",
+          "Los demás -ever words también pueden adquirir funciones abiertas similares según el referente.",
         ],
         examples: [
           { english: "Take whatever you need." },
@@ -74,16 +76,17 @@ const c1Topics: GrammarTopic[] = [
         ],
       },
       {
-        title: "Emphatic -ever questions",
+        title: "Emphatic -ever questions and replies",
         rules: [
-          "Whatever, however, whenever, wherever y whoever pueden reforzar preguntas y expresar sorpresa, crítica o incredulidad.",
-          "En conversación, Whatever. también puede ser una respuesta despectiva o impaciente y puede sonar brusca.",
-          "Como respuesta corta, Whatever. también puede significar 'I don't mind', aunque puede sonar impaciente o brusco; whatever you like/prefer resulta más cortés.",
+          "Whatever puede funcionar como forma enfática de what y expresar crítica o sorpresa.",
+          "However, whenever, wherever y whoever también pueden ser formas enfáticas de how, when, where y who.",
+          "Como respuesta aislada, Whatever. puede ser despectivo o impaciente y sonar brusco.",
+          "El Gold indica que podemos hacerlo menos descortés añadiendo una clause o dando una respuesta completa.",
         ],
         examples: [
           { english: "Whatever were you thinking?" },
-          { english: "Whoever told you that?" },
-          { english: "Whatever you prefer is fine with me.", note: "respuesta más cortés" },
+          { english: "Whoever do you think you are?" },
+          { english: "Whatever is easiest for you.", note: "respuesta completa y menos brusca" },
         ],
         traps: ["Whatever. como respuesta aislada puede sonar grosero; el tono pragmático importa en C1."],
       },
@@ -102,7 +105,7 @@ const c1Topics: GrammarTopic[] = [
         rules: [
           "An -ing participle tiene significado activo y puede sustituir una relative clause con verbo activo.",
           "An -ed participle tiene significado pasivo y puede sustituir una relative clause con verbo pasivo.",
-          "La reducción hace el estilo más compacto, especialmente en escritura formal.",
+          "La reducción hace el estilo más compacto.",
         ],
         examples: [
           { english: "The people waiting outside have appointments." },
@@ -113,7 +116,7 @@ const c1Topics: GrammarTopic[] = [
         title: "Participle clauses for reason, time, condition and result",
         rules: [
           "Después de conjunctions como before/after podemos usar -ing cuando el sujeto se mantiene claro.",
-          "Una participle clause puede sustituir una adverbial clause de razón, tiempo, condición o resultado.",
+          "Una participle clause puede sustituir una relación de razón, condición, resultado u otra relación adverbial indicada por el contexto.",
           "Having + past participle marca que la acción de la participle clause ocurrió antes que la de la main clause.",
           "Seen/heard/considered... pueden expresar una lectura pasiva equivalente a if/when/because + passive clause.",
         ],
@@ -122,7 +125,7 @@ const c1Topics: GrammarTopic[] = [
           { english: "Having finished the report, she went home.", note: "acción anterior" },
           { english: "Seen from above, the building looks much smaller.", note: "passive condition/viewpoint" },
         ],
-        traps: ["El sujeto implícito de la participle clause debe coincidir lógicamente con el sujeto de la main clause; evita dangling participles."],
+        traps: ["Comprueba que el sujeto de la participle clause y el de la main clause sean el mismo; si no, la frase puede interpretarse como incorrecta."],
       },
     ],
   },
