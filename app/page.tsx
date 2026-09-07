@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 const areas = [
-  { href: "/grammar", icon: "Aa", title: "Gramática", text: "Explicaciones lógicas, ejemplos y patrones desde las bases hasta C1.", meta: "6 temas iniciales" },
-  { href: "/vocabulary", icon: "W", title: "Vocabulario", text: "Palabras por contexto, nivel y uso real para que no estudies listas aisladas.", meta: "4 packs iniciales" },
-  { href: "/games", icon: "▶", title: "Juegos", text: "Practica de forma activa con quizzes y actividades que iremos ampliando.", meta: "Quiz disponible" },
+  { href: "/grammar", icon: "Aa", title: "Gramática", text: "Explicaciones lógicas, ejemplos y patrones desde las bases hasta C1.", meta: "B2 + C1" },
+  { href: "/vocabulary", icon: "W", title: "Vocabulario", text: "Palabras por contexto, nivel y uso real para que no estudies listas aisladas.", meta: "B2 + C1" },
+  { href: "/games", icon: "▶", title: "Ejercicios", text: "Practica gramática y vocabulario por separado con quizzes, grupos y recuperación activa.", meta: "Gramática + vocabulario" },
   { href: "/progress", icon: "↗", title: "Progreso", text: "Consulta tus mejores resultados y, más adelante, tu evolución completa.", meta: "Progreso local" },
 ];
 
@@ -18,7 +18,7 @@ export default function Home() {
             <p>Gramática explicada con lógica, vocabulario útil y práctica interactiva en un mismo sitio. Diseñado para avanzar desde las bases hasta un nivel avanzado.</p>
             <div className="hero-actions">
               <Link className="button button-primary" href="/grammar">Empezar por gramática</Link>
-              <Link className="button button-secondary" href="/games">Practicar jugando</Link>
+              <Link className="button button-secondary" href="/games">Ir a ejercicios</Link>
             </div>
             <div className="hero-points" aria-label="Características">
               <span>✓ Por niveles</span><span>✓ Explicaciones claras</span><span>✓ Práctica activa</span>
