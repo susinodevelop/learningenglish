@@ -38,6 +38,7 @@ function searchableText(entry: VocabularyLexeme) {
     entry.term,
     entry.meaning.es,
     entry.meaning.en,
+    ...entry.levels,
     ...entry.notes,
     ...entry.members.flatMap((member) => [member.term, member.meaning.es, member.meaning.en]),
     ...entry.relations.collocations,
@@ -75,7 +76,7 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
       topic.sections.flatMap((section) =>
         section.entries
           .filter((entry) =>
-            [searchableText(entry), topic.title, section.title, kindLabels[section.kind]]
+            [searchableText(entry), topic.title, topic.level, section.title, kindLabels[section.kind]]
               .join(" ")
               .toLocaleLowerCase()
               .includes(normalised),
@@ -136,7 +137,7 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
                       onClick={() => openTopic(topic.slug)}
                       key={topic.slug}
                     >
-                      {topic.title}
+                      {topic.title} · {topic.level}
                     </button>
                   ))}
                 </div>
@@ -149,7 +150,7 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
       <main className={styles.content}>
         <div className={styles.toolbar}>
           <div className={styles.statLine}>
-            <span>B2 Cambridge</span>
+            <span>Cambridge B2 + C1</span>
             <span>EN definition + ES meaning</span>
             <span>Preparado para juegos</span>
           </div>
@@ -168,7 +169,7 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
               <span className="eyebrow">Resultados</span>
               <h2>{searchResults.length} coincidencias para “{query.trim()}”</h2>
               <p>
-                Busca por término, traducción, definición inglesa, familia léxica, collocation,
+                Busca por término, traducción, definición inglesa, nivel, familia léxica, collocation,
                 phrasal verb o tema.
               </p>
             </header>
@@ -181,10 +182,10 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
                   onClick={() => openTopic(topic.slug)}
                   key={`${topic.slug}-${section.title}-${entry.id}-${index}`}
                 >
-                  <span>{topic.title} · {kindLabels[section.kind]}</span>
+                  <span>{topic.level} · {topic.title} · {kindLabels[section.kind]}</span>
                   <div className={richStyles.entryHeading}>
                     <strong>{entry.term}</strong>
-                    <em>{typeLabels[entry.type]}</em>
+                    <em>{entry.levels.join(" · ")} · {typeLabels[entry.type]}</em>
                   </div>
                   <p className={richStyles.englishDefinition}>{entry.meaning.en}</p>
                   <p className={!showMeanings ? styles.hiddenMeaning : richStyles.spanishMeaning}>
@@ -222,7 +223,7 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
               <p>
                 Lee primero la definición en inglés e intenta recuperar la palabra o el significado.
                 Después comprueba el español. Las familias, collocations y confusables se guardan como
-                relaciones reutilizables para los futuros juegos.
+                relaciones reutilizables para los juegos y grupos de estudio.
               </p>
             </div>
 
@@ -249,7 +250,7 @@ export function VocabularyBrowser({ categories, topics, entryCount }: Vocabulary
                         <article className={styles.entry} key={`${entry.id}-${index}`}>
                           <div className={richStyles.entryHeading}>
                             <strong>{entry.term}</strong>
-                            <em>{typeLabels[entry.type]}</em>
+                            <em>{entry.levels.join(" · ")} · {typeLabels[entry.type]}</em>
                           </div>
 
                           <div className={richStyles.definitionBlock}>
