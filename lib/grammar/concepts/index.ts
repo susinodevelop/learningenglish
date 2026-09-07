@@ -14,6 +14,8 @@ import { conditionals } from "./conditionals";
 import { relativeClauses } from "./relative-clauses";
 import { prepositions } from "./prepositions";
 import { linkingWords } from "./linking-words";
+import { cohesion } from "./cohesion";
+import { inversion } from "./inversion";
 
 export const grammarConcepts = [
   presentTenses,
@@ -32,4 +34,6 @@ export const grammarConcepts = [
   relativeClauses,
   prepositions,
   linkingWords,
+  cohesion,
+  inversion,
 ];
