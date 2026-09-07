@@ -189,6 +189,23 @@ function makeLexemeId(term: string, meaningEs: string) {
   return `${slugPart(term)}-${shortHash(normalise(meaningEs))}`;
 }
 
+function findCrossLevelTermConflicts(lexicon: VocabularyLexeme[]) {
+  const byTerm = new Map<string, VocabularyLexeme[]>();
+
+  for (const entry of lexicon) {
+    const entries = byTerm.get(entry.normalizedTerm) ?? [];
+    entries.push(entry);
+    byTerm.set(entry.normalizedTerm, entries);
+  }
+
+  return Array.from(byTerm.entries()).flatMap(([term, entries]) => {
+    if (entries.length < 2) return [];
+    const levels = new Set(entries.flatMap((entry) => entry.levels));
+    if (!levels.has("B2") || !levels.has("C1")) return [];
+    return [{ term, entries }];
+  });
+}
+
 export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
   const lexiconBySense = new Map<string, VocabularyLexeme>();
   const usedGlossKeys = new Set<string>();
@@ -300,8 +317,18 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
     );
   }
 
+  const lexicon = Array.from(lexiconBySense.values()).sort((a, b) => a.term.localeCompare(b.term, "en"));
+  const crossLevelConflicts = findCrossLevelTermConflicts(lexicon);
+  if (crossLevelConflicts.length > 0) {
+    throw new Error(
+      `Potential B2/C1 duplicate terms (${crossLevelConflicts.length}):\n${crossLevelConflicts
+        .map(({ term, entries }) => `${term}: ${entries.map((entry) => `[${entry.levels.join("+")}] ${entry.meaning.es}`).join(" || ")}`)
+        .join("\n")}`,
+    );
+  }
+
   return {
     topics,
-    lexicon: Array.from(lexiconBySense.values()).sort((a, b) => a.term.localeCompare(b.term, "en")),
+    lexicon,
   };
 }
