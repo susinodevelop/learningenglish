@@ -98,11 +98,13 @@ const c1Topics: GrammarTopic[] = [
         title: "Conditional linkers and alternatives to if",
         rules: [
           "Además de if, son frecuentes as/so long as, unless, even if, whether, providing, provided (that) y on condition that.",
+          "Cuando la clause con el conditional linker va primero, el Gold indica que se separa de la main clause con coma; si la main clause va primero, normalmente no se usa esa coma.",
           "In the event of + noun presenta formalmente una posible situación futura.",
           "Otherwise introduce la consecuencia si no se cumple la condición implícita.",
           "In case introduce una precaución ante algo que podría ocurrir; no equivale a if.",
         ],
         examples: [
+          { english: "If you lay the table, I'll serve the dinner.", note: "conditional clause primero → coma" },
           { english: "You can stay as long as you keep the noise down." },
           { english: "In the event of cancellation, we'll refund the full amount." },
           { english: "Take a charger in case the battery runs out." },
