@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
-import { StudyWorkspace } from "@/components/study/study-workspace";
+import { ExercisesHub } from "@/components/exercises/exercises-hub";
+import {
+  grammarExerciseConcepts,
+  grammarExerciseQuestions,
+} from "@/lib/grammar/exercises";
 import { vocabularyLexicon, vocabularyTopics } from "@/lib/vocabulary";
 
 export const metadata: Metadata = {
-  title: "Estudiar vocabulario",
-  description: "Crea grupos de estudio y practica el vocabulario Cambridge B2 y C1 con distintos modos de recuperación activa.",
+  title: "Ejercicios B2 + C1",
+  description: "Practica gramática y vocabulario Cambridge B2 y C1 con ejercicios interactivos y recuperación activa.",
 };
 
 export default function GamesPage() {
@@ -16,17 +20,20 @@ export default function GamesPage() {
   return (
     <div className="shell page-shell">
       <header className="page-header compact-header">
-        <span className="eyebrow">Estudio · vocabulario · juegos</span>
-        <h1>Decide qué quieres estudiar. Después decide cómo recuperarlo.</h1>
+        <span className="eyebrow">Ejercicios · Cambridge B2 + C1</span>
+        <h1>Practica gramática y vocabulario por separado.</h1>
         <p>
-          Los grupos de estudio son una capa sobre el léxico canónico B2 + C1: los estáticos guardan
-          una selección concreta y los dinámicos se recalculan mediante filtros. Todos los modos de
-          práctica usan las mismas fichas canónicas, así que una palabra compartida entre niveles no
-          se duplica.
+          Elige qué quieres entrenar. Gramática reutiliza las preguntas vinculadas a cada concepto de
+          la teoría; Vocabulario conserva tus grupos de estudio, filtros, progreso y modos de práctica.
         </p>
       </header>
 
-      <StudyWorkspace lexicon={vocabularyLexicon} topics={topics} />
+      <ExercisesHub
+        grammarQuestions={grammarExerciseQuestions}
+        grammarConcepts={grammarExerciseConcepts}
+        vocabularyLexicon={vocabularyLexicon}
+        vocabularyTopics={topics}
+      />
     </div>
   );
 }
