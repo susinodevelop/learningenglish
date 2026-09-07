@@ -23,8 +23,8 @@ export default function GamesPage() {
         <span className="eyebrow">Ejercicios · Cambridge B2 + C1</span>
         <h1>Practica gramática y vocabulario por separado.</h1>
         <p>
-          Elige qué quieres entrenar. Gramática reutiliza las preguntas vinculadas a cada concepto de
-          la teoría; Vocabulario conserva tus grupos de estudio, filtros, progreso y modos de práctica.
+          Gramática cubre cada subapartado de la teoría B2 + C1 con práctica por nivel, concepto, regla
+          y formato. Vocabulario conserva tus grupos de estudio, filtros, progreso y modos de recuperación.
         </p>
       </header>
 
