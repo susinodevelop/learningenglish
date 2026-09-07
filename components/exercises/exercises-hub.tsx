@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StudyWorkspace } from "@/components/study/study-workspace";
 import type { GrammarExerciseConcept, GrammarExerciseQuestion } from "@/lib/grammar/exercises";
 import type { VocabularyLexeme } from "@/lib/vocabulary";
@@ -21,6 +21,11 @@ type ExercisesHubProps = {
 
 type ExerciseArea = "grammar" | "vocabulary";
 
+function areaFromHash(): ExerciseArea {
+  if (typeof window !== "undefined" && window.location.hash === "#vocabulary") return "vocabulary";
+  return "grammar";
+}
+
 export function ExercisesHub({
   grammarQuestions,
   grammarConcepts,
@@ -28,6 +33,18 @@ export function ExercisesHub({
   vocabularyTopics,
 }: ExercisesHubProps) {
   const [area, setArea] = useState<ExerciseArea>("grammar");
+
+  useEffect(() => {
+    const syncArea = () => setArea(areaFromHash());
+    syncArea();
+    window.addEventListener("hashchange", syncArea);
+    return () => window.removeEventListener("hashchange", syncArea);
+  }, []);
+
+  function chooseArea(nextArea: ExerciseArea) {
+    setArea(nextArea);
+    window.history.replaceState(null, "", `#${nextArea}`);
+  }
 
   return (
     <>
@@ -37,7 +54,7 @@ export function ExercisesHub({
           role="tab"
           aria-selected={area === "grammar"}
           className={area === "grammar" ? styles.activeTab : ""}
-          onClick={() => setArea("grammar")}
+          onClick={() => chooseArea("grammar")}
         >
           <span className={styles.tabIcon}>Aa</span>
           <span>
@@ -50,7 +67,7 @@ export function ExercisesHub({
           role="tab"
           aria-selected={area === "vocabulary"}
           className={area === "vocabulary" ? styles.activeTab : ""}
-          onClick={() => setArea("vocabulary")}
+          onClick={() => chooseArea("vocabulary")}
         >
           <span className={styles.tabIcon}>W</span>
           <span>
