@@ -1,5 +1,6 @@
 import type {
   VocabularyEntryType,
+  VocabularyLevel,
   VocabularyLexeme,
   VocabularySectionKind,
 } from "./vocabulary";
@@ -24,6 +25,8 @@ export type VocabularyProgress = Record<string, VocabularyProgressRecord>;
 export type DynamicStudyGroupFilter = {
   query: string;
   topicSlugs: string[];
+  /** Optional for backwards compatibility with study groups saved before C1 was added. */
+  levels?: VocabularyLevel[];
   entryTypes: VocabularyEntryType[];
   sectionKinds: VocabularySectionKind[];
   performance: VocabularyPerformanceFilter;
@@ -53,6 +56,7 @@ export const VOCABULARY_PROGRESS_STORAGE_KEY = "learningenglish:vocabulary-progr
 export const emptyDynamicStudyGroupFilter: DynamicStudyGroupFilter = {
   query: "",
   topicSlugs: [],
+  levels: [],
   entryTypes: [],
   sectionKinds: [],
   performance: "all",
@@ -60,11 +64,26 @@ export const emptyDynamicStudyGroupFilter: DynamicStudyGroupFilter = {
 
 export const systemStudyGroups: StudyGroup[] = [
   {
+    // Keep the historic id so existing client state cannot be invalidated by the B2+C1 expansion.
     id: "system-all-b2",
-    name: "Todo el vocabulario B2",
+    name: "Todo el vocabulario B2 + C1",
     kind: "dynamic",
     system: true,
     filter: { ...emptyDynamicStudyGroupFilter },
+  },
+  {
+    id: "system-level-b2",
+    name: "Solo vocabulario B2",
+    kind: "dynamic",
+    system: true,
+    filter: { ...emptyDynamicStudyGroupFilter, levels: ["B2"] },
+  },
+  {
+    id: "system-level-c1",
+    name: "Solo vocabulario C1",
+    kind: "dynamic",
+    system: true,
+    filter: { ...emptyDynamicStudyGroupFilter, levels: ["C1"] },
   },
   {
     id: "system-mistakes",
@@ -123,6 +142,7 @@ function searchableLexemeText(entry: VocabularyLexeme) {
     entry.term,
     entry.meaning.en,
     entry.meaning.es,
+    ...entry.levels,
     ...entry.topics,
     ...entry.sectionTitles,
     ...entry.notes,
@@ -151,8 +171,16 @@ export function resolveStudyGroup(
   }
 
   const query = normalise(group.filter.query);
+  const levels = group.filter.levels ?? [];
 
   return lexicon.filter((entry) => {
+    if (
+      levels.length > 0 &&
+      !entry.levels.some((level) => levels.includes(level))
+    ) {
+      return false;
+    }
+
     if (
       group.filter.topicSlugs.length > 0 &&
       !entry.topics.some((topic) => group.filter.topicSlugs.includes(topic))
