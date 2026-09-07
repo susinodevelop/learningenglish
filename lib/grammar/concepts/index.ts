@@ -1,4 +1,5 @@
 import { presentTenses } from "./present-tenses";
+import { perfectContinuousAspect } from "./perfect-continuous-aspect";
 import { pastTenses } from "./past-tenses";
 import { future } from "./future";
 import { questions } from "./questions";
@@ -20,6 +21,7 @@ import { inversion } from "./inversion";
 
 export const grammarConcepts = [
   presentTenses,
+  perfectContinuousAspect,
   pastTenses,
   future,
   questions,
