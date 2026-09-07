@@ -5,8 +5,10 @@ import { useMemo, useState } from "react";
 import type { GrammarLevel } from "@/lib/grammar";
 import type {
   GrammarExerciseConcept,
+  GrammarExerciseKind,
   GrammarExerciseQuestion,
 } from "@/lib/grammar/exercises";
+import advancedStyles from "./grammar-exercise-workspace.module.css";
 import styles from "./exercises.module.css";
 
 type GrammarExerciseWorkspaceProps = {
@@ -15,6 +17,14 @@ type GrammarExerciseWorkspaceProps = {
 };
 
 type LevelFilter = "all" | GrammarLevel;
+type KindFilter = "all" | GrammarExerciseKind;
+
+const kindLabels: Record<GrammarExerciseKind, string> = {
+  "multiple-choice": "Elección múltiple",
+  gap: "Completar hueco",
+  "error-correction": "Corregir error",
+  transformation: "Transformación",
+};
 
 function shuffle<T>(values: T[]) {
   const result = [...values];
@@ -25,14 +35,36 @@ function shuffle<T>(values: T[]) {
   return result;
 }
 
+function normaliseAnswer(value: string) {
+  return value
+    .toLocaleLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[’‘]/g, "'")
+    .replace(/[.,!?;:]+$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function typedAnswerIsCorrect(question: GrammarExerciseQuestion, answer: string) {
+  const submitted = normaliseAnswer(answer);
+  return (question.acceptedAnswers ?? []).some((candidate) => normaliseAnswer(candidate) === submitted);
+}
+
 export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExerciseWorkspaceProps) {
   const [level, setLevel] = useState<LevelFilter>("all");
   const [conceptSlug, setConceptSlug] = useState("all");
+  const [sectionId, setSectionId] = useState("all");
+  const [kind, setKind] = useState<KindFilter>("all");
   const [session, setSession] = useState<GrammarExerciseQuestion[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
+  const [typedAnswer, setTypedAnswer] = useState("");
+  const [typedChecked, setTypedChecked] = useState(false);
+  const [typedCorrect, setTypedCorrect] = useState<boolean | null>(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [missedQuestions, setMissedQuestions] = useState<GrammarExerciseQuestion[]>([]);
 
   const availableConcepts = useMemo(
     () => concepts.filter((concept) =>
@@ -41,22 +73,58 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
     [concepts, level],
   );
 
+  const availableSections = useMemo(() => {
+    const sectionMap = new Map<string, { id: string; title: string; level: GrammarLevel }>();
+    questions
+      .filter((question) =>
+        question.sectionId &&
+        question.sectionTitle &&
+        (level === "all" || question.level === level) &&
+        (conceptSlug === "all" || question.conceptSlug === conceptSlug),
+      )
+      .forEach((question) => {
+        if (!question.sectionId || !question.sectionTitle) return;
+        sectionMap.set(question.sectionId, {
+          id: question.sectionId,
+          title: question.sectionTitle,
+          level: question.level,
+        });
+      });
+    return Array.from(sectionMap.values()).sort((a, b) => a.title.localeCompare(b.title, "es"));
+  }, [conceptSlug, level, questions]);
+
   const filteredQuestions = useMemo(
     () => questions.filter((question) =>
       (level === "all" || question.level === level) &&
-      (conceptSlug === "all" || question.conceptSlug === conceptSlug),
+      (conceptSlug === "all" || question.conceptSlug === conceptSlug) &&
+      (sectionId === "all" || question.sectionId === sectionId) &&
+      (kind === "all" || question.kind === kind),
     ),
-    [conceptSlug, level, questions],
+    [conceptSlug, kind, level, questions, sectionId],
   );
 
   const current = session[questionIndex];
+  const selectedConcept = concepts.find((concept) => concept.slug === conceptSlug);
+  const selectedSection = availableSections.find((section) => section.id === sectionId);
+  const answered = current?.kind === "multiple-choice" ? selected !== null : typedChecked;
+  const currentCorrect = current?.kind === "multiple-choice"
+    ? selected !== null && selected === current.answerIndex
+    : typedCorrect === true;
+
+  function resetAnswerState() {
+    setSelected(null);
+    setTypedAnswer("");
+    setTypedChecked(false);
+    setTypedCorrect(null);
+  }
 
   function resetSession() {
     setSession([]);
     setQuestionIndex(0);
-    setSelected(null);
+    resetAnswerState();
     setScore(0);
     setFinished(false);
+    setMissedQuestions([]);
   }
 
   function changeLevel(nextLevel: LevelFilter) {
@@ -70,51 +138,91 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
     ) {
       setConceptSlug("all");
     }
+    setSectionId("all");
     resetSession();
   }
 
   function changeConcept(nextSlug: string) {
     setConceptSlug(nextSlug);
+    setSectionId("all");
     resetSession();
   }
 
-  function startSession() {
-    const size = Math.min(filteredQuestions.length, 20);
+  function changeSection(nextSection: string) {
+    setSectionId(nextSection);
+    resetSession();
+  }
+
+  function changeKind(nextKind: KindFilter) {
+    setKind(nextKind);
+    resetSession();
+  }
+
+  function beginRound(nextQuestions: GrammarExerciseQuestion[]) {
+    const size = Math.min(nextQuestions.length, 20);
     if (size === 0) return;
-    setSession(shuffle(filteredQuestions).slice(0, size));
+    setSession(shuffle(nextQuestions).slice(0, size));
     setQuestionIndex(0);
-    setSelected(null);
+    resetAnswerState();
     setScore(0);
     setFinished(false);
+    setMissedQuestions([]);
+  }
+
+  function startSession() {
+    beginRound(filteredQuestions);
+  }
+
+  function practiseMistakes() {
+    const uniqueMissed = Array.from(new Map(missedQuestions.map((question) => [question.id, question])).values());
+    beginRound(uniqueMissed);
   }
 
   function chooseAnswer(optionIndex: number) {
-    if (!current || selected !== null) return;
+    if (!current || current.kind !== "multiple-choice" || selected !== null) return;
     setSelected(optionIndex);
-    if (optionIndex === current.answer) setScore((value) => value + 1);
+    if (optionIndex === current.answerIndex) {
+      setScore((value) => value + 1);
+    } else {
+      setMissedQuestions((value) => [...value, current]);
+    }
+  }
+
+  function checkTypedAnswer() {
+    if (!current || current.kind === "multiple-choice" || typedChecked || !typedAnswer.trim()) return;
+    const correct = typedAnswerIsCorrect(current, typedAnswer);
+    setTypedChecked(true);
+    setTypedCorrect(correct);
+    if (correct) {
+      setScore((value) => value + 1);
+    } else {
+      setMissedQuestions((value) => [...value, current]);
+    }
   }
 
   function nextQuestion() {
-    if (selected === null) return;
+    if (!answered) return;
     if (questionIndex >= session.length - 1) {
       setFinished(true);
       return;
     }
     setQuestionIndex((value) => value + 1);
-    setSelected(null);
+    resetAnswerState();
   }
 
-  const selectedConcept = concepts.find((concept) => concept.slug === conceptSlug);
+  const correctAnswer = current?.kind === "multiple-choice"
+    ? current.options?.[current.answerIndex ?? -1]
+    : current?.modelAnswer;
 
   return (
     <section className={styles.grammarWorkspace} aria-label="Ejercicios de gramática">
       <div className={styles.exerciseIntro}>
         <div>
           <span className="eyebrow">Gramática · B2 + C1</span>
-          <h2>Practica la decisión, no solo la regla.</h2>
+          <h2>Practica cada regla, no solo cada tema.</h2>
           <p>
-            Las preguntas salen del mismo banco canónico que acompaña a la teoría. Puedes mezclar todo,
-            centrarte en B2 o C1, o practicar un concepto concreto.
+            El banco combina los mini-tests canónicos, ejercicios originales de aplicación y controles
+            automáticos de cada subapartado de la teoría. Puedes aislar una regla concreta o mezclarlo todo.
           </p>
         </div>
         <div className={styles.exerciseCount}>
@@ -138,8 +246,28 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
             <option value="all">Todos los conceptos</option>
             {availableConcepts.map((concept) => (
               <option value={concept.slug} key={concept.slug}>
-                {concept.title} · {concept.level}
+                {concept.title} · {concept.level} · {concept.questionCount}
               </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Subapartado</span>
+          <select value={sectionId} onChange={(event) => changeSection(event.target.value)}>
+            <option value="all">Todos los subapartados</option>
+            {availableSections.map((section) => (
+              <option value={section.id} key={section.id}>
+                {section.title} · {section.level}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Formato</span>
+          <select value={kind} onChange={(event) => changeKind(event.target.value as KindFilter)}>
+            <option value="all">Todos los formatos</option>
+            {(Object.entries(kindLabels) as [GrammarExerciseKind, string][]).map(([value, label]) => (
+              <option value={value} key={value}>{label}</option>
             ))}
           </select>
         </label>
@@ -154,8 +282,10 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
       {selectedConcept ? (
         <div className={styles.selectionNote}>
           <div>
-            <strong>{selectedConcept.title}</strong>
-            <span>{selectedConcept.categoryLabel} · {selectedConcept.level}</span>
+            <strong>{selectedConcept.title}{selectedSection ? ` · ${selectedSection.title}` : ""}</strong>
+            <span>
+              {selectedConcept.categoryLabel} · {selectedConcept.level} · {selectedConcept.sectionCount} subapartados
+            </span>
           </div>
           <Link href={`/grammar#${selectedConcept.slug}`}>Repasar teoría →</Link>
         </div>
@@ -163,7 +293,7 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
         <div className={styles.selectionNote}>
           <div>
             <strong>Práctica mixta</strong>
-            <span>Los conceptos se mezclan para obligarte a identificar primero qué estructura necesitas.</span>
+            <span>Los conceptos y formatos se mezclan para obligarte a identificar primero qué estructura necesitas.</span>
           </div>
         </div>
       )}
@@ -171,7 +301,7 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
       {session.length === 0 ? (
         <div className={styles.emptyPractice}>
           <strong>Configura tu ronda.</strong>
-          <p>Elige nivel y concepto, o deja ambos en modo mixto. Cada sesión selecciona hasta 20 preguntas al azar.</p>
+          <p>Elige nivel, concepto, subapartado y formato, o déjalos en modo mixto. Cada sesión saca hasta 20 preguntas al azar.</p>
         </div>
       ) : finished ? (
         <div className={styles.grammarResult} aria-live="polite">
@@ -181,9 +311,14 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
           <p>
             {score === session.length
               ? "Has resuelto correctamente todas las decisiones de esta ronda."
-              : "Puedes repetir con una selección nueva o volver a la teoría del concepto que te haya generado dudas."}
+              : `Has fallado ${missedQuestions.length} pregunta${missedQuestions.length === 1 ? "" : "s"}. Puedes repetir solo esos errores o generar una ronda nueva.`}
           </p>
-          <button className="button button-primary" type="button" onClick={startSession}>Otra ronda</button>
+          <div className={advancedStyles.resultActions}>
+            {missedQuestions.length > 0 ? (
+              <button className="button button-secondary" type="button" onClick={practiseMistakes}>Practicar solo mis fallos</button>
+            ) : null}
+            <button className="button button-primary" type="button" onClick={startSession}>Otra ronda</button>
+          </div>
         </div>
       ) : current ? (
         <article className={styles.grammarCard} aria-live="polite">
@@ -194,36 +329,73 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
             </div>
             <span>Pregunta {questionIndex + 1}/{session.length} · {score} aciertos</span>
           </div>
+
+          <div className={advancedStyles.questionBadges}>
+            <span>{kindLabels[current.kind]}</span>
+            {current.sectionTitle ? <span>{current.sectionTitle}</span> : null}
+            {current.keyword ? <span>Keyword: {current.keyword}</span> : null}
+          </div>
+
           <div className={styles.progressTrack} aria-hidden="true">
             <span style={{ width: `${((questionIndex + 1) / session.length) * 100}%` }} />
           </div>
           <h3>{current.prompt}</h3>
-          <div className={styles.answerGrid}>
-            {current.options.map((option, optionIndex) => {
-              const answered = selected !== null;
-              const isCorrect = answered && optionIndex === current.answer;
-              const isWrong = selected === optionIndex && optionIndex !== current.answer;
-              return (
-                <button
-                  type="button"
-                  onClick={() => chooseAnswer(optionIndex)}
-                  disabled={answered}
-                  className={`${isCorrect ? styles.correct : ""} ${isWrong ? styles.wrong : ""}`}
-                  key={`${current.id}-${optionIndex}`}
-                >
-                  <span>{String.fromCharCode(65 + optionIndex)}</span>
-                  {option}
-                </button>
-              );
-            })}
-          </div>
 
-          {selected !== null ? (
+          {current.kind === "multiple-choice" ? (
+            <div className={styles.answerGrid}>
+              {(current.options ?? []).map((option, optionIndex) => {
+                const isAnswered = selected !== null;
+                const isCorrect = isAnswered && optionIndex === current.answerIndex;
+                const isWrong = selected === optionIndex && optionIndex !== current.answerIndex;
+                return (
+                  <button
+                    type="button"
+                    onClick={() => chooseAnswer(optionIndex)}
+                    disabled={isAnswered}
+                    className={`${isCorrect ? styles.correct : ""} ${isWrong ? styles.wrong : ""}`}
+                    key={`${current.id}-${optionIndex}`}
+                  >
+                    <span>{String.fromCharCode(65 + optionIndex)}</span>
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className={advancedStyles.typedAnswer}>
+              <label htmlFor={`grammar-answer-${current.id}`}>
+                {current.kind === "transformation"
+                  ? "Escribe la frase completa"
+                  : current.kind === "error-correction"
+                    ? "Escribe la versión corregida"
+                    : "Escribe lo que falta"}
+              </label>
+              <div>
+                <input
+                  id={`grammar-answer-${current.id}`}
+                  value={typedAnswer}
+                  onChange={(event) => setTypedAnswer(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") checkTypedAnswer();
+                  }}
+                  disabled={typedChecked}
+                  autoComplete="off"
+                  spellCheck={false}
+                />
+                <button className="button button-primary" type="button" onClick={checkTypedAnswer} disabled={typedChecked || !typedAnswer.trim()}>
+                  Comprobar
+                </button>
+              </div>
+              <span className={advancedStyles.formatHelp}>No importa una mayúscula inicial, el punto final ni los acentos tipográficos del apóstrofo.</span>
+            </div>
+          )}
+
+          {answered ? (
             <div className={styles.feedback}>
               <div>
-                <strong>{selected === current.answer ? "✓ Correcto" : "✕ No exactamente"}</strong>
+                <strong>{currentCorrect ? "✓ Correcto" : "✕ No exactamente"}</strong>
                 <p>{current.explanation}</p>
-                {selected !== current.answer ? <small>Respuesta correcta: {current.options[current.answer]}</small> : null}
+                {!currentCorrect && correctAnswer ? <small>Respuesta correcta: {correctAnswer}</small> : null}
               </div>
               <div className={styles.feedbackActions}>
                 <Link href={`/grammar#${current.conceptSlug}`}>Ver teoría</Link>
