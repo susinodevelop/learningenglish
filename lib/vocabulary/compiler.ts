@@ -6,9 +6,12 @@ import type {
   VocabularyLexicalMember,
   VocabularyRelations,
   VocabularySectionKind,
+  VocabularySource,
   VocabularyStudyTopic,
   VocabularyTopic,
 } from "./types";
+
+const B2_SOURCE: VocabularySource = "Grammar and Vocabulary for First and First for Schools";
 
 const SOURCE_UNITS: Record<string, number> = {
   "geography-climate-weather": 25,
@@ -186,13 +189,32 @@ function makeLexemeId(term: string, meaningEs: string) {
   return `${slugPart(term)}-${shortHash(normalise(meaningEs))}`;
 }
 
+function findCrossLevelTermConflicts(lexicon: VocabularyLexeme[]) {
+  const byTerm = new Map<string, VocabularyLexeme[]>();
+
+  for (const entry of lexicon) {
+    const entries = byTerm.get(entry.normalizedTerm) ?? [];
+    entries.push(entry);
+    byTerm.set(entry.normalizedTerm, entries);
+  }
+
+  return Array.from(byTerm.entries()).flatMap(([term, entries]) => {
+    if (entries.length < 2) return [];
+    const levels = new Set(entries.flatMap((entry) => entry.levels));
+    if (!levels.has("B2") || !levels.has("C1")) return [];
+    return [{ term, entries }];
+  });
+}
+
 export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
   const lexiconBySense = new Map<string, VocabularyLexeme>();
   const usedGlossKeys = new Set<string>();
   const missingDefinitions: string[] = [];
 
   const topics: VocabularyStudyTopic[] = sourceTopics.map((topic) => {
-    const sourceUnit = SOURCE_UNITS[topic.slug];
+    const sourceUnit = topic.sourceUnit ?? SOURCE_UNITS[topic.slug];
+    const source = topic.source ?? B2_SOURCE;
+
     if (!sourceUnit) {
       throw new Error(`Missing source-unit mapping for vocabulary topic: ${topic.slug}`);
     }
@@ -209,9 +231,9 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
         return {
           title: section.title,
           kind: section.kind,
-          entries: section.entries.map(([term, meaningEs, note]) => {
-            const definitionEn = getEnglishDefinition(term, meaningEs);
-            usedGlossKeys.add(glossKey(term, meaningEs));
+          entries: section.entries.map(([term, meaningEs, note, inlineDefinitionEn]) => {
+            const definitionEn = inlineDefinitionEn ?? getEnglishDefinition(term, meaningEs);
+            if (!inlineDefinitionEn) usedGlossKeys.add(glossKey(term, meaningEs));
 
             if (!definitionEn) {
               missingDefinitions.push(`${topic.slug} → ${section.title} → ${term} = ${meaningEs}`);
@@ -230,11 +252,13 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
             const existing = lexiconBySense.get(senseKey);
 
             if (existing) {
+              existing.levels = Array.from(new Set([...existing.levels, topic.level]));
               existing.topics = unique([...existing.topics, topic.slug]);
               existing.sourceUnits = Array.from(new Set([...existing.sourceUnits, sourceUnit])).sort((a, b) => a - b);
               existing.sectionKinds = Array.from(new Set([...existing.sectionKinds, section.kind]));
               existing.sectionTitles = unique([...existing.sectionTitles, section.title]);
               existing.notes = unique([...existing.notes, ...(note ? [note] : [])]);
+              existing.provenance.sources = Array.from(new Set([...existing.provenance.sources, source]));
               mergeRelations(existing.relations, relations);
               return existing;
             }
@@ -244,7 +268,8 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
               term,
               normalizedTerm: normalise(term),
               type: inferType(section.kind, term),
-              cefr: "B2",
+              cefr: topic.level,
+              levels: [topic.level],
               meaning: {
                 es: meaningEs,
                 en: safeDefinition,
@@ -264,7 +289,7 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
               relations,
               notes: note ? [note] : [],
               provenance: {
-                source: "Grammar and Vocabulary for First and First for Schools",
+                sources: [source],
                 lexicalSelection: "book",
                 englishDefinition: "pedagogical-original",
                 examples: "pedagogical-original",
@@ -292,8 +317,18 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
     );
   }
 
+  const lexicon = Array.from(lexiconBySense.values()).sort((a, b) => a.term.localeCompare(b.term, "en"));
+  const crossLevelConflicts = findCrossLevelTermConflicts(lexicon);
+  if (crossLevelConflicts.length > 0) {
+    throw new Error(
+      `Potential B2/C1 duplicate terms (${crossLevelConflicts.length}):\n${crossLevelConflicts
+        .map(({ term, entries }) => `${term}: ${entries.map((entry) => `[${entry.levels.join("+")}] ${entry.meaning.es}`).join(" || ")}`)
+        .join("\n")}`,
+    );
+  }
+
   return {
     topics,
-    lexicon: Array.from(lexiconBySense.values()).sort((a, b) => a.term.localeCompare(b.term, "en")),
+    lexicon,
   };
 }

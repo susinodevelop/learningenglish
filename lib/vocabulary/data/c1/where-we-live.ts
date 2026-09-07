@@ -1,0 +1,51 @@
+import type { VocabularyTopic } from "../../types";
+
+export const c1WhereWeLiveVocabularyTopic: VocabularyTopic = {
+    slug: "c1-where-we-live",
+    title: "Where we live",
+    category: "places",
+    level: "C1",
+    summary: "Espacio, vivienda y compound words/adjectives trabajados en la Unit 1 del Gold C1.",
+    sourceUnit: 1,
+    source: "Gold C1 Advanced New Edition",
+    sections: [
+      {
+        title: "Expressions with space and room",
+        kind: "chunks",
+        entries: [
+          ["take up space", "ocupar espacio", undefined, "to use or occupy an amount of physical space"],
+          ["have enough room", "tener suficiente espacio", undefined, "to have enough available space for something or someone"],
+          ["make room", "hacer sitio", undefined, "to create enough space for someone or something"],
+          ["standing room only", "solo hay sitio de pie", undefined, "a situation in which all seats are occupied and people can only stand"],
+          ["room to do something", "espacio para hacer algo", undefined, "enough physical space or capacity to do an activity"],
+          ["open space", "espacio abierto", undefined, "an area that is not occupied by buildings or objects"],
+          ["room for dessert", "sitio para el postre", undefined, "enough appetite or capacity to eat dessert"],
+          ["need more space", "necesitar más espacio", undefined, "to require a larger amount of physical or personal space"],
+        ],
+      },
+      {
+        title: "Compound words",
+        kind: "chunks",
+        entries: [
+          ["long-standing friendship", "amistad de muchos años", undefined, "a friendship that has existed for a long time"],
+          ["run-down area", "zona deteriorada", undefined, "an area in poor condition because it has not been maintained"],
+          ["cut-price airline tickets", "billetes de avión a precio reducido", undefined, "airline tickets sold at a lower than usual price"],
+          ["drop-down menu", "menú desplegable", undefined, "a computer menu that appears when a user selects an item"],
+          ["middle-aged man", "hombre de mediana edad", undefined, "a man who is neither young nor old"],
+          ["part-time job", "trabajo a tiempo parcial", undefined, "a job involving fewer hours than a full-time job"],
+          ["air-conditioned", "con aire acondicionado", undefined, "cooled or heated by an air-conditioning system"],
+          ["mass-produced", "producido en masa", undefined, "made in large quantities using standardised methods"],
+          ["far-fetched", "inverosímil / poco creíble", undefined, "very unlikely to be true or believable"],
+          ["highly regarded", "muy valorado / respetado", undefined, "admired or respected to a high degree"],
+          ["high-rise", "de gran altura", undefined, "having many floors, especially of a building"],
+          ["life-saving", "que salva vidas", undefined, "capable of preventing death"],
+          ["interest-free", "sin intereses", undefined, "requiring no interest to be paid on borrowed money"],
+          ["built-up", "urbanizado / muy edificado", undefined, "covered with many buildings and little open land"],
+          ["world-renowned", "de fama mundial", undefined, "famous and respected throughout the world"],
+          ["purpose-built", "construido expresamente para un fin", undefined, "designed and built for a particular purpose"],
+          ["sun-soaked", "bañado por el sol", undefined, "receiving a lot of sunshine"],
+          ["wind-swept", "azotado por el viento", undefined, "regularly exposed to strong winds"],
+        ],
+      },
+    ],
+  };

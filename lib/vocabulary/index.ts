@@ -6,11 +6,13 @@ import { cultureVocabularyTopics } from "./data/culture";
 import { placesVocabularyTopics } from "./data/places";
 import { timeVocabularyTopics } from "./data/time";
 import { studyWorkVocabularyTopics } from "./data/study-work";
+import { goldC1VocabularyTopics } from "./data/c1";
 
 export type {
   VocabularyCategory,
   VocabularyEntryType,
   VocabularyExample,
+  VocabularyLevel,
   VocabularyLexeme,
   VocabularyLexicalMember,
   VocabularyMeaning,
@@ -18,6 +20,7 @@ export type {
   VocabularySeedEntry,
   VocabularySection,
   VocabularySectionKind,
+  VocabularySource,
   VocabularyStudySection,
   VocabularyStudyTopic,
   VocabularyTopic,
@@ -29,7 +32,7 @@ export const vocabularyCategories: VocabularyCategory[] = [
   { id: "culture", label: "Cultura y ocio", description: "Música, deporte, hobbies, comida, arte y entretenimiento." },
   { id: "places", label: "Lugares y movimiento", description: "Viajes, ciudades, vivienda, ropa y espacios personales." },
   { id: "time", label: "Historia y tiempo", description: "Pasado, historia y expresiones temporales." },
-  { id: "study-work", label: "Estudio y trabajo", description: "Escuela, empleo, universidad y opinión." },
+  { id: "study-work", label: "Estudio y trabajo", description: "Escuela, empleo, universidad, opinión, negocios e investigación." },
 ];
 
 const sourceVocabularyTopics: VocabularyTopic[] = [
@@ -39,14 +42,15 @@ const sourceVocabularyTopics: VocabularyTopic[] = [
   ...placesVocabularyTopics,
   ...timeVocabularyTopics,
   ...studyWorkVocabularyTopics,
+  ...goldC1VocabularyTopics,
 ];
 
 const compiledVocabulary = compileVocabulary(sourceVocabularyTopics);
 
-/** Learner-facing, rich topics. */
+/** Learner-facing, rich topics from the B2 First and C1 Advanced source books. */
 export const vocabularyTopics = compiledVocabulary.topics;
 
-/** Canonical lexical senses reusable by quizzes and future games. */
+/** Canonical lexical senses reusable by study groups and games. */
 export const vocabularyLexicon = compiledVocabulary.lexicon;
 
 /** Number of source study cards shown across all topic sections. */
@@ -56,5 +60,20 @@ export const vocabularyEntryCount = vocabularyTopics.reduce(
   0,
 );
 
-/** Number of unique lexical senses after cross-topic deduplication. */
+export const vocabularyEntryCountByLevel = {
+  B2: vocabularyTopics
+    .filter((topic) => topic.level === "B2")
+    .reduce(
+      (total, topic) => total + topic.sections.reduce((sectionTotal, section) => sectionTotal + section.entries.length, 0),
+      0,
+    ),
+  C1: vocabularyTopics
+    .filter((topic) => topic.level === "C1")
+    .reduce(
+      (total, topic) => total + topic.sections.reduce((sectionTotal, section) => sectionTotal + section.entries.length, 0),
+      0,
+    ),
+};
+
+/** Number of unique lexical senses after cross-topic and cross-level deduplication. */
 export const vocabularySenseCount = vocabularyLexicon.length;
