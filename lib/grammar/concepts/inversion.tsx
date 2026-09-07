@@ -15,8 +15,8 @@ const c1Topics: GrammarTopic[] = [
         forms: ["negative/restrictive adverbial + auxiliary + subject + main verb"],
         rules: [
           "Cuando una expresión negativa se adelanta al principio de la clause para énfasis, invertimos auxiliary y subject.",
-          "Son frecuentes under no circumstances, at no time, not until, nowhere, on no account y expresiones similares.",
-          "Si la oración original no tiene auxiliary, añadimos do/does/did según corresponda.",
+          "El Gold ejemplifica este patrón con under no circumstances, at no time y not until.",
+          "Si la oración original no tiene auxiliary, usamos do/does/did para construir la inversión cuando corresponde.",
         ],
         examples: [
           { english: "Under no circumstances should you reveal the password." },
@@ -27,18 +27,21 @@ const c1Topics: GrammarTopic[] = [
       {
         title: "Restrictive expressions",
         rules: [
-          "Hardly, no sooner, seldom, little, never, only when y not only pueden provocar inversión cuando se colocan al inicio.",
-          "Hardly...when y no sooner...than son pares frecuentes.",
-          "Only + time/condition expression provoca inversión en la main clause que sigue, no necesariamente dentro de la clause introducida por only.",
-          "Estas estructuras son especialmente frecuentes en registro formal o literario.",
+          "El Gold trabaja hardly, scarcely, no sooner, seldom, rarely, little, never, only when y not only como expresiones que pueden provocar inversión cuando se adelantan.",
+          "Hardly/scarcely...when y no sooner...than son combinaciones frecuentes en estas estructuras.",
+          "Only + time/condition expression provoca inversión en la main clause que sigue, no dentro de la clause introducida por only.",
+          "Estas estructuras son más probables en contextos escritos formales o literarios que en conversación.",
         ],
         examples: [
-          { english: "Hardly had I sat down when the phone rang." },
+          { english: "Hardly had I arrived when the phone rang." },
+          { english: "Scarcely had I put down my suitcase when I was asked to help." },
           { english: "No sooner had we arrived than the storm began." },
+          { english: "Seldom have I felt so moved." },
           { english: "Little did she know what was about to happen." },
+          { english: "Only when I saw him again did I realise how good a friend he had been." },
           { english: "Not only did he miss the deadline, he also lost the data." },
         ],
-        traps: ["Hardly combina típicamente con when; no sooner con than."],
+        traps: ["Hardly/scarcely combinan típicamente con when; no sooner con than."],
       },
     ],
   },
