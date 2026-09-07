@@ -2,10 +2,10 @@ import { defineGrammarConcept } from "./factory";
 
 export const conditionals = defineGrammarConcept({
   slug: "conditionals",
-  title: "Conditionals",
+  title: "Conditionals & hypothetical meaning",
   category: "complex-structures",
-  sourceSlugs: ["conditionals-1", "conditionals-2"],
-  summary: "Zero, first, second, third, mixed conditionals, alternativas a if y estructuras de wish reunidas por grado de realidad y por tiempo.",
-  memoryHook: "REAL → posible → imaginario → imposible porque ya pasó.",
-  studyQuestion: "¿La condición es una verdad, una posibilidad real, una hipótesis presente o algo pasado que ya no puede cambiar?",
+  sourceSlugs: ["conditionals-1", "conditionals-2", "c1-hypothetical-meaning", "c1-conditionals-advanced"],
+  summary: "Conditionals B2 ampliados con C1: mixed conditionals, alternatives to if, formal inversion, suppose/what if, wish, if only, it's time y would rather.",
+  memoryHook: "REALIDAD + TIEMPO + DISTANCIA: cuanto más remoto, más retrocede la forma verbal.",
+  studyQuestion: "¿Hablas de una condición real/imaginaria, un pasado alternativo o una situación que deseas que fuera diferente?",
 });
