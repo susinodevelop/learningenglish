@@ -3,20 +3,20 @@ import { GrammarConceptBrowser } from "@/components/grammar/grammar-concept-brow
 import { grammarConcepts } from "@/lib/grammar";
 
 export const metadata: Metadata = {
-  title: "Gramática B2 por conceptos",
-  description: "Gramática Cambridge B2 reorganizada por conceptos relacionados, con mapas visuales, ejemplos, lógica, traps y práctica activa.",
+  title: "Gramática Cambridge B2 + C1 por conceptos",
+  description: "Gramática Cambridge B2 y C1 integrada por conceptos relacionados, con explicaciones, estructuras, ejemplos, traps y práctica activa.",
 };
 
 export default function GrammarPage() {
   return (
     <div className="shell page-shell">
       <header className="page-header grammar-page-header">
-        <span className="eyebrow">Gramática · Cambridge B2</span>
+        <span className="eyebrow">Gramática · Cambridge B2 + C1</span>
         <h1>Estudia conceptos, no unidades.</h1>
         <p>
-          La gramática está reordenada por relaciones reales: tiempos verbales, construcción de frases,
-          intención del verbo y conexión de ideas. Cada tema empieza con una pregunta guía, un atajo mental
-          y ejemplos visuales para reducir la carga de memoria.
+          La base B2 y las ampliaciones C1 están integradas en un mismo mapa: tiempos verbales,
+          construcción de frases, intención del verbo y conexión de ideas. Cada subapartado indica
+          su nivel para que puedas consolidar B2 y avanzar a C1 sin estudiar la misma gramática dos veces.
         </p>
       </header>
 
