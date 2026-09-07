@@ -107,14 +107,16 @@ const c1Topics: GrammarTopic[] = [
       {
         title: "Substitution, ellipsis and conjunction as cohesive devices",
         rules: [
-          "Substitution reemplaza un elemento repetido con one, do, so, etc.",
+          "Substitution reemplaza un noun, verb o incluso una phrase para evitar repetirla.",
           "Ellipsis omite información recuperable del contexto.",
-          "Coordinating conjunctions incluyen and, or, but, so, nor y yet.",
-          "Subordinating conjunctions como although, because, if, unless, whereas, while, as long as, so that, etc. conectan una subordinate clause con la main clause.",
+          "Coordinating conjunctions: and, or, but, so, nor y yet.",
+          "El Gold enumera como subordinating conjunctions: after, although, as, as far as, as if, as long as, as soon as, as though, because, before, if, in order that, since, so, so that, than, though, unless, until, when, whenever, where, whereas, wherever y while.",
+          "Las subordinating conjunctions enlazan una subordinate clause con la main clause.",
         ],
         examples: [
           { english: "I ordered the vegetarian option, and Eva did too.", note: "substitution" },
           { english: "I wanted to stay, but I couldn't.", note: "ellipsis" },
+          { english: "As far as I'm concerned, he can take over responsibility next week.", note: "subordination" },
         ],
       },
     ],
