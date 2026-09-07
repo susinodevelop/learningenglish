@@ -76,7 +76,7 @@ function MiniQuiz({ questions }: { questions: GrammarQuizQuestion[] }) {
             <button
               type="button"
               key={option}
-              className={`${styles.quizAnswer}${isCorrect ? ` ${styles.correct}` : ""}${isWrong ? ` ${styles.wrong}` : ""}`
+              className={`${styles.quizAnswer}${isCorrect ? ` ${styles.correct}` : ""}${isWrong ? ` ${styles.wrong}` : ""}`}
               onClick={() => chooseAnswer(optionIndex)}
               disabled={selected !== null}
             >
