@@ -80,7 +80,8 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
         question.sectionId &&
         question.sectionTitle &&
         (level === "all" || question.level === level) &&
-        (conceptSlug === "all" || question.conceptSlug === conceptSlug),
+        (conceptSlug === "all" || question.conceptSlug === conceptSlug) &&
+        (kind === "all" || question.kind === kind),
       )
       .forEach((question) => {
         if (!question.sectionId || !question.sectionTitle) return;
@@ -91,7 +92,7 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
         });
       });
     return Array.from(sectionMap.values()).sort((a, b) => a.title.localeCompare(b.title, "es"));
-  }, [conceptSlug, level, questions]);
+  }, [conceptSlug, kind, level, questions]);
 
   const filteredQuestions = useMemo(
     () => questions.filter((question) =>
@@ -155,6 +156,7 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
 
   function changeKind(nextKind: KindFilter) {
     setKind(nextKind);
+    setSectionId("all");
     resetSession();
   }
 
