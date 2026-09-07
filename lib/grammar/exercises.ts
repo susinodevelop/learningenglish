@@ -113,6 +113,10 @@ function theoryExamplePool(concept: GrammarConcept) {
   return unique(concept.sections.flatMap((section) => (section.examples ?? []).map((example) => example.english)));
 }
 
+function theoryTrapPool(concept: GrammarConcept) {
+  return unique(concept.sections.flatMap((section) => section.traps ?? []));
+}
+
 function makeTheoryQuestion(
   concept: GrammarConcept,
   section: GrammarConceptSection,
@@ -150,77 +154,110 @@ function generatedQuestionsForSection(
   const rulePool = theoryRulePool(concept);
   const formPool = theoryFormPool(concept);
   const examplePool = theoryExamplePool(concept);
-  const primaryRule = section.rules[0];
-  const secondaryRule = section.rules[1];
-  const primaryForm = section.forms?.[0];
-  const primaryExample = section.examples?.[0]?.english;
+  const trapPool = theoryTrapPool(concept);
 
-  if (primaryRule) {
+  section.rules.forEach((rule, index) => {
     questions.push(
       makeTheoryQuestion(
         concept,
         section,
-        "rule",
-        `¿Qué regla describe correctamente «${section.title}»?`,
-        primaryRule,
+        `rule-${index + 1}`,
+        index === 0
+          ? `¿Qué regla describe correctamente «${section.title}»?`
+          : `¿Qué afirmación también debes recordar en «${section.title}»?`,
+        rule,
         rulePool,
-        `Esta es una de las reglas que debes asociar a «${section.title}».`,
+        `La opción correcta forma parte de las reglas de «${section.title}».`,
       ),
     );
-  }
+  });
 
-  if (primaryExample) {
+  (section.examples ?? []).forEach((example, index) => {
     questions.push(
       makeTheoryQuestion(
         concept,
         section,
-        "example",
-        `¿Qué ejemplo pertenece a «${section.title}»?`,
-        primaryExample,
+        `example-${index + 1}`,
+        index === 0
+          ? `¿Qué ejemplo pertenece a «${section.title}»?`
+          : `¿Qué frase vuelve a aplicar correctamente «${section.title}»?`,
+        example.english,
         examplePool,
-        `El ejemplo correcto aplica el patrón explicado en «${section.title}».`,
+        example.note
+          ? `Este ejemplo aplica «${section.title}»: ${example.note}.`
+          : `Este ejemplo aplica el patrón explicado en «${section.title}».`,
       ),
     );
-  } else if (secondaryRule) {
-    questions.push(
-      makeTheoryQuestion(
-        concept,
-        section,
-        "rule-2",
-        `Elige otra afirmación correcta sobre «${section.title}».`,
-        secondaryRule,
-        rulePool,
-        `Esta segunda regla completa la decisión gramatical del subapartado «${section.title}».`,
-      ),
-    );
-  }
+  });
 
-  if (primaryForm) {
+  (section.forms ?? []).forEach((form, index) => {
     questions.push(
       makeTheoryQuestion(
         concept,
         section,
-        "form",
-        `¿Qué forma corresponde a «${section.title}»?`,
-        primaryForm,
+        `form-${index + 1}`,
+        index === 0
+          ? `¿Qué forma corresponde a «${section.title}»?`
+          : `¿Qué otra estructura pertenece a «${section.title}»?`,
+        form,
         formPool,
-        `Esta es la forma estructural registrada para «${section.title}».`,
+        `Esta forma estructural está asociada a «${section.title}».`,
       ),
     );
-  }
+  });
 
-  if (questions.length < 2 && secondaryRule) {
+  (section.traps ?? []).forEach((trap, index) => {
     questions.push(
       makeTheoryQuestion(
         concept,
         section,
-        "fallback",
-        `¿Qué afirmación también es correcta para «${section.title}»?`,
-        secondaryRule,
-        rulePool,
-        `La afirmación pertenece a la teoría de «${section.title}».`,
+        `trap-${index + 1}`,
+        `¿Qué trampa o advertencia es correcta en «${section.title}»?`,
+        trap,
+        trapPool.length > 1 ? trapPool : rulePool,
+        `Esta advertencia evita uno de los errores típicos del subapartado «${section.title}».`,
       ),
     );
+  });
+
+  const reinforcementSources = [
+    ...section.rules.map((value) => ({ type: "regla", value, pool: rulePool })),
+    ...(section.examples ?? []).map((example) => ({ type: "ejemplo", value: example.english, pool: examplePool })),
+    ...(section.forms ?? []).map((value) => ({ type: "forma", value, pool: formPool })),
+    ...(section.traps ?? []).map((value) => ({ type: "trampa", value, pool: trapPool.length > 1 ? trapPool : rulePool })),
+  ];
+
+  if (reinforcementSources.length === 0) {
+    throw new Error(`Grammar subsection without usable theory: ${concept.slug} → ${section.title}`);
+  }
+
+  const reinforcementPrompts = [
+    "Selecciona la opción que sí pertenece a este subapartado.",
+    "Si estuvieras repasando esta regla, ¿qué opción deberías conservar?",
+    "¿Qué opción es coherente con la teoría de este subapartado?",
+    "Identifica la opción correcta antes de aplicar la estructura en una frase.",
+    "¿Qué elemento forma parte de la decisión gramatical de este subapartado?",
+    "Elige la opción que encaja con lo explicado en esta sección.",
+    "¿Qué opción usarías como recordatorio correcto de esta regla?",
+    "Selecciona el dato gramatical que corresponde a esta sección.",
+  ];
+
+  let reinforcementIndex = 0;
+  while (questions.length < 8) {
+    const source = reinforcementSources[reinforcementIndex % reinforcementSources.length];
+    const prompt = reinforcementPrompts[reinforcementIndex % reinforcementPrompts.length];
+    questions.push(
+      makeTheoryQuestion(
+        concept,
+        section,
+        `reinforce-${reinforcementIndex + 1}`,
+        `${prompt} «${section.title}»`,
+        source.value,
+        source.pool,
+        `La respuesta correcta recupera una ${source.type} real de «${section.title}».`,
+      ),
+    );
+    reinforcementIndex += 1;
   }
 
   return questions;
@@ -340,15 +377,15 @@ for (const concept of grammarConcepts) {
 
   for (const section of concept.sections) {
     const sectionQuestions = grammarExerciseQuestions.filter((question) => question.sectionId === section.id);
-    if (sectionQuestions.length < 2) {
+    if (sectionQuestions.length < 8) {
       validationErrors.push(
-        `Theory subsection has fewer than 2 exercises: ${concept.slug} → ${section.title} (${sectionQuestions.length})`,
+        `Theory subsection has fewer than 8 exercises: ${concept.slug} → ${section.title} (${sectionQuestions.length})`,
       );
     }
   }
 }
 
-if (grammarExerciseQuestions.length < 350) {
+if (grammarExerciseQuestions.length < 600) {
   validationErrors.push(`Grammar bank is unexpectedly small: ${grammarExerciseQuestions.length} exercises`);
 }
 
