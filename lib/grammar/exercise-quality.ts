@@ -64,7 +64,7 @@ const qualityPatches: Record<string, ExercisePatch> = {
   },
 };
 
-const suspiciousFragments = [
+const suspiciousOptions = new Set([
   "would can",
   "can't to",
   "should to",
@@ -79,7 +79,7 @@ const suspiciousFragments = [
   "it one",
   "that one did",
   "moreover only",
-];
+]);
 
 export function applyGrammarApplicationQuality(seed: GrammarApplicationSeed): GrammarApplicationSeed {
   const patch = qualityPatches[seed.prompt];
@@ -97,8 +97,9 @@ export function grammarApplicationQualityErrors(seed: GrammarApplicationSeed, in
       errors.push(`Duplicate options in ${label}`);
     }
     for (const option of normalised) {
-      const suspicious = suspiciousFragments.find((fragment) => option.includes(fragment));
-      if (suspicious) errors.push(`Weak/artificial distractor '${suspicious}' in ${label}`);
+      if (suspiciousOptions.has(option)) {
+        errors.push(`Weak/artificial distractor '${option}' in ${label}`);
+      }
     }
   }
 
