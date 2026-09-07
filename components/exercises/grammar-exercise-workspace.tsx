@@ -74,7 +74,7 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
   );
 
   const availableSections = useMemo(() => {
-    const sectionMap = new Map<string, { id: string; title: string; level: GrammarLevel }>();
+    const sectionMap = new Map<string, { id: string; title: string; level: GrammarLevel; applicationCount: number }>();
     questions
       .filter((question) =>
         question.sectionId &&
@@ -85,10 +85,12 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
       )
       .forEach((question) => {
         if (!question.sectionId || !question.sectionTitle) return;
+        const current = sectionMap.get(question.sectionId);
         sectionMap.set(question.sectionId, {
           id: question.sectionId,
           title: question.sectionTitle,
           level: question.level,
+          applicationCount: (current?.applicationCount ?? 0) + (question.skill.includes("application") ? 1 : 0),
         });
       });
     return Array.from(sectionMap.values()).sort((a, b) => a.title.localeCompare(b.title, "es"));
@@ -223,8 +225,8 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
           <span className="eyebrow">Gramática · B2 + C1</span>
           <h2>Practica cada regla, no solo cada tema.</h2>
           <p>
-            El banco combina los mini-tests canónicos, ejercicios originales de aplicación y controles
-            automáticos de cada subapartado de la teoría. Puedes aislar una regla concreta o mezclarlo todo.
+            El banco combina mini-tests canónicos, ejercicios originales de aplicación y una actividad
+            guiada para cada subapartado de la teoría. Puedes aislar una regla concreta o mezclarlo todo.
           </p>
         </div>
         <div className={styles.exerciseCount}>
@@ -248,7 +250,7 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
             <option value="all">Todos los conceptos</option>
             {availableConcepts.map((concept) => (
               <option value={concept.slug} key={concept.slug}>
-                {concept.title} · {concept.level} · {concept.questionCount}
+                {concept.title} · {concept.level} · {concept.questionCount} ejercicios
               </option>
             ))}
           </select>
@@ -286,7 +288,7 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
           <div>
             <strong>{selectedConcept.title}{selectedSection ? ` · ${selectedSection.title}` : ""}</strong>
             <span>
-              {selectedConcept.categoryLabel} · {selectedConcept.level} · {selectedConcept.sectionCount} subapartados
+              {selectedConcept.categoryLabel} · {selectedConcept.level} · {selectedConcept.sectionCount} subapartados · {selectedConcept.applicationCount} ejercicios de aplicación
             </span>
           </div>
           <Link href={`/grammar#${selectedConcept.slug}`}>Repasar teoría →</Link>
@@ -364,31 +366,21 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
               })}
             </div>
           ) : (
-            <div className={advancedStyles.typedAnswer}>
-              <label htmlFor={`grammar-answer-${current.id}`}>
-                {current.kind === "transformation"
-                  ? "Escribe la frase completa"
-                  : current.kind === "error-correction"
-                    ? "Escribe la versión corregida"
-                    : "Escribe lo que falta"}
-              </label>
-              <div>
-                <input
-                  id={`grammar-answer-${current.id}`}
-                  value={typedAnswer}
-                  onChange={(event) => setTypedAnswer(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter") checkTypedAnswer();
-                  }}
-                  disabled={typedChecked}
-                  autoComplete="off"
-                  spellCheck={false}
-                />
-                <button className="button button-primary" type="button" onClick={checkTypedAnswer} disabled={typedChecked || !typedAnswer.trim()}>
+            <div className={advancedStyles.typedAnswerArea}>
+              <label htmlFor="grammar-answer">Tu respuesta</label>
+              <textarea
+                id="grammar-answer"
+                rows={current.kind === "transformation" || current.kind === "error-correction" ? 3 : 2}
+                value={typedAnswer}
+                onChange={(event) => setTypedAnswer(event.target.value)}
+                disabled={typedChecked}
+                placeholder={current.kind === "gap" ? "Escribe solo lo que falta" : "Escribe la frase completa"}
+              />
+              {!typedChecked ? (
+                <button className="button button-primary" type="button" onClick={checkTypedAnswer} disabled={!typedAnswer.trim()}>
                   Comprobar
                 </button>
-              </div>
-              <span className={advancedStyles.formatHelp}>No importa una mayúscula inicial, el punto final ni los acentos tipográficos del apóstrofo.</span>
+              ) : null}
             </div>
           )}
 
@@ -397,7 +389,7 @@ export function GrammarExerciseWorkspace({ questions, concepts }: GrammarExercis
               <div>
                 <strong>{currentCorrect ? "✓ Correcto" : "✕ No exactamente"}</strong>
                 <p>{current.explanation}</p>
-                {!currentCorrect && correctAnswer ? <small>Respuesta correcta: {correctAnswer}</small> : null}
+                {!currentCorrect && correctAnswer ? <small>Respuesta modelo: {correctAnswer}</small> : null}
               </div>
               <div className={styles.feedbackActions}>
                 <Link href={`/grammar#${current.conceptSlug}`}>Ver teoría</Link>
