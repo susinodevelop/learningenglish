@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { ExercisesHub } from "@/components/exercises/exercises-hub";
 import {
+  grammarExerciseApplicationCount,
   grammarExerciseConcepts,
+  grammarExerciseCount,
   grammarExerciseQuestions,
+  grammarExerciseSections,
 } from "@/lib/grammar/exercises";
 import { vocabularyLexicon, vocabularyTopics } from "@/lib/vocabulary";
 
@@ -25,6 +28,9 @@ export default function GamesPage() {
         <p>
           Gramática cubre cada subapartado de la teoría B2 + C1 con práctica por nivel, concepto, regla
           y formato. Vocabulario conserva tus grupos de estudio, filtros, progreso y modos de recuperación.
+        </p>
+        <p>
+          {grammarExerciseCount} ejercicios de gramática · {grammarExerciseSections.length} subapartados · {grammarExerciseApplicationCount} ejercicios originales de aplicación
         </p>
       </header>
 
