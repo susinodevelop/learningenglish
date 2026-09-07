@@ -6,9 +6,12 @@ import type {
   VocabularyLexicalMember,
   VocabularyRelations,
   VocabularySectionKind,
+  VocabularySource,
   VocabularyStudyTopic,
   VocabularyTopic,
 } from "./types";
+
+const B2_SOURCE: VocabularySource = "Grammar and Vocabulary for First and First for Schools";
 
 const SOURCE_UNITS: Record<string, number> = {
   "geography-climate-weather": 25,
@@ -192,7 +195,9 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
   const missingDefinitions: string[] = [];
 
   const topics: VocabularyStudyTopic[] = sourceTopics.map((topic) => {
-    const sourceUnit = SOURCE_UNITS[topic.slug];
+    const sourceUnit = topic.sourceUnit ?? SOURCE_UNITS[topic.slug];
+    const source = topic.source ?? B2_SOURCE;
+
     if (!sourceUnit) {
       throw new Error(`Missing source-unit mapping for vocabulary topic: ${topic.slug}`);
     }
@@ -209,9 +214,9 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
         return {
           title: section.title,
           kind: section.kind,
-          entries: section.entries.map(([term, meaningEs, note]) => {
-            const definitionEn = getEnglishDefinition(term, meaningEs);
-            usedGlossKeys.add(glossKey(term, meaningEs));
+          entries: section.entries.map(([term, meaningEs, note, inlineDefinitionEn]) => {
+            const definitionEn = inlineDefinitionEn ?? getEnglishDefinition(term, meaningEs);
+            if (!inlineDefinitionEn) usedGlossKeys.add(glossKey(term, meaningEs));
 
             if (!definitionEn) {
               missingDefinitions.push(`${topic.slug} → ${section.title} → ${term} = ${meaningEs}`);
@@ -230,11 +235,13 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
             const existing = lexiconBySense.get(senseKey);
 
             if (existing) {
+              existing.levels = Array.from(new Set([...existing.levels, topic.level]));
               existing.topics = unique([...existing.topics, topic.slug]);
               existing.sourceUnits = Array.from(new Set([...existing.sourceUnits, sourceUnit])).sort((a, b) => a - b);
               existing.sectionKinds = Array.from(new Set([...existing.sectionKinds, section.kind]));
               existing.sectionTitles = unique([...existing.sectionTitles, section.title]);
               existing.notes = unique([...existing.notes, ...(note ? [note] : [])]);
+              existing.provenance.sources = Array.from(new Set([...existing.provenance.sources, source]));
               mergeRelations(existing.relations, relations);
               return existing;
             }
@@ -244,7 +251,8 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
               term,
               normalizedTerm: normalise(term),
               type: inferType(section.kind, term),
-              cefr: "B2",
+              cefr: topic.level,
+              levels: [topic.level],
               meaning: {
                 es: meaningEs,
                 en: safeDefinition,
@@ -264,7 +272,7 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
               relations,
               notes: note ? [note] : [],
               provenance: {
-                source: "Grammar and Vocabulary for First and First for Schools",
+                sources: [source],
                 lexicalSelection: "book",
                 englishDefinition: "pedagogical-original",
                 examples: "pedagogical-original",
