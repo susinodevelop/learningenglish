@@ -8,7 +8,7 @@ const c1Topics: GrammarTopic[] = [
     title: "Relative clauses: register and precision",
     level: "C1",
     examPractice: "Gold C1 · Unit 2 · Grammar reference p. 152",
-    summary: "Defining y non-defining relatives con foco C1 en comas, omisión, preposiciones y registro formal.",
+    summary: "Defining y non-defining relatives con foco C1 en comas, omisión, preposiciones, referencia a ideas completas y registro formal.",
     sections: [
       {
         title: "Defining vs non-defining at C1",
@@ -26,6 +26,19 @@ const c1Topics: GrammarTopic[] = [
           { english: "The consultant, who called yesterday, is waiting outside.", note: "información adicional" },
           { english: "Everything that we discussed remains confidential.", note: "that tras quantifier" },
         ],
+      },
+      {
+        title: "Which referring to a whole clause",
+        rules: [
+          "En una non-defining relative clause, which puede referirse no solo a un sustantivo, sino a toda la situación o idea expresada en la clause anterior.",
+          "En este uso, la clause con which comenta o expresa una consecuencia de toda la información anterior y va separada por coma.",
+          "That no sustituye a which en este patrón porque se trata de una non-defining relative clause.",
+        ],
+        examples: [
+          { english: "The flight was cancelled, which meant we had to stay another night.", note: "which = toda la situación anterior" },
+          { english: "He received an unexpected bonus, which allowed him to pay off the debt.", note: "consecuencia de la clause anterior" },
+        ],
+        traps: ["No interpretes siempre which como referencia al último noun: aquí puede recuperar toda la idea anterior."],
       },
       {
         title: "Prepositions in relative clauses",
@@ -137,7 +150,7 @@ export const relativeClauses = defineGrammarConcept({
   category: "complex-structures",
   sourceSlugs: ["relative-clauses"],
   additionalTopics: c1Topics,
-  summary: "Defining y non-defining clauses desde B2 hasta C1, ampliadas con registro formal, -ever free relatives y participle clauses reducidas.",
+  summary: "Defining y non-defining clauses desde B2 hasta C1, ampliadas con registro formal, referencia a ideas completas, -ever free relatives y participle clauses reducidas.",
   memoryHook: "IDENTIFICA · AÑADE · REDUCE: decide qué información cumple la clause.",
-  studyQuestion: "¿La clause identifica, añade información, expresa una referencia abierta o puede reducirse con un participle?",
+  studyQuestion: "¿La clause identifica, añade información, comenta una idea completa, expresa una referencia abierta o puede reducirse con un participle?",
 });
