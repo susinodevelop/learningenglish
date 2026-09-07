@@ -56,6 +56,11 @@ const qualityPatches: Record<string, ExercisePatch> = {
     answerIndex: 0,
     explanation: "Moreover adds a further supporting point; nevertheless marks concession, consequently marks result and on the contrary rejects or reverses a previous claim.",
   },
+  "The first plan is expensive. ___, the alternative is much slower.": {
+    options: ["On the other hand", "Consequently", "Moreover", "For this reason"],
+    answerIndex: 0,
+    explanation: "On the other hand introduces a contrasting consideration. Consequently/for this reason express result, while moreover adds information.",
+  },
   "Look at that shelf! It ___.": {
     prompt: "Choose the form that explicitly presents a prediction based on the evidence you can see: Look at that shelf! It ___.",
     options: ["will collapse", "is going to collapse", "is collapsing every day", "has collapsed"],
