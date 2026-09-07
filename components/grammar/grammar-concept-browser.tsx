@@ -3,16 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import type { GrammarConcept } from "@/lib/grammar";
 import { grammarQuizzes, type GrammarQuizQuestion } from "@/lib/grammar/quizzes";
-import { c1GrammarQuizzes } from "@/lib/grammar/c1-quizzes";
 import styles from "./grammar-concept-browser.module.css";
 
 type GrammarConceptBrowserProps = {
   topics: GrammarConcept[];
-};
-
-const allGrammarQuizzes: Record<string, GrammarQuizQuestion[]> = {
-  ...grammarQuizzes,
-  ...c1GrammarQuizzes,
 };
 
 function MiniQuiz({ questions }: { questions: GrammarQuizQuestion[] }) {
@@ -124,7 +118,7 @@ export function GrammarConceptBrowser({ topics }: GrammarConceptBrowserProps) {
 
   const quizQuestions = useMemo(() => {
     if (!activeTopic) return [];
-    return activeTopic.sourceSlugs.flatMap((slug) => allGrammarQuizzes[normaliseQuizKey(slug)] ?? []);
+    return activeTopic.sourceSlugs.flatMap((slug) => grammarQuizzes[normaliseQuizKey(slug)] ?? []);
   }, [activeTopic]);
 
   if (!activeTopic) return null;
