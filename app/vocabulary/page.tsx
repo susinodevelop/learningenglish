@@ -40,7 +40,7 @@ export default function VocabularyPage() {
           <span className="eyebrow">Grupos de estudio</span>
           <h2>Crea una lista para un examen o deja que un grupo dinámico reúna automáticamente lo que necesitas repasar.</h2>
         </div>
-        <Link className="button button-primary" href="/games">
+        <Link className="button button-primary" href="/games#vocabulary">
           Crear grupo y estudiar
         </Link>
       </section>
