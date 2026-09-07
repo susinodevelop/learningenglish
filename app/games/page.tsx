@@ -30,7 +30,7 @@ export default function GamesPage() {
           y formato. Vocabulario conserva tus grupos de estudio, filtros, progreso y modos de recuperación.
         </p>
         <p>
-          {grammarExerciseCount} ejercicios de gramática · {grammarExerciseSections.length} subapartados · {grammarExerciseApplicationCount} ejercicios originales de aplicación
+          {grammarExerciseCount} ejercicios · {grammarExerciseSections.length} subapartados · {grammarExerciseApplicationCount} de aplicación original
         </p>
       </header>
 
