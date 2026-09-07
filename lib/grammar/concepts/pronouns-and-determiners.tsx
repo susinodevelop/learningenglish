@@ -2,10 +2,10 @@ import { defineGrammarConcept } from "./factory";
 
 export const pronounsAndDeterminers = defineGrammarConcept({
   slug: "pronouns-and-determiners",
-  title: "Pronouns, determiners & introductory it",
+  title: "Pronouns & determiners",
   category: "sentence-building",
-  sourceSlugs: ["pronouns-and-determiners", "c1-introductory-it", "c1-ever-words"],
-  summary: "Pronombres y determinantes B2 ampliados con introductory it, cleft sentences y whoever/whatever/etc. de C1.",
-  memoryHook: "SUSTITUYE · SEÑALA · ENFATIZA · ABRE: decide qué función cumple la palabra dentro de la frase.",
-  studyQuestion: "¿Necesitas sustituir/señalar un nombre, introducir una estructura pesada, enfocar un elemento o expresar una referencia abierta con -ever?",
+  sourceSlugs: ["pronouns-and-determiners"],
+  summary: "Posesión, reflexivos, reciprocidad, there/it y cuantificadores explicados según la función que cumplen dentro de la frase.",
+  memoryHook: "¿DE QUIÉN? · ¿A SÍ MISMO? · ¿ENTRE ELLOS? · ¿CUÁNTOS?",
+  studyQuestion: "¿Necesitas marcar posesión, sustituir un nombre, referirte al mismo sujeto o expresar cantidad?",
 });
