@@ -27,12 +27,18 @@ const c1Topics: GrammarTopic[] = [
       {
         title: "Time and place reference changes",
         rules: [
-          "Tomorrow puede pasar a the next/following day; yesterday a the day before/previous day.",
-          "Now puede pasar a then/at that time; here a there; today a that day.",
-          "Ago suele pasar a before/earlier.",
+          "Tomorrow → the next day / the day after / the following day.",
+          "Now → at that time/moment, immediately o then, según el contexto.",
+          "Yesterday → the day before / the previous day; last week → the week before / the previous week.",
+          "Here → there; this morning → that morning; today → that day.",
+          "Next Friday → the following Friday / the Friday after.",
+          "Ago → before / earlier.",
           "Estos cambios no son automáticos: dependen de si el punto de referencia realmente ha cambiado.",
         ],
-        examples: [{ english: "'I'll finish tomorrow.' → She said she'd finish the following day." }],
+        examples: [
+          { english: "'I'll finish tomorrow.' → She said she'd finish the following day." },
+          { english: "'I saw her last week.' → He said he'd seen her the week before." },
+        ],
       },
       {
         title: "Reported questions",
@@ -77,10 +83,10 @@ const c1Topics: GrammarTopic[] = [
         rules: [
           "Verb + (that) + clause: accept, admit, claim, doubt, explain, promise, recommend, say, suggest.",
           "Verb + object + (that) + clause: promise, remind, tell, warn.",
-          "Con recommend/suggest, la clause puede llevar should o una forma base en registros formales.",
+          "El Gold ejemplifica recommend con that + subject + should + infinitive.",
         ],
         examples: [
-          { english: "She suggested that we should leave early." },
+          { english: "She recommended that we should visit the museum." },
           { english: "He warned us that the road might be closed." },
         ],
       },
@@ -90,7 +96,7 @@ const c1Topics: GrammarTopic[] = [
           "Verb + -ing: admit, deny, recommend, regret, suggest.",
           "Verb + preposition + -ing: apologise for, insist on, object to.",
           "Verb + object + preposition + -ing: accuse somebody of, blame somebody for, congratulate somebody on, discourage somebody from, forgive somebody for.",
-          "En C1 conviene aprender el reporting verb junto con su patrón completo.",
+          "No es necesario reproducir una declaración palabra por palabra: el Gold señala que la información puede resumirse con el reporting verb adecuado.",
         ],
         examples: [
           { english: "He denied taking the money." },
@@ -100,15 +106,13 @@ const c1Topics: GrammarTopic[] = [
       },
       {
         title: "Impersonal reporting verbs",
+        forms: ["It + be + past participle + that-clause"],
         rules: [
           "En formal written English, verbs como believe, consider, expect y suggest pueden reportar opiniones generales sin identificar una fuente concreta.",
-          "La estructura impersonal típica es It + be + past participle + that-clause.",
-          "Otra opción frecuente, especialmente con pasiva, es subject + be + past participle + to-infinitive.",
+          "En esta unidad el Gold presenta la estructura impersonal It + be + past participle + that-clause.",
+          "La alternativa passive subject + be + past participle + to-infinitive se estudia de forma específica en Passive forms (Unit 11) y aparece allí en este mapa.",
         ],
-        examples: [
-          { english: "It is believed that demand will increase." },
-          { english: "The company is expected to announce the results tomorrow." },
-        ],
+        examples: [{ english: "It is believed that migration will increase substantially in the next ten years." }],
       },
     ],
   },
