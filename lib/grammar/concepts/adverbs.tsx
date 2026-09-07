@@ -2,10 +2,10 @@ import { defineGrammarConcept } from "./factory";
 
 export const adverbs = defineGrammarConcept({
   slug: "adverbs",
-  title: "Adverbs",
+  title: "Adverbs & modifiers",
   category: "sentence-building",
-  sourceSlugs: ["adverbs"],
-  summary: "Forma, significado, comparación, modificadores y posición de los adverbios para ver de un vistazo qué parte de la frase están modificando.",
-  memoryHook: "El adverbio modifica CÓMO, CUÁNDO, CUÁNTO o CON QUÉ FRECUENCIA.",
-  studyQuestion: "¿Qué palabra o acción estás modificando y en qué posición suena natural el adverbio?",
+  sourceSlugs: ["adverbs", "c1-modifying-adverbs"],
+  summary: "Adverbs B2 ampliados con modifiers C1: posición, significado, gradability e intensifiers que dependen de collocation.",
+  memoryHook: "MODIFICA, pero comprueba GRADO + COLLOCATION.",
+  studyQuestion: "¿Qué estás modificando y qué intensidad admite de forma natural esa palabra?",
 });
