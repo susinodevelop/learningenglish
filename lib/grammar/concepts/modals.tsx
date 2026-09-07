@@ -14,12 +14,13 @@ const c1Topics: GrammarTopic[] = [
         title: "Possibility and deduction",
         rules: [
           "Can/could pueden expresar posibilidad teórica.",
-          "May/might/could + infinitive expresan posibilidad presente o futura; may suele sugerir una posibilidad algo más fuerte que might/could según el contexto.",
+          "May/might/could + infinitive expresan posibilidad presente o futura; el Gold ejemplifica may como strong possibility y might/could como less possible.",
           "May/might/could + have + past participle expresan posibilidad sobre un evento pasado.",
           "Must expresa deducción positiva fuerte; must have + past participle la traslada al pasado.",
           "Can't/couldn't expresan deducción negativa fuerte en presente o pasado; no usamos mustn't con este significado.",
         ],
         examples: [
+          { english: "He may be on holiday.", note: "strong possibility en el ejemplo del Gold" },
           { english: "She might have missed the train." },
           { english: "He must have misunderstood the question." },
           { english: "That can't be the final version." },
@@ -30,9 +31,9 @@ const c1Topics: GrammarTopic[] = [
         title: "Obligation, prohibition and necessity",
         rules: [
           "Must/mustn't suelen presentar obligación o prohibición desde la perspectiva del hablante.",
-          "Have to/have got to suelen presentar una obligación impuesta externamente; have got to es especialmente común en British English.",
+          "Have to/have got to suelen presentar una obligación impuesta externamente; have got to es más común en British English que en American English.",
           "Had to expresa obligación pasada y también la forma reportada de must cuando significa obligación.",
-          "Need to expresa necesidad u obligación de manera más neutral.",
+          "Need to expresa necesidad u obligación.",
         ],
         examples: [
           { english: "I must finish this before I leave." },
@@ -55,18 +56,21 @@ const c1Topics: GrammarTopic[] = [
       {
         title: "Ability and unfulfilled ability",
         rules: [
-          "Can/be able to expresan capacidad presente y futura; can también aparece cuando existe oportunidad futura.",
+          "Can/be able to expresan capacidad presente y futura; can también aparece para el futuro cuando existe un sentido de oportunidad.",
           "Could/couldn't y was/were able to pueden expresar capacidad general pasada.",
-          "Could have + past participle puede expresar una capacidad u oportunidad pasada que no se aprovechó.",
+          "El Gold presenta could/couldn't + perfect infinitive para hablar de capacidad pasada no realizada o no disponible.",
         ],
-        examples: [{ english: "I could have studied abroad, but I chose to stay." }],
+        examples: [
+          { english: "I could have learnt to ski, but I preferred skating.", note: "capacidad no aprovechada" },
+          { english: "I couldn't have completed it without your help.", note: "forma perfecta negativa" },
+        ],
       },
       {
         title: "Should and past criticism",
         forms: ["should/ought to + infinitive", "should have + past participle"],
         rules: [
-          "Should expresa consejo, deber u obligación menos categórica; ought to es más formal.",
-          "Should have + past participle sirve para criticar una acción pasada o expresar que otra conducta habría sido mejor.",
+          "Should expresa obligaciones y deberes en presente, futuro o pasado, y también se usa para dar consejo; ought to puede sustituirlo y es más formal.",
+          "Should have + past participle sirve para criticar acciones propias o ajenas en el pasado.",
         ],
         examples: [{ english: "You should have checked the figures before publishing them." }],
       },
