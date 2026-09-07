@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { ExercisesHub } from "@/components/exercises/exercises-hub";
 import {
-  grammarExerciseApplicationCount,
   grammarExerciseConcepts,
   grammarExerciseCount,
+  grammarExerciseGuidedApplicationCount,
+  grammarExerciseManualApplicationCount,
   grammarExerciseQuestions,
   grammarExerciseSections,
 } from "@/lib/grammar/exercises";
@@ -30,7 +31,7 @@ export default function GamesPage() {
           y formato. Vocabulario conserva tus grupos de estudio, filtros, progreso y modos de recuperación.
         </p>
         <p>
-          {grammarExerciseCount} ejercicios · {grammarExerciseSections.length} subapartados · {grammarExerciseApplicationCount} de aplicación original
+          {grammarExerciseCount} ejercicios · {grammarExerciseSections.length} subapartados · {grammarExerciseManualApplicationCount} de aplicación manual · {grammarExerciseGuidedApplicationCount} guiados
         </p>
       </header>
 
