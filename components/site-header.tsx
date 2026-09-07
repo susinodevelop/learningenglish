@@ -3,7 +3,7 @@ import Link from "next/link";
 const links = [
   { href: "/grammar", label: "Gramática" },
   { href: "/vocabulary", label: "Vocabulario" },
-  { href: "/games", label: "Juegos" },
+  { href: "/games", label: "Estudiar" },
   { href: "/progress", label: "Progreso" },
 ];
 
