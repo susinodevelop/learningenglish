@@ -3,6 +3,7 @@ import { grammarUnits07to12 } from "./source/book-part-b";
 import { grammarUnits13to18 } from "./source/book-part-c";
 import { grammarUnits19to24 } from "./source/book-part-d";
 import { applyBookFidelityPatches } from "./source/book-fidelity";
+import { applyC1GoldFidelityPatches } from "./source/c1-gold-fidelity";
 import { c1GoldGrammarUnits01to03 } from "./source/c1-gold-part-a";
 import { c1GoldGrammarUnits04to06 } from "./source/c1-gold-part-b";
 import { c1GoldGrammarUnits07to09 } from "./source/c1-gold-part-c";
@@ -15,7 +16,7 @@ const rawB2BookGrammarTopics = [
   ...grammarUnits19to24,
 ];
 
-const c1GoldGrammarTopics = [
+const rawC1GoldGrammarTopics = [
   ...c1GoldGrammarUnits01to03,
   ...c1GoldGrammarUnits04to06,
   ...c1GoldGrammarUnits07to09,
@@ -24,5 +25,5 @@ const c1GoldGrammarTopics = [
 
 export const bookGrammarTopics = [
   ...applyBookFidelityPatches(rawB2BookGrammarTopics),
-  ...c1GoldGrammarTopics,
+  ...applyC1GoldFidelityPatches(rawC1GoldGrammarTopics),
 ];
