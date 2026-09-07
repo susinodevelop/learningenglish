@@ -178,6 +178,63 @@ function makeTheoryQuestion(
   };
 }
 
+function makeGuidedApplicationQuestion(
+  concept: GrammarConcept,
+  section: GrammarConceptSection,
+): GrammarExerciseQuestion {
+  const example = section.examples?.[0]?.english;
+  const form = section.forms?.[0];
+  const rule = section.rules[0];
+
+  let correct: string;
+  let distractors: string[];
+  let prompt: string;
+  let explanation: string;
+
+  if (example) {
+    correct = example;
+    distractors = theoryExamplePool(concept);
+    prompt = `¿Qué frase aplica correctamente «${section.title}» en contexto?`;
+    explanation = section.examples?.[0]?.note
+      ? `La frase correcta aplica «${section.title}»: ${section.examples[0].note}.`
+      : `La frase correcta es un ejemplo real del patrón explicado en «${section.title}».`;
+  } else if (form) {
+    correct = form;
+    distractors = theoryFormPool(concept);
+    prompt = `Si tuvieras que construir una frase con «${section.title}», ¿qué estructura elegirías?`;
+    explanation = `Esta es una de las formas estructurales que necesitas para aplicar «${section.title}».`;
+  } else {
+    correct = rule;
+    distractors = theoryRulePool(concept);
+    prompt = `Antes de resolver una frase nueva sobre «${section.title}», ¿qué principio debes aplicar?`;
+    explanation = `Este principio guía la aplicación de «${section.title}» en contexto.`;
+  }
+
+  const { options, answerIndex } = rotatedOptions(
+    correct,
+    distractors,
+    `guided-${section.id}`,
+  );
+
+  return {
+    id: `guided-${section.id}`,
+    kind: "multiple-choice",
+    skill: "guided-application",
+    level: section.level,
+    conceptSlug: concept.slug,
+    conceptTitle: concept.title,
+    category: concept.category,
+    categoryLabel: concept.categoryLabel,
+    sectionId: section.id,
+    sectionTitle: section.title,
+    sourceTopic: section.sourceTopic,
+    prompt,
+    explanation,
+    options,
+    answerIndex,
+  };
+}
+
 function generatedQuestionsForSection(
   concept: GrammarConcept,
   section: GrammarConceptSection,
@@ -254,7 +311,7 @@ function generatedQuestionsForSection(
 
   const reinforcementSources = [
     ...section.rules.map((value) => ({ type: "regla", value, pool: rulePool })),
-    ...(section.examples ?? []).map((example) => ({ type: "ejemplo", value: example.english, pool: examplePool })),
+    ...(section.examples ?? []).map((entry) => ({ type: "ejemplo", value: entry.english, pool: examplePool })),
     ...(section.forms ?? []).map((value) => ({ type: "forma", value, pool: formPool })),
     ...(section.traps ?? []).map((value) => ({
       type: "trampa",
@@ -299,20 +356,61 @@ function generatedQuestionsForSection(
   return questions;
 }
 
+const sectionSearchStopWords = new Set([
+  "the", "and", "with", "that", "this", "from", "into", "have", "has", "had", "been",
+  "what", "which", "when", "where", "your", "you", "they", "their", "there", "than", "then",
+  "complete", "choose", "correct", "sentence", "rewrite", "using", "form", "best", "option",
+  "una", "para", "que", "con", "del", "las", "los", "por", "como",
+]);
+
+function meaningfulTokens(value: string) {
+  return normalise(value)
+    .split(" ")
+    .filter((token) => token.length >= 3 && !sectionSearchStopWords.has(token));
+}
+
+function sectionSearchCorpus(section: GrammarConceptSection) {
+  return normalise([
+    section.title,
+    ...section.rules,
+    ...(section.forms ?? []),
+    ...(section.examples ?? []).map((entry) => `${entry.english} ${entry.note ?? ""}`),
+    ...(section.traps ?? []),
+  ].join(" "));
+}
+
 function closestSection(
   concept: GrammarConcept,
   hint: string | undefined,
   level: GrammarLevel,
+  context: string,
 ) {
   if (!hint) return null;
   const wanted = normalise(hint);
   const sameLevel = concept.sections.filter((section) => section.level === level);
   const candidates = sameLevel.length > 0 ? sameLevel : concept.sections;
 
-  return candidates.find((section) => {
+  const direct = candidates.find((section) => {
     const title = normalise(section.title);
     return title === wanted || title.includes(wanted) || wanted.includes(title);
-  }) ?? null;
+  });
+  if (direct) return direct;
+
+  const tokens = unique(meaningfulTokens(`${hint} ${context}`));
+  const scored = candidates
+    .map((section) => {
+      const title = normalise(section.title);
+      const corpus = sectionSearchCorpus(section);
+      const score = tokens.reduce((total, token) => {
+        if (title.includes(token)) return total + 5;
+        if (corpus.includes(token)) return total + 1;
+        return total;
+      }, 0);
+      return { section, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  return scored[0]?.score > 0 ? scored[0].section : null;
 }
 
 const missingQuizSources: string[] = [];
@@ -358,14 +456,23 @@ const generatedSectionQuestions = grammarConcepts.flatMap((concept) =>
   concept.sections.flatMap((section) => generatedQuestionsForSection(concept, section)),
 );
 
+const guidedApplicationQuestions = grammarConcepts.flatMap((concept) =>
+  concept.sections.map((section) => makeGuidedApplicationQuestion(concept, section)),
+);
+
 const unresolvedApplicationSections: string[] = [];
 const qualityApplicationSeeds = grammarApplicationSeeds.map(applyGrammarApplicationQuality);
 
-const applicationQuestions: GrammarExerciseQuestion[] = qualityApplicationSeeds.map((seed, index) => {
+const manualApplicationQuestions: GrammarExerciseQuestion[] = qualityApplicationSeeds.map((seed, index) => {
   const concept = grammarConcepts.find((candidate) => candidate.slug === seed.conceptSlug);
   if (!concept) throw new Error(`Grammar application seed references unknown concept: ${seed.conceptSlug}`);
 
-  const section = closestSection(concept, seed.sectionHint, seed.level);
+  const section = closestSection(
+    concept,
+    seed.sectionHint,
+    seed.level,
+    `${seed.prompt} ${seed.explanation} ${seed.keyword ?? ""}`,
+  );
   if (seed.sectionHint && !section) {
     unresolvedApplicationSections.push(
       `${seed.conceptSlug} · ${seed.level} · ${seed.sectionHint} · ${seed.prompt}`,
@@ -393,6 +500,11 @@ const applicationQuestions: GrammarExerciseQuestion[] = qualityApplicationSeeds.
     keyword: seed.keyword,
   };
 });
+
+const applicationQuestions: GrammarExerciseQuestion[] = [
+  ...manualApplicationQuestions,
+  ...guidedApplicationQuestions,
+];
 
 export const grammarExerciseQuestions: GrammarExerciseQuestion[] = [
   ...applicationQuestions,
@@ -444,14 +556,14 @@ for (const question of grammarExerciseQuestions) {
 
 for (const concept of grammarConcepts) {
   const conceptQuestions = grammarExerciseQuestions.filter((question) => question.conceptSlug === concept.slug);
-  const conceptApplications = applicationQuestions.filter((question) => question.conceptSlug === concept.slug);
+  const conceptManualApplications = manualApplicationQuestions.filter((question) => question.conceptSlug === concept.slug);
 
   if (conceptQuestions.length < 10) {
     validationErrors.push(`Concept has fewer than 10 exercises: ${concept.slug} (${conceptQuestions.length})`);
   }
-  if (conceptApplications.length < 4) {
+  if (conceptManualApplications.length < 4) {
     validationErrors.push(
-      `Concept has fewer than 4 application exercises: ${concept.slug} (${conceptApplications.length})`,
+      `Concept has fewer than 4 hand-authored application exercises: ${concept.slug} (${conceptManualApplications.length})`,
     );
   }
 
@@ -459,9 +571,9 @@ for (const concept of grammarConcepts) {
     const sectionQuestions = grammarExerciseQuestions.filter((question) => question.sectionId === section.id);
     const sectionApplications = applicationQuestions.filter((question) => question.sectionId === section.id);
 
-    if (sectionQuestions.length < 8) {
+    if (sectionQuestions.length < 9) {
       validationErrors.push(
-        `Theory subsection has fewer than 8 exercises: ${concept.slug} → ${section.title} (${sectionQuestions.length})`,
+        `Theory subsection has fewer than 9 exercises: ${concept.slug} → ${section.title} (${sectionQuestions.length})`,
       );
     }
     if (sectionApplications.length < 1) {
@@ -472,11 +584,11 @@ for (const concept of grammarConcepts) {
   }
 }
 
-if (applicationQuestions.length < 130) {
-  validationErrors.push(`Application bank is unexpectedly small: ${applicationQuestions.length} exercises`);
+if (manualApplicationQuestions.length < 130) {
+  validationErrors.push(`Hand-authored application bank is unexpectedly small: ${manualApplicationQuestions.length} exercises`);
 }
 
-if (grammarExerciseQuestions.length < 600) {
+if (grammarExerciseQuestions.length < 700) {
   validationErrors.push(`Grammar bank is unexpectedly small: ${grammarExerciseQuestions.length} exercises`);
 }
 
@@ -518,4 +630,6 @@ export const grammarExerciseConcepts: GrammarExerciseConcept[] = grammarConcepts
 
 export const grammarExerciseCount = grammarExerciseQuestions.length;
 export const grammarExerciseApplicationCount = applicationQuestions.length;
+export const grammarExerciseManualApplicationCount = manualApplicationQuestions.length;
+export const grammarExerciseGuidedApplicationCount = guidedApplicationQuestions.length;
 export const grammarExerciseTheoryCheckCount = generatedSectionQuestions.length;
