@@ -4,24 +4,28 @@ import { VocabularyBrowser } from "@/components/vocabulary/vocabulary-browser";
 import {
   vocabularyCategories,
   vocabularyEntryCount,
+  vocabularyEntryCountByLevel,
   vocabularyTopics,
 } from "@/lib/vocabulary";
 
 export const metadata: Metadata = {
-  title: "Vocabulario B2",
-  description: "Vocabulario Cambridge B2 clasificado por conceptos, chunks, phrasal verbs y word families.",
+  title: "Vocabulario B2 + C1",
+  description: "Vocabulario Cambridge B2 First y C1 Advanced clasificado por conceptos, chunks, phrasal verbs y word families.",
 };
 
 export default function VocabularyPage() {
   return (
     <div className="shell page-shell">
       <header className="page-header compact-header">
-        <span className="eyebrow">Vocabulario · Cambridge B2</span>
+        <span className="eyebrow">Vocabulario · Cambridge B2 + C1</span>
         <h1>No memorices listas. Construye asociaciones.</h1>
         <p>
-          Todo el vocabulario clave del bloque Vocabulary del libro está reorganizado por conceptos.
-          Dentro de cada tema separas palabras, chunks, collocations, phrasal verbs, word building y
-          diferencias que suelen provocar errores.
+          El vocabulario de Grammar and Vocabulary for First y Gold C1 Advanced está reorganizado
+          sobre un único léxico canónico. Si B2 y C1 trabajan el mismo sentido, la web reutiliza la
+          misma ficha; C1 añade únicamente los sentidos y relaciones nuevos.
+        </p>
+        <p>
+          {vocabularyEntryCountByLevel.B2} fichas fuente B2 · {vocabularyEntryCountByLevel.C1} fichas fuente C1
         </p>
       </header>
 
