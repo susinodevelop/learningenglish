@@ -12,12 +12,16 @@ export type {
   VocabularyCategory,
   VocabularyEntryType,
   VocabularyExample,
+  VocabularyLegacyLexeme,
   VocabularyLevel,
   VocabularyLexeme,
   VocabularyLexicalMember,
   VocabularyMeaning,
+  VocabularyRelationLink,
   VocabularyRelations,
+  VocabularyResolvedRelations,
   VocabularySeedEntry,
+  VocabularySense,
   VocabularySection,
   VocabularySectionKind,
   VocabularySource,
@@ -50,8 +54,20 @@ const compiledVocabulary = compileVocabulary(sourceVocabularyTopics);
 /** Learner-facing, rich topics from the B2 First and C1 Advanced source books. */
 export const vocabularyTopics = compiledVocabulary.topics;
 
-/** Canonical lexical senses reusable by study groups and games. */
-export const vocabularyLexicon = compiledVocabulary.lexicon;
+/** Canonical semantic senses. New games and persistence should use senseId. */
+export const vocabularySenses = compiledVocabulary.senses;
+
+/** Parent terms used by grouped search and detail pages. */
+export const vocabularyLexemes = compiledVocabulary.lexemes;
+
+/** Maps historic localStorage IDs to the new stable sense IDs. */
+export const vocabularyLegacyIdMap = compiledVocabulary.legacyIdMap;
+
+/**
+ * Backwards-compatible sense list used by the existing StudyWorkspace while its
+ * localStorage data is migrated. Prefer `vocabularySenses` in new code.
+ */
+export const vocabularyLexicon = vocabularySenses;
 
 /** Number of source study cards shown across all topic sections. */
 export const vocabularyEntryCount = vocabularyTopics.reduce(
@@ -75,5 +91,8 @@ export const vocabularyEntryCountByLevel = {
     ),
 };
 
-/** Number of unique lexical senses after cross-topic and cross-level deduplication. */
-export const vocabularySenseCount = vocabularyLexicon.length;
+/** Number of unique semantic senses after cross-topic and cross-level deduplication. */
+export const vocabularySenseCount = vocabularySenses.length;
+
+/** Number of unique learner-facing terms after grouping polysemous senses. */
+export const vocabularyLexemeCount = vocabularyLexemes.length;

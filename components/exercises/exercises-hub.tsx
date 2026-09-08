@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { StudyWorkspace } from "@/components/study/study-workspace";
 import type { GrammarExerciseConcept, GrammarExerciseQuestion } from "@/lib/grammar/exercises";
-import type { VocabularyLexeme } from "@/lib/vocabulary";
+import type { VocabularySense } from "@/lib/vocabulary";
 import { GrammarExerciseWorkspace } from "./grammar-exercise-workspace";
 import styles from "./exercises.module.css";
 
@@ -15,7 +15,7 @@ type TopicOption = {
 type ExercisesHubProps = {
   grammarQuestions: GrammarExerciseQuestion[];
   grammarConcepts: GrammarExerciseConcept[];
-  vocabularyLexicon: VocabularyLexeme[];
+  vocabularyLexicon: VocabularySense[];
   vocabularyTopics: TopicOption[];
 };
 
@@ -86,8 +86,8 @@ export function ExercisesHub({
               <span className="eyebrow">Vocabulario · B2 + C1</span>
               <h2>Elige qué vocabulario estudiar y cómo recuperarlo.</h2>
               <p>
-                Conservamos los grupos estáticos y dinámicos, el progreso y todos los modos de práctica
-                que ya tenías. Solo cambia su lugar dentro de la nueva sección de Ejercicios.
+                Los grupos trabajan sobre sentidos léxicos estables. Conservamos tus listas y progreso
+                local mientras preparamos la sincronización multi-dispositivo.
               </p>
             </div>
             <StudyWorkspace lexicon={vocabularyLexicon} topics={vocabularyTopics} />

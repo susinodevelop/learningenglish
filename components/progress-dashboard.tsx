@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import {
   isVocabularyMastered,
+  migrateVocabularyProgress,
   STUDY_GROUPS_STORAGE_KEY,
   VOCABULARY_PROGRESS_STORAGE_KEY,
   type StudyGroup,
   type VocabularyProgress,
 } from "@/lib/study-groups";
+import { initialiseRemoteStudyState } from "@/lib/study-sync-client";
+import { vocabularySenses } from "@/lib/vocabulary";
 
 type ProgressDashboardProps = {
   vocabularyTotal: number;
@@ -19,6 +22,7 @@ type Snapshot = {
   attempts: number;
   correct: number;
   groups: number;
+  cloud: boolean;
 };
 
 function readJson<T>(raw: string | null, fallback: T): T {
@@ -30,36 +34,58 @@ function readJson<T>(raw: string | null, fallback: T): T {
   }
 }
 
+function makeSnapshot(progress: VocabularyProgress, groups: StudyGroup[], cloud: boolean): Snapshot {
+  const records = Object.values(progress);
+  return {
+    practised: records.filter((record) => record.attempts > 0).length,
+    mastered: records.filter((record) => isVocabularyMastered(record)).length,
+    attempts: records.reduce((total, record) => total + record.attempts, 0),
+    correct: records.reduce((total, record) => total + record.correct, 0),
+    groups: groups.length,
+    cloud,
+  };
+}
+
 export function ProgressDashboard({ vocabularyTotal }: ProgressDashboardProps) {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
 
   useEffect(() => {
-    const read = () => {
-      const progress = readJson<VocabularyProgress>(
+    let cancelled = false;
+
+    const readLocal = () => {
+      const rawProgress = readJson<VocabularyProgress>(
         window.localStorage.getItem(VOCABULARY_PROGRESS_STORAGE_KEY),
         {},
       );
+      const progress = migrateVocabularyProgress(rawProgress, vocabularySenses);
       const groups = readJson<StudyGroup[]>(
         window.localStorage.getItem(STUDY_GROUPS_STORAGE_KEY),
         [],
       );
-      const records = Object.values(progress);
-
-      setSnapshot({
-        practised: records.filter((record) => record.attempts > 0).length,
-        mastered: records.filter((record) => isVocabularyMastered(record)).length,
-        attempts: records.reduce((total, record) => total + record.attempts, 0),
-        correct: records.reduce((total, record) => total + record.correct, 0),
-        groups: Array.isArray(groups) ? groups.length : 0,
-      });
+      if (!cancelled) setSnapshot(makeSnapshot(progress, groups, false));
+      return { progress, groups };
     };
 
-    read();
-    window.addEventListener("learningenglish:progress", read);
-    window.addEventListener("learningenglish:study-groups", read);
+    const sync = async () => {
+      const local = readLocal();
+      try {
+        const remote = await initialiseRemoteStudyState(local.groups, local.progress);
+        if (cancelled || !remote.authenticated) return;
+        window.localStorage.setItem(STUDY_GROUPS_STORAGE_KEY, JSON.stringify(remote.groups));
+        window.localStorage.setItem(VOCABULARY_PROGRESS_STORAGE_KEY, JSON.stringify(remote.progress));
+        setSnapshot(makeSnapshot(remote.progress, remote.groups, true));
+      } catch (error) {
+        console.error("Could not refresh cloud progress", error);
+      }
+    };
+
+    void sync();
+    window.addEventListener("learningenglish:progress", readLocal);
+    window.addEventListener("learningenglish:study-groups", readLocal);
     return () => {
-      window.removeEventListener("learningenglish:progress", read);
-      window.removeEventListener("learningenglish:study-groups", read);
+      cancelled = true;
+      window.removeEventListener("learningenglish:progress", readLocal);
+      window.removeEventListener("learningenglish:study-groups", readLocal);
     };
   }, []);
 
@@ -82,7 +108,11 @@ export function ProgressDashboard({ vocabularyTotal }: ProgressDashboardProps) {
       <article className="stat-card">
         <span>Precisión global</span>
         <strong>{snapshot === null ? "—" : `${accuracy}%`}</strong>
-        <small>{snapshot === null ? "Guardado en este dispositivo" : `${snapshot.attempts} intentos · ${snapshot.groups} grupos propios`}</small>
+        <small>
+          {snapshot === null
+            ? "Cargando progreso"
+            : `${snapshot.attempts} intentos · ${snapshot.groups} grupos · ${snapshot.cloud ? "Supabase" : "este dispositivo"}`}
+        </small>
       </article>
     </div>
   );

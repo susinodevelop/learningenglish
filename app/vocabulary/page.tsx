@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { VocabularyBrowser } from "@/components/vocabulary/vocabulary-browser";
+import { VocabularyExplorer } from "@/components/vocabulary/vocabulary-explorer";
 import {
   vocabularyCategories,
-  vocabularyEntryCount,
   vocabularyEntryCountByLevel,
+  vocabularyLexemeCount,
+  vocabularyLexemes,
+  vocabularySenseCount,
+  vocabularySenses,
   vocabularyTopics,
 } from "@/lib/vocabulary";
 
 export const metadata: Metadata = {
   title: "Vocabulario B2 + C1",
-  description: "Vocabulario Cambridge B2 First y C1 Advanced clasificado por conceptos, chunks, phrasal verbs y word families.",
+  description: "Léxico Cambridge B2 First y C1 Advanced agrupado por términos, acepciones, temas y relaciones.",
 };
 
 export default function VocabularyPage() {
@@ -18,30 +21,30 @@ export default function VocabularyPage() {
     <div className="shell page-shell">
       <header className="page-header compact-header">
         <span className="eyebrow">Vocabulario · Cambridge B2 + C1</span>
-        <h1>No memorices listas. Construye asociaciones.</h1>
+        <h1>Busca una palabra. Entiende cada acepción. Practícala después.</h1>
         <p>
-          El vocabulario de Grammar and Vocabulary for First y Gold C1 Advanced está reorganizado
-          sobre un único léxico canónico. Si B2 y C1 trabajan el mismo sentido, la web reutiliza la
-          misma ficha; C1 añade únicamente los sentidos y relaciones nuevos.
+          El vocabulario de Grammar and Vocabulary for First y Gold C1 Advanced comparte ahora una
+          estructura Lexeme → Sense: una palabra aparece una sola vez y agrupa todos sus significados.
         </p>
         <p>
-          {vocabularyEntryCountByLevel.B2} fichas fuente B2 · {vocabularyEntryCountByLevel.C1} fichas fuente C1
+          {vocabularyEntryCountByLevel.B2} fichas fuente B2 · {vocabularyEntryCountByLevel.C1} fichas fuente C1 · {vocabularyLexemeCount} términos · {vocabularySenseCount} acepciones
         </p>
       </header>
 
-      <VocabularyBrowser
+      <VocabularyExplorer
         categories={vocabularyCategories}
         topics={vocabularyTopics}
-        entryCount={vocabularyEntryCount}
+        lexemes={vocabularyLexemes}
+        senses={vocabularySenses}
       />
 
       <section className="cta-panel">
         <div>
-          <span className="eyebrow">Grupos de estudio</span>
-          <h2>Crea una lista para un examen o deja que un grupo dinámico reúna automáticamente lo que necesitas repasar.</h2>
+          <span className="eyebrow">Grupos y juegos</span>
+          <h2>Crea listas estáticas o dinámicas y practica con Flashcards, Write it y cuatro direcciones de multiple choice.</h2>
         </div>
         <Link className="button button-primary" href="/games#vocabulary">
-          Crear grupo y estudiar
+          Ir a ejercicios de vocabulario
         </Link>
       </section>
     </div>

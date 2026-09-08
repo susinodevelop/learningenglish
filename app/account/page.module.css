@@ -1,0 +1,62 @@
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+
+.card h2 {
+  margin: 8px 0 6px;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  letter-spacing: -.04em;
+  overflow-wrap: anywhere;
+}
+
+.card p {
+  max-width: 660px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  justify-content: flex-end;
+}
+
+.actions form { margin: 0; }
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.infoGrid article {
+  padding: 23px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--white);
+}
+
+.infoGrid strong {
+  font-size: 1.1rem;
+}
+
+.infoGrid p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+@media (max-width: 800px) {
+  .card { align-items: flex-start; flex-direction: column; }
+  .actions { justify-content: flex-start; }
+  .infoGrid { grid-template-columns: 1fr; }
+}
