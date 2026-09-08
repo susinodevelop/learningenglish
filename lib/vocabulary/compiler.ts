@@ -4,8 +4,11 @@ import type {
   VocabularyEntryType,
   VocabularyLexeme,
   VocabularyLexicalMember,
+  VocabularyRelationLink,
   VocabularyRelations,
+  VocabularyResolvedRelations,
   VocabularySectionKind,
+  VocabularySense,
   VocabularySource,
   VocabularyStudyTopic,
   VocabularyTopic,
@@ -36,7 +39,7 @@ const SOURCE_UNITS: Record<string, number> = {
   "university-opinions": 44,
 };
 
-function normalise(value: string) {
+export function normaliseVocabularyText(value: string) {
   return value
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -47,7 +50,7 @@ function normalise(value: string) {
 }
 
 function slugPart(value: string) {
-  return normalise(value)
+  return normaliseVocabularyText(value)
     .replace(/\[[^\]]+\]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
@@ -131,6 +134,15 @@ function emptyRelations(): VocabularyRelations {
   };
 }
 
+function emptyResolvedRelations(): VocabularyResolvedRelations {
+  return {
+    synonyms: [],
+    antonyms: [],
+    confusedWith: [],
+    wordFamily: [],
+  };
+}
+
 function mergeRelations(target: VocabularyRelations, incoming: VocabularyRelations) {
   target.collocations = unique([...target.collocations, ...incoming.collocations]);
   target.patterns = unique([...target.patterns, ...incoming.patterns]);
@@ -181,33 +193,55 @@ function makeRelations(
   };
 }
 
+/** Historic v1 ID used by existing localStorage groups/progress. */
+function makeLegacyId(term: string, meaningEs: string) {
+  return `${slugPart(term)}-${shortHash(normaliseVocabularyText(meaningEs))}`;
+}
+
 function makeSenseKey(term: string, meaningEs: string) {
-  return `${normalise(term)}::${normalise(meaningEs)}`;
+  return `${normaliseVocabularyText(term)}::${normaliseVocabularyText(meaningEs)}`;
 }
 
-function makeLexemeId(term: string, meaningEs: string) {
-  return `${slugPart(term)}-${shortHash(normalise(meaningEs))}`;
+function makeLexemeId(term: string) {
+  const normalizedTerm = normaliseVocabularyText(term);
+  return `lexeme-${slugPart(term)}-${shortHash(normalizedTerm)}`;
 }
 
-function findCrossLevelTermConflicts(lexicon: VocabularyLexeme[]) {
-  const byTerm = new Map<string, VocabularyLexeme[]>();
+/**
+ * Stable identity is anchored to source structure, term and an optional explicit key,
+ * never to the Spanish translation. If a future source creates a collision, add the
+ * fifth seed tuple field (`stableKey`) rather than changing existing IDs.
+ */
+function makeStableSenseId(
+  term: string,
+  sourceUnit: number,
+  kind: VocabularySectionKind,
+  sectionTitle: string,
+  stableKey?: string,
+) {
+  const identity = stableKey ?? `${sourceUnit}|${kind}|${normaliseVocabularyText(sectionTitle)}|${normaliseVocabularyText(term)}`;
+  return `sense-${slugPart(term)}-${sourceUnit}-${shortHash(identity)}`;
+}
 
-  for (const entry of lexicon) {
-    const entries = byTerm.get(entry.normalizedTerm) ?? [];
-    entries.push(entry);
-    byTerm.set(entry.normalizedTerm, entries);
-  }
-
-  return Array.from(byTerm.entries()).flatMap(([term, entries]) => {
-    if (entries.length < 2) return [];
-    const levels = new Set(entries.flatMap((entry) => entry.levels));
-    if (!levels.has("B2") || !levels.has("C1")) return [];
-    return [{ term, entries }];
+function resolveRelationLabels(
+  labels: string[],
+  lexemeByTerm: Map<string, VocabularyLexeme>,
+  sensesByLexeme: Map<string, VocabularySense[]>,
+): VocabularyRelationLink[] {
+  return unique(labels).map((label) => {
+    const lexeme = lexemeByTerm.get(normaliseVocabularyText(label));
+    if (!lexeme) return { label, senseIds: [] };
+    return {
+      label,
+      lexemeId: lexeme.id,
+      senseIds: (sensesByLexeme.get(lexeme.id) ?? []).map((sense) => sense.senseId),
+    };
   });
 }
 
 export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
-  const lexiconBySense = new Map<string, VocabularyLexeme>();
+  const sensesByMeaningKey = new Map<string, VocabularySense>();
+  const stableIdToMeaningKey = new Map<string, string>();
   const usedGlossKeys = new Set<string>();
   const missingDefinitions: string[] = [];
 
@@ -231,7 +265,7 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
         return {
           title: section.title,
           kind: section.kind,
-          entries: section.entries.map(([term, meaningEs, note, inlineDefinitionEn]) => {
+          entries: section.entries.map(([term, meaningEs, note, inlineDefinitionEn, stableKey]) => {
             const definitionEn = inlineDefinitionEn ?? getEnglishDefinition(term, meaningEs);
             if (!inlineDefinitionEn) usedGlossKeys.add(glossKey(term, meaningEs));
 
@@ -248,8 +282,9 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
               members,
               sectionPeerTerms,
             );
-            const senseKey = makeSenseKey(term, meaningEs);
-            const existing = lexiconBySense.get(senseKey);
+            const meaningKey = makeSenseKey(term, meaningEs);
+            const legacyId = makeLegacyId(term, meaningEs);
+            const existing = sensesByMeaningKey.get(meaningKey);
 
             if (existing) {
               existing.levels = Array.from(new Set([...existing.levels, topic.level]));
@@ -258,15 +293,28 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
               existing.sectionKinds = Array.from(new Set([...existing.sectionKinds, section.kind]));
               existing.sectionTitles = unique([...existing.sectionTitles, section.title]);
               existing.notes = unique([...existing.notes, ...(note ? [note] : [])]);
+              existing.legacyIds = unique([...existing.legacyIds, legacyId]);
               existing.provenance.sources = Array.from(new Set([...existing.provenance.sources, source]));
               mergeRelations(existing.relations, relations);
               return existing;
             }
 
-            const lexeme: VocabularyLexeme = {
-              id: makeLexemeId(term, meaningEs),
+            const senseId = makeStableSenseId(term, sourceUnit, section.kind, section.title, stableKey);
+            const collisionMeaningKey = stableIdToMeaningKey.get(senseId);
+            if (collisionMeaningKey && collisionMeaningKey !== meaningKey) {
+              throw new Error(
+                `Stable vocabulary sense ID collision: ${senseId}. Add an explicit stableKey to one source entry.`,
+              );
+            }
+            stableIdToMeaningKey.set(senseId, meaningKey);
+
+            const sense: VocabularySense = {
+              id: legacyId,
+              senseId,
+              lexemeId: makeLexemeId(term),
+              legacyIds: [legacyId],
               term,
-              normalizedTerm: normalise(term),
+              normalizedTerm: normaliseVocabularyText(term),
               type: inferType(section.kind, term),
               cefr: topic.level,
               levels: [topic.level],
@@ -287,6 +335,7 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
               sectionKinds: [section.kind],
               sectionTitles: [section.title],
               relations,
+              resolvedRelations: emptyResolvedRelations(),
               notes: note ? [note] : [],
               provenance: {
                 sources: [source],
@@ -296,8 +345,8 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
               },
             };
 
-            lexiconBySense.set(senseKey, lexeme);
-            return lexeme;
+            sensesByMeaningKey.set(meaningKey, sense);
+            return sense;
           }),
         };
       }),
@@ -317,18 +366,56 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
     );
   }
 
-  const lexicon = Array.from(lexiconBySense.values()).sort((a, b) => a.term.localeCompare(b.term, "en"));
-  const crossLevelConflicts = findCrossLevelTermConflicts(lexicon);
-  if (crossLevelConflicts.length > 0) {
-    throw new Error(
-      `Potential B2/C1 duplicate terms (${crossLevelConflicts.length}):\n${crossLevelConflicts
-        .map(({ term, entries }) => `${term}: ${entries.map((entry) => `[${entry.levels.join("+")}] ${entry.meaning.es}`).join(" || ")}`)
-        .join("\n")}`,
-    );
+  const senses = Array.from(sensesByMeaningKey.values()).sort((a, b) => {
+    const termOrder = a.term.localeCompare(b.term, "en");
+    return termOrder !== 0 ? termOrder : a.senseId.localeCompare(b.senseId, "en");
+  });
+
+  const lexemeMap = new Map<string, VocabularyLexeme>();
+  const sensesByLexeme = new Map<string, VocabularySense[]>();
+
+  for (const sense of senses) {
+    const existingLexeme = lexemeMap.get(sense.lexemeId);
+    if (existingLexeme) {
+      existingLexeme.senseIds = unique([...existingLexeme.senseIds, sense.senseId]);
+      existingLexeme.levels = Array.from(new Set([...existingLexeme.levels, ...sense.levels]));
+    } else {
+      lexemeMap.set(sense.lexemeId, {
+        id: sense.lexemeId,
+        term: sense.term,
+        normalizedTerm: sense.normalizedTerm,
+        senseIds: [sense.senseId],
+        levels: [...sense.levels],
+      });
+    }
+
+    const lexemeSenses = sensesByLexeme.get(sense.lexemeId) ?? [];
+    lexemeSenses.push(sense);
+    sensesByLexeme.set(sense.lexemeId, lexemeSenses);
   }
+
+  const lexemes = Array.from(lexemeMap.values()).sort((a, b) => a.term.localeCompare(b.term, "en"));
+  const lexemeByTerm = new Map(lexemes.map((lexeme) => [lexeme.normalizedTerm, lexeme]));
+
+  for (const sense of senses) {
+    sense.resolvedRelations = {
+      synonyms: resolveRelationLabels(sense.relations.synonyms, lexemeByTerm, sensesByLexeme),
+      antonyms: resolveRelationLabels(sense.relations.antonyms, lexemeByTerm, sensesByLexeme),
+      confusedWith: resolveRelationLabels(sense.relations.confusedWith, lexemeByTerm, sensesByLexeme),
+      wordFamily: resolveRelationLabels(sense.relations.wordFamily, lexemeByTerm, sensesByLexeme),
+    };
+  }
+
+  const legacyIdMap = Object.fromEntries(
+    senses.flatMap((sense) => sense.legacyIds.map((legacyId) => [legacyId, sense.senseId] as const)),
+  );
 
   return {
     topics,
-    lexicon,
+    senses,
+    lexemes,
+    legacyIdMap,
+    /** Backwards-compatible alias for existing study code during migration. */
+    lexicon: senses,
   };
 }
