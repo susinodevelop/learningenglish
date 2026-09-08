@@ -71,6 +71,28 @@
   margin-top: 4px;
 }
 
+.resend {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--green);
+  cursor: pointer;
+  font: inherit;
+  font-size: .86rem;
+  font-weight: 800;
+}
+
+.resend:hover {
+  text-decoration: underline;
+}
+
+.resend:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
 .notice,
 .noticeError {
   margin-bottom: 18px;
