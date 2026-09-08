@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type {
   VocabularyEntryType,
+  VocabularyLevel,
   VocabularySectionKind,
   VocabularySense,
 } from "@/lib/vocabulary";
@@ -27,6 +29,14 @@ import {
   type VocabularyPerformanceFilter,
   type VocabularyProgress,
 } from "@/lib/study-groups";
+import {
+  initialiseRemoteStudyState,
+  queuePendingAttempt,
+  queuePendingGroups,
+  saveRemoteStudyGroups,
+  saveRemoteVocabularyAttempt,
+} from "@/lib/study-sync-client";
+import type { StudyAttemptInput } from "@/lib/study-db";
 import styles from "./study-workspace.module.css";
 
 type TopicOption = {
@@ -39,10 +49,8 @@ type StudyWorkspaceProps = {
   topics: TopicOption[];
 };
 
-type StudyMode =
-  | "flashcards"
-  | VocabularyMultipleChoiceDirection
-  | "write-word";
+type StudyMode = "flashcards" | VocabularyMultipleChoiceDirection | "write-word";
+type CloudState = "checking" | "local" | "syncing" | "synced" | "error";
 
 const typeLabels: Record<VocabularyEntryType, string> = {
   word: "Word",
@@ -138,11 +146,21 @@ function safeReadProgress(raw: string | null): VocabularyProgress {
   }
 }
 
+function writeLocalStudyState(groups: StudyGroup[], progress: VocabularyProgress) {
+  window.localStorage.setItem(STUDY_GROUPS_STORAGE_KEY, JSON.stringify(groups));
+  window.localStorage.setItem(VOCABULARY_PROGRESS_STORAGE_KEY, JSON.stringify(progress));
+  window.dispatchEvent(new Event("learningenglish:study-groups"));
+  window.dispatchEvent(new Event("learningenglish:progress"));
+}
+
 export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   const [hydrated, setHydrated] = useState(false);
   const [userGroups, setUserGroups] = useState<StudyGroup[]>([]);
   const [progress, setProgress] = useState<VocabularyProgress>({});
   const [activeGroupId, setActiveGroupId] = useState(systemStudyGroups[0].id);
+  const [cloudState, setCloudState] = useState<CloudState>("checking");
+  const [cloudEmail, setCloudEmail] = useState<string | null>(null);
+  const [remoteEnabled, setRemoteEnabled] = useState(false);
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -167,31 +185,51 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   const [finished, setFinished] = useState(false);
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
+    let cancelled = false;
+
+    async function boot() {
       const storedGroups = safeReadGroups(window.localStorage.getItem(STUDY_GROUPS_STORAGE_KEY));
       const migratedGroups = storedGroups.map((group) => migrateStaticGroupIds(group, lexicon));
       const storedProgress = safeReadProgress(window.localStorage.getItem(VOCABULARY_PROGRESS_STORAGE_KEY));
       const migratedProgress = migrateVocabularyProgress(storedProgress, lexicon);
 
+      if (cancelled) return;
       setUserGroups(migratedGroups);
       setProgress(migratedProgress);
-      window.localStorage.setItem(STUDY_GROUPS_STORAGE_KEY, JSON.stringify(migratedGroups));
-      window.localStorage.setItem(VOCABULARY_PROGRESS_STORAGE_KEY, JSON.stringify(migratedProgress));
-      setHydrated(true);
-    });
+      writeLocalStudyState(migratedGroups, migratedProgress);
 
-    return () => window.cancelAnimationFrame(frame);
+      try {
+        const remote = await initialiseRemoteStudyState(migratedGroups, migratedProgress);
+        if (cancelled) return;
+
+        if (!remote.authenticated) {
+          setRemoteEnabled(false);
+          setCloudState("local");
+        } else {
+          setRemoteEnabled(true);
+          setCloudEmail(remote.userEmail ?? null);
+          setUserGroups(remote.groups);
+          setProgress(remote.progress);
+          writeLocalStudyState(remote.groups, remote.progress);
+          setCloudState("synced");
+        }
+      } catch (error) {
+        console.error("Could not initialize cloud study state", error);
+        if (!cancelled) setCloudState("error");
+      } finally {
+        if (!cancelled) setHydrated(true);
+      }
+    }
+
+    void boot();
+    return () => { cancelled = true; };
   }, [lexicon]);
 
   const groups = useMemo(() => [...systemStudyGroups, ...userGroups], [userGroups]);
-
   const resolvedGroups = useMemo(
-    () => new Map(
-      groups.map((group) => [group.id, resolveStudyGroup(group, lexicon, progress)]),
-    ),
+    () => new Map(groups.map((group) => [group.id, resolveStudyGroup(group, lexicon, progress)])),
     [groups, lexicon, progress],
   );
-
   const activeGroup = groups.find((group) => group.id === activeGroupId) ?? groups[0];
   const activeEntries = useMemo(
     () => resolvedGroups.get(activeGroup.id) ?? [],
@@ -233,7 +271,6 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   );
 
   const current = sessionEntries[sessionIndex];
-
   const question = useMemo(() => {
     if (!current || !multipleChoiceModes.has(mode)) return null;
     return generateVocabularyMultipleChoiceQuestion({
@@ -249,6 +286,24 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     setUserGroups(next);
     window.localStorage.setItem(STUDY_GROUPS_STORAGE_KEY, JSON.stringify(next));
     window.dispatchEvent(new Event("learningenglish:study-groups"));
+
+    if (!remoteEnabled) return;
+    setCloudState("syncing");
+    void saveRemoteStudyGroups(next)
+      .then((saved) => {
+        if (!saved) {
+          queuePendingGroups(next);
+          setRemoteEnabled(false);
+          setCloudState("local");
+          return;
+        }
+        setCloudState("synced");
+      })
+      .catch((error) => {
+        console.error("Could not save study groups remotely", error);
+        queuePendingGroups(next);
+        setCloudState("error");
+      });
   }
 
   function persistProgress(next: VocabularyProgress) {
@@ -257,7 +312,27 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     window.dispatchEvent(new Event("learningenglish:progress"));
   }
 
-  function recordResult(entry: VocabularySense, correct: boolean) {
+  function sendAttempt(attempt: StudyAttemptInput) {
+    if (!remoteEnabled) return;
+    setCloudState("syncing");
+    void saveRemoteVocabularyAttempt(attempt)
+      .then((saved) => {
+        if (!saved) {
+          queuePendingAttempt(attempt);
+          setRemoteEnabled(false);
+          setCloudState("local");
+          return;
+        }
+        setCloudState("synced");
+      })
+      .catch((error) => {
+        console.error("Could not save vocabulary attempt remotely", error);
+        queuePendingAttempt(attempt);
+        setCloudState("error");
+      });
+  }
+
+  function recordResult(entry: VocabularySense, correct: boolean, selectedAnswer?: string | null) {
     const previous = progressForSense(progress, entry) ?? {
       attempts: 0,
       correct: 0,
@@ -278,6 +353,14 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     };
 
     persistProgress(next);
+    sendAttempt({
+      senseId: entry.senseId,
+      gameType: mode === "flashcards" ? "flashcards" : mode === "write-word" ? "write-word" : "multiple-choice",
+      direction: mode,
+      difficulty: multipleChoiceModes.has(mode) ? difficulty : null,
+      correct,
+      selectedAnswer: selectedAnswer ?? null,
+    });
   }
 
   function resetEditor() {
@@ -381,7 +464,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     setSelectedAnswer(option);
     setAnswerCorrect(correct);
     if (correct) setScore((value) => value + 1);
-    recordResult(current, correct);
+    recordResult(current, correct, option);
   }
 
   function checkTypedAnswer() {
@@ -389,14 +472,14 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     const correct = normaliseVocabularyAnswer(typedAnswer) === normaliseVocabularyAnswer(current.term);
     setAnswerCorrect(correct);
     if (correct) setScore((value) => value + 1);
-    recordResult(current, correct);
+    recordResult(current, correct, typedAnswer);
   }
 
   function rateFlashcard(correct: boolean) {
     if (!current || answerCorrect !== null) return;
     setAnswerCorrect(correct);
     if (correct) setScore((value) => value + 1);
-    recordResult(current, correct);
+    recordResult(current, correct, correct ? "Lo sabía" : "Repasar");
   }
 
   function nextQuestion() {
@@ -405,7 +488,6 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
       setFinished(true);
       return;
     }
-
     setSessionIndex((value) => value + 1);
     setSelectedAnswer(null);
     setTypedAnswer("");
@@ -436,6 +518,14 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
         <p className={styles.intro}>
           Los grupos no duplican vocabulario: guardan IDs estables de sentidos o filtros sobre el léxico canónico.
         </p>
+
+        <div className={`${styles.syncStatus} ${cloudState === "error" ? styles.syncError : ""}`}>
+          {cloudState === "synced" ? <><strong>☁ Sincronizado</strong><span>{cloudEmail ?? "Supabase"}</span></> : null}
+          {cloudState === "syncing" ? <><strong>☁ Sincronizando…</strong><span>{cloudEmail ?? "Supabase"}</span></> : null}
+          {cloudState === "error" ? <><strong>Sincronización pendiente</strong><span>Seguimos guardando localmente y reintentaremos.</span></> : null}
+          {cloudState === "local" ? <><strong>Solo este dispositivo</strong><Link href="/login?next=/games%23vocabulary">Inicia sesión para sincronizar →</Link></> : null}
+          {cloudState === "checking" ? <><strong>Comprobando cuenta…</strong><span>Preparando sincronización.</span></> : null}
+        </div>
 
         <div className={styles.groupList}>
           {groups.map((group) => {
@@ -488,7 +578,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
 
             {draftKind === "static" ? (
               <>
-                <p className={styles.editorHelp}>Elige acepciones concretas. Los nuevos grupos ya guardan senseIds estables.</p>
+                <p className={styles.editorHelp}>Elige acepciones concretas. Los nuevos grupos guardan senseIds estables.</p>
                 <label className={styles.field}>
                   <span>Buscar en el léxico</span>
                   <input value={staticQuery} onChange={(event) => setStaticQuery(event.target.value)} placeholder="Escribe al menos 2 letras…" />
@@ -525,6 +615,20 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
                   <input value={draftFilter.query} onChange={(event) => setDraftFilter((value) => ({ ...value, query: event.target.value }))} placeholder="Opcional: travel, work, reliable…" />
                 </label>
                 <div className={styles.filterGrid}>
+                  <label className={styles.field}>
+                    <span>Nivel</span>
+                    <select
+                      value={draftFilter.levels?.[0] ?? ""}
+                      onChange={(event) => setDraftFilter((value) => ({
+                        ...value,
+                        levels: event.target.value ? [event.target.value as VocabularyLevel] : [],
+                      }))}
+                    >
+                      <option value="">B2 + C1</option>
+                      <option value="B2">Solo B2</option>
+                      <option value="C1">Solo C1</option>
+                    </select>
+                  </label>
                   <label className={styles.field}>
                     <span>Tema</span>
                     <select value={draftFilter.topicSlugs[0] ?? ""} onChange={(event) => setDraftFilter((value) => ({ ...value, topicSlugs: event.target.value ? [event.target.value] : [] }))}>
