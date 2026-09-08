@@ -12,6 +12,8 @@ export type VocabularySeedEntry = readonly [
   meaningEs: string,
   note?: string,
   definitionEn?: string,
+  /** Optional explicit identity for the rare case where two senses share the same source anchor. */
+  stableKey?: string,
 ];
 
 export type VocabularySection = {
@@ -62,6 +64,7 @@ export type VocabularyLexicalMember = {
   meaning: VocabularyMeaning;
 };
 
+/** Source-faithful textual relationships retained for display and fallback matching. */
 export type VocabularyRelations = {
   collocations: string[];
   patterns: string[];
@@ -71,14 +74,37 @@ export type VocabularyRelations = {
   wordFamily: string[];
 };
 
+export type VocabularyRelationLink = {
+  /** Text as it appears in the pedagogical/source relationship. */
+  label: string;
+  /** Canonical term entry when this relationship can be resolved. */
+  lexemeId?: string;
+  /** All matching senses, useful when the related term is polysemous. */
+  senseIds: string[];
+};
+
+export type VocabularyResolvedRelations = {
+  synonyms: VocabularyRelationLink[];
+  antonyms: VocabularyRelationLink[];
+  confusedWith: VocabularyRelationLink[];
+  wordFamily: VocabularyRelationLink[];
+};
+
 /**
- * Canonical lexical sense used by study UI and games.
- * A term can legitimately have more than one sense (e.g. track).
- * `cefr` is the earliest level at which this sense is introduced; `levels`
- * records every source level in which the same canonical sense is taught.
+ * Canonical lexical SENSE used by study groups and games.
+ *
+ * `id` intentionally remains the historic ID for localStorage backwards compatibility.
+ * New persistent systems must use `senseId`, which is independent from the Spanish translation.
  */
-export type VocabularyLexeme = {
+export type VocabularySense = {
+  /** Historic term + Spanish-meaning ID. Do not use for new persistent data. */
   id: string;
+  /** Stable identity for this semantic sense. */
+  senseId: string;
+  /** Stable parent term identity. */
+  lexemeId: string;
+  /** Historic IDs that can be migrated to senseId. */
+  legacyIds: string[];
   term: string;
   normalizedTerm: string;
   type: VocabularyEntryType;
@@ -92,6 +118,7 @@ export type VocabularyLexeme = {
   sectionKinds: VocabularySectionKind[];
   sectionTitles: string[];
   relations: VocabularyRelations;
+  resolvedRelations: VocabularyResolvedRelations;
   notes: string[];
   provenance: {
     sources: VocabularySource[];
@@ -101,10 +128,22 @@ export type VocabularyLexeme = {
   };
 };
 
+/** Parent lexeme shown by search/detail UI. One lexeme can own many senses. */
+export type VocabularyLexeme = {
+  id: string;
+  term: string;
+  normalizedTerm: string;
+  senseIds: string[];
+  levels: VocabularyLevel[];
+};
+
+/** Temporary compatibility alias for code that still consumes one entry per sense. */
+export type VocabularyLegacyLexeme = VocabularySense;
+
 export type VocabularyStudySection = {
   title: string;
   kind: VocabularySectionKind;
-  entries: VocabularyLexeme[];
+  entries: VocabularySense[];
 };
 
 export type VocabularyStudyTopic = {
