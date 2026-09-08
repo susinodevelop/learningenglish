@@ -1,8 +1,8 @@
 import type {
   VocabularyEntryType,
   VocabularyLevel,
-  VocabularyLexeme,
   VocabularySectionKind,
+  VocabularySense,
 } from "./vocabulary";
 
 export type VocabularyPerformanceFilter =
@@ -20,6 +20,7 @@ export type VocabularyProgressRecord = {
   lastPractisedAt: string;
 };
 
+/** During localStorage migration keys may be historic IDs or stable senseIds. */
 export type VocabularyProgress = Record<string, VocabularyProgressRecord>;
 
 export type DynamicStudyGroupFilter = {
@@ -40,6 +41,7 @@ type StudyGroupBase = {
 
 export type StaticStudyGroup = StudyGroupBase & {
   kind: "static";
+  /** Historic field name. Values can be v1 IDs or stable senseIds during migration. */
   lexemeIds: string[];
 };
 
@@ -137,7 +139,7 @@ function matchesPerformance(
   }
 }
 
-function searchableLexemeText(entry: VocabularyLexeme) {
+function searchableSenseText(entry: VocabularySense) {
   return [
     entry.term,
     entry.meaning.en,
@@ -160,14 +162,29 @@ function searchableLexemeText(entry: VocabularyLexeme) {
   ].join(" ");
 }
 
+export function progressForSense(progress: VocabularyProgress, entry: VocabularySense) {
+  if (progress[entry.senseId]) return progress[entry.senseId];
+  if (progress[entry.id]) return progress[entry.id];
+  for (const legacyId of entry.legacyIds) {
+    if (progress[legacyId]) return progress[legacyId];
+  }
+  return undefined;
+}
+
+export function storedIdMatchesSense(storedId: string, entry: VocabularySense) {
+  return storedId === entry.senseId || storedId === entry.id || entry.legacyIds.includes(storedId);
+}
+
 export function resolveStudyGroup(
   group: StudyGroup,
-  lexicon: VocabularyLexeme[],
+  lexicon: VocabularySense[],
   progress: VocabularyProgress,
 ) {
   if (group.kind === "static") {
     const ids = new Set(group.lexemeIds);
-    return lexicon.filter((entry) => ids.has(entry.id));
+    return lexicon.filter((entry) =>
+      ids.has(entry.senseId) || ids.has(entry.id) || entry.legacyIds.some((legacyId) => ids.has(legacyId)),
+    );
   }
 
   const query = normalise(group.filter.query);
@@ -202,12 +219,55 @@ export function resolveStudyGroup(
       return false;
     }
 
-    if (!matchesPerformance(group.filter.performance, progress[entry.id])) {
+    if (!matchesPerformance(group.filter.performance, progressForSense(progress, entry))) {
       return false;
     }
 
-    return query.length === 0 || normalise(searchableLexemeText(entry)).includes(query);
+    return query.length === 0 || normalise(searchableSenseText(entry)).includes(query);
   });
+}
+
+/** Convert a v1 static group to stable senseIds without changing its user-facing identity. */
+export function migrateStaticGroupIds(group: StudyGroup, lexicon: VocabularySense[]): StudyGroup {
+  if (group.kind !== "static") return group;
+
+  const migrated = group.lexemeIds.flatMap((storedId) => {
+    const match = lexicon.find((entry) => storedIdMatchesSense(storedId, entry));
+    return match ? [match.senseId] : [];
+  });
+
+  return {
+    ...group,
+    lexemeIds: Array.from(new Set(migrated)),
+  };
+}
+
+/** Re-key v1 local progress to stable senseIds, merging records defensively. */
+export function migrateVocabularyProgress(
+  progress: VocabularyProgress,
+  lexicon: VocabularySense[],
+): VocabularyProgress {
+  const next: VocabularyProgress = {};
+
+  for (const entry of lexicon) {
+    const record = progressForSense(progress, entry);
+    if (!record) continue;
+    const previous = next[entry.senseId];
+    if (!previous) {
+      next[entry.senseId] = record;
+      continue;
+    }
+
+    next[entry.senseId] = {
+      attempts: previous.attempts + record.attempts,
+      correct: previous.correct + record.correct,
+      incorrect: previous.incorrect + record.incorrect,
+      streak: Math.max(previous.streak, record.streak),
+      lastPractisedAt: [previous.lastPractisedAt, record.lastPractisedAt].sort().at(-1) ?? "",
+    };
+  }
+
+  return next;
 }
 
 export function createStudyGroupId() {
