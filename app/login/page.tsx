@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { login, signup } from "./actions";
+import { login, resendConfirmation, signup } from "./actions";
 import { getCurrentUser } from "@/lib/supabase/auth";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import styles from "./page.module.css";
@@ -73,11 +73,20 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
                 Crear cuenta
               </button>
             </div>
+            <button
+              className="text-link"
+              formAction={resendConfirmation}
+              formNoValidate
+              disabled={!configured}
+              type="submit"
+            >
+              Reenviar email de confirmación
+            </button>
           </form>
 
           <p className={styles.help}>
             Si Supabase exige confirmación de email, recibirás un enlace antes del primer inicio de sesión.
-            Después, la web importará una sola vez los grupos y el progreso que ya tengas en este navegador.
+            Usa siempre el enlace más reciente. Después, la web importará una sola vez los grupos y el progreso que ya tengas en este navegador.
           </p>
         </div>
       </section>
