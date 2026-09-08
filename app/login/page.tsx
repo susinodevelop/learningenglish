@@ -74,7 +74,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </button>
             </div>
             <button
-              className="text-link"
+              className={styles.resend}
               formAction={resendConfirmation}
               formNoValidate
               disabled={!configured}
