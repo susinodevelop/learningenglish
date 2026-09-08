@@ -300,7 +300,7 @@ export async function getStudyState(userId: string): Promise<RemoteStudyState> {
 }
 
 async function insertGroup(
-  sql: ReturnType<typeof postgres>,
+  sql: postgres.TransactionSql,
   userId: string,
   group: StudyGroup,
   conflictMode: "merge" | "replace",
