@@ -7,13 +7,33 @@ function safeNext(value: string | null) {
   return value;
 }
 
+function loginError(origin: string, message: string, next: string) {
+  const url = new URL("/login", origin);
+  url.searchParams.set("error", message);
+  url.searchParams.set("next", next);
+  return url;
+}
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
-  const code = requestUrl.searchParams.get("code");
   const next = safeNext(requestUrl.searchParams.get("next"));
+  const providerError = requestUrl.searchParams.get("error_description") ?? requestUrl.searchParams.get("error");
 
-  if (!isSupabaseConfigured() || !code) {
-    return NextResponse.redirect(new URL("/login?error=No+se+pudo+confirmar+la+sesión.", requestUrl.origin));
+  if (!isSupabaseConfigured()) {
+    return NextResponse.redirect(loginError(requestUrl.origin, "Supabase no está configurado en este despliegue.", next));
+  }
+
+  if (providerError) {
+    return NextResponse.redirect(
+      loginError(requestUrl.origin, "El enlace de confirmación no es válido, ya se usó o ha caducado. Reenvía la confirmación desde la pantalla de acceso.", next),
+    );
+  }
+
+  const code = requestUrl.searchParams.get("code");
+  if (!code) {
+    return NextResponse.redirect(
+      loginError(requestUrl.origin, "El enlace de confirmación no contiene un código válido. Reenvía la confirmación desde la pantalla de acceso.", next),
+    );
   }
 
   const supabase = await createClient();
@@ -24,11 +44,13 @@ export async function GET(request: Request) {
   );
 
   if (error) {
-    return NextResponse.redirect(new URL("/login?error=El+enlace+de+confirmación+no+es+válido+o+ha+caducado.", requestUrl.origin));
+    return NextResponse.redirect(
+      loginError(requestUrl.origin, "No se pudo completar la confirmación. Reenvía el email y usa el enlace más reciente en este mismo navegador.", next),
+    );
   }
 
-  const forwardedHost = request.headers.get("x-forwarded-host");
-  const protocol = request.headers.get("x-forwarded-proto") ?? "https";
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const protocol = request.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() ?? "https";
   if (process.env.NODE_ENV !== "development" && forwardedHost) {
     return NextResponse.redirect(`${protocol}://${forwardedHost}${next}`);
   }
