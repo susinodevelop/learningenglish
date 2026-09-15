@@ -189,7 +189,7 @@ export const c1IdiomsVocabularyTopic: VocabularyTopic = {
         ["talk to a brick wall", "hablar con las paredes / hablar con alguien que no escucha", undefined, "to try to communicate with someone who refuses to listen or respond"],
         ["talk shop", "hablar de trabajo", undefined, "to talk about your work or profession, especially in a social situation"],
         ["talk turkey", "hablar en serio / hablar de forma directa sobre lo importante", undefined, "to discuss something seriously and directly, especially practical details or business"],
-        ["that really gets me going", "eso me saca de quicio / me pone de los nervios", undefined, "used in context to say that something makes you very annoyed or worked up"],
+        ["that really gets me going", "eso me activa, entusiasma o pone en marcha; según el contexto, también puede sacarme de quicio", undefined, "used to say that something makes you excited, enthusiastic, active or strongly worked up; in some contexts it can mean very annoyed"],
         ["the cream of the crop", "la flor y nata / lo mejor de todo", undefined, "the very best people or things in a particular group"],
         ["the jury is out", "aún no hay una conclusión o consenso", undefined, "used to say that a final decision or opinion has not yet been reached"],
         ["the pot calling the kettle black", "le dijo la sartén al cazo / criticar a otro por un defecto propio", undefined, "used when someone criticises another person for a fault that they themselves also have"],
