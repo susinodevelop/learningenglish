@@ -79,6 +79,29 @@ function relatedTermSet(sense: VocabularySense, key: "confusedWith" | "synonyms"
   return new Set(sense.relations[key].map(normaliseVocabularyText));
 }
 
+function promptFragments(value: string) {
+  return normaliseVocabularyText(value)
+    .split(/\s*[\/;]\s*/)
+    .map((fragment) => fragment.trim())
+    .filter(Boolean);
+}
+
+function promptsOverlap(a: string, b: string) {
+  const normalisedA = normaliseVocabularyText(a);
+  const normalisedB = normaliseVocabularyText(b);
+  if (normalisedA === normalisedB) return true;
+
+  const fragmentsA = promptFragments(a);
+  const fragmentsB = promptFragments(b);
+  if (fragmentsA.some((fragment) => fragmentsB.includes(fragment))) return true;
+
+  if (normalisedA.length >= 12 && normalisedB.length >= 12) {
+    return normalisedA.includes(normalisedB) || normalisedB.includes(normalisedA);
+  }
+
+  return false;
+}
+
 function candidateScore(
   current: VocabularySense,
   candidate: VocabularySense,
@@ -137,6 +160,7 @@ export function selectVocabularyDistractors({
 }) {
   const answer = optionValue(current, direction);
   const answerNormalised = normaliseVocabularyText(answer);
+  const currentPrompt = promptValue(current, direction);
   const explicitSynonyms = relatedTermSet(current, "synonyms");
 
   const ranked = lexicon
@@ -145,6 +169,12 @@ export function selectVocabularyDistractors({
       const option = optionValue(candidate, direction);
       if (!option) return false;
       if (normaliseVocabularyText(option) === answerNormalised) return false;
+
+      if (
+        (direction === "definition-to-word" || direction === "spanish-to-word") &&
+        promptsOverlap(currentPrompt, promptValue(candidate, direction))
+      ) return false;
+
       // Explicit synonyms are intentionally excluded: they can create two semantically valid answers.
       if (
         (direction === "definition-to-word" || direction === "spanish-to-word") &&
@@ -194,7 +224,7 @@ export function generateVocabularyMultipleChoiceQuestion({
   if (distractors.length < 3) return null;
 
   const options = unique([answer, ...distractors]);
-    if (options.length !== 4) return null;
+  if (options.length !== 4) return null;
 
   options.sort((a, b) => hash(`${seed ?? current.senseId}|${a}`) - hash(`${seed ?? current.senseId}|${b}`));
 
@@ -213,5 +243,10 @@ export function generateVocabularyMultipleChoiceQuestion({
 }
 
 export function normaliseVocabularyAnswer(value: string) {
-  return normaliseVocabularyText(value);
+  return normaliseVocabularyText(value)
+    .replace(/[.,!?;:()[\]{}"“”]/g, "")
+    .replace(/[‐‑–—-]/g, " ")
+    .replace(/\b(?:am|is|are|was|were|been|being)\b/g, "be")
+    .replace(/\s+/g, " ")
+    .trim();
 }

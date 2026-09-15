@@ -1,5 +1,5 @@
 import { compileVocabulary } from "./compiler";
-import type { VocabularyCategory, VocabularyTopic } from "./types";
+import type { VocabularyCategory, VocabularyEntryType, VocabularyTopic } from "./types";
 import { worldVocabularyTopics } from "./data/world";
 import { peopleVocabularyTopics } from "./data/people";
 import { cultureVocabularyTopics } from "./data/culture";
@@ -51,6 +51,29 @@ const sourceVocabularyTopics: VocabularyTopic[] = [
 
 const compiledVocabulary = compileVocabulary(sourceVocabularyTopics);
 
+const personalVocabularyTypeOverrides: Record<string, VocabularyEntryType> = {
+  "a self-made person": "expression",
+  "an eleventh-hour decision": "collocation",
+  "brain drain": "expression",
+  "do something on a daily basis": "expression",
+  "graveyard shift": "collocation",
+  "Jersey justice": "expression",
+  "Joe Public": "expression",
+  "John Q. Public": "expression",
+  "John Doe": "expression",
+  "Jane Doe": "expression",
+  "Johnny-on-the-spot": "expression",
+  "make all the difference": "collocation",
+  "monkey around": "phrasal-verb",
+  "parrot-fashion": "word",
+  "rock-hard, capital-T Truth": "expression",
+  "spoil someone's plans": "collocation",
+  "be calm and collected": "collocation",
+  "be unfazed": "expression",
+  "the yellow press": "collocation",
+  "that really gets me going": "expression",
+};
+
 for (const sense of compiledVocabulary.senses) {
   const hasPersonalSource = sense.provenance.sources.includes("Personal C1 vocabulary");
   const hasBookSource = sense.provenance.sources.some((source) => source !== "Personal C1 vocabulary");
@@ -60,6 +83,10 @@ for (const sense of compiledVocabulary.senses) {
       ? "mixed"
       : "personal"
     : "book";
+
+  if (hasPersonalSource && !hasBookSource) {
+    sense.type = personalVocabularyTypeOverrides[sense.term] ?? sense.type;
+  }
 }
 
 /** Learner-facing, rich topics from the source books and personal C1 vocabulary. */
