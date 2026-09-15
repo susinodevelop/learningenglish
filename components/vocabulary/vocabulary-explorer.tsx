@@ -16,6 +16,7 @@ type ExplorerView =
   | "topics"
   | "phrasal"
   | "chunks"
+  | "idioms"
   | "synonyms"
   | "antonyms"
   | "confusables"
@@ -35,6 +36,7 @@ const viewCards: Array<{ view: ExplorerView; title: string; description: string 
   { view: "topics", title: "Temas", description: "Explora el vocabulario por áreas y contextos." },
   { view: "phrasal", title: "Phrasal verbs", description: "Verbos con partícula y sus significados." },
   { view: "chunks", title: "Chunks & collocations", description: "Combinaciones que conviene recordar como una unidad." },
+  { view: "idioms", title: "Idioms", description: "Expresiones figuradas y frases hechas para sonar más natural." },
   { view: "synonyms", title: "Sinónimos", description: "Palabras relacionadas por significado." },
   { view: "antonyms", title: "Antónimos", description: "Contrastes de significado." },
   { view: "confusables", title: "Confusables", description: "Palabras que Cambridge suele obligarte a distinguir." },
@@ -112,6 +114,8 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
           return levelSenses.some((sense) => sense.type === "phrasal-verb");
         case "chunks":
           return levelSenses.some((sense) => sense.type === "collocation" || sense.sectionKinds.includes("chunks"));
+        case "idioms":
+          return levelSenses.some((sense) => sense.topics.includes("c1-idioms"));
         case "synonyms":
           return levelSenses.some((sense) => sense.relations.synonyms.length > 0);
         case "antonyms":
