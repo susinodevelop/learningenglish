@@ -128,7 +128,7 @@ export const c1IdiomsVocabularyTopic: VocabularyTopic = {
         ["John Q. Public", "el ciudadano de a pie / la persona promedio", undefined, "a name used to represent an ordinary member of the public"],
         ["jog someone's memory", "refrescarle la memoria a alguien", undefined, "to help someone remember something they had forgotten"],
         ["John Doe", "fulanito de tal / nombre para un hombre no identificado", undefined, "a conventional name used for an unidentified or anonymous man"],
-        ["Jane Doe", "fulanita de tal / nombre para una mujer no identificado", undefined, "a conventional name used for an unidentified or anonymous woman"],
+        ["Jane Doe", "fulanita de tal / nombre para una mujer no identificada", undefined, "a conventional name used for an unidentified or anonymous woman"],
         ["Johnny-on-the-spot", "alguien siempre dispuesto y rápido en acudir", undefined, "a person who is ready and available exactly when needed"],
         ["juggle frogs", "intentar hacer algo muy difícil / manejar muchas tareas complicadas", undefined, "to try to deal with several difficult or unpredictable tasks at the same time"],
         ["jump down someone's throat", "arremeter contra alguien / ir a la yugular", undefined, "to react very angrily and criticise someone sharply"],
