@@ -60,10 +60,6 @@ for (const sense of compiledVocabulary.senses) {
       ? "mixed"
       : "personal"
     : "book";
-
-  if (sense.topics.includes("c1-idioms")) {
-    sense.type = "idiom";
-  }
 }
 
 /** Learner-facing, rich topics from the source books and personal C1 vocabulary. */
