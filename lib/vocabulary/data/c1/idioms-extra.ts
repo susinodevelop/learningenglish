@@ -30,5 +30,5 @@ export const c1IdiomsExtraEntries: VocabularySeedEntry[] = [
   ["you reap what you sow", "lo que siembras, recoges", undefined, "your actions eventually produce consequences of the same kind"],
   ["you're toast", "estás acabado / estás en serios problemas", undefined, "used informally to say that someone is in serious trouble or is likely to fail"],
   ["you said it!", "¡y que lo digas! / ¡bien dicho!", undefined, "used to show strong agreement with what someone has just said"],
-  ["zig when you should zag", "tomar la dirección equivocada / hacer justo lo contrario de lo que convenía", undefined, "to make the wrong move or choose the wrong course when circumstances call for a different one"],
+  ["zigged before you zagged", "hacer las cosas en el orden incorrecto / empezar la casa por el tejado", undefined, "used to say that someone did things in the wrong order"],
 ];
