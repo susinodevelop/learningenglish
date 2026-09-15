@@ -101,7 +101,7 @@ const modeMeta: Record<StudyMode, { title: string; description: string }> = {
   },
   "write-word": {
     title: "Write it",
-    description: "Escribe el término exacto desde una definición inglesa.",
+    description: "Escribe el término o una variante gramatical válida desde una definición inglesa.",
   },
 };
 
@@ -119,6 +119,43 @@ function shuffle<T>(values: T[]) {
     [result[index], result[target]] = [result[target], result[index]];
   }
   return result;
+}
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function writeAnswerTokenPattern(token: string) {
+  switch (token) {
+    case "one's":
+      return "(?:one's|my|your|his|her|our|their|someone's|somebody's)";
+    case "someone's":
+      return "(?:someone's|somebody's|my|your|his|her|our|their)";
+    case "someone/something":
+      return "(?:someone|somebody|something|me|you|him|her|us|them|it|this|that)";
+    case "someone":
+      return "(?:someone|somebody|me|you|him|her|us|them)";
+    case "something":
+      return "(?:something|it|this|that)";
+    default:
+      if (token.includes("/")) {
+        return `(?:${token.split("/").map(escapeRegExp).join("|")})`;
+      }
+      return escapeRegExp(token);
+  }
+}
+
+function isAcceptableWrittenAnswer(value: string, expected: string) {
+  const actual = normaliseVocabularyAnswer(value);
+  const canonical = normaliseVocabularyAnswer(expected);
+  if (actual === canonical) return true;
+
+  const pattern = canonical
+    .split(" ")
+    .map(writeAnswerTokenPattern)
+    .join("\\s+");
+
+  return new RegExp(`^${pattern}$`, "i").test(actual);
 }
 
 function safeReadGroups(raw: string | null): StudyGroup[] {
@@ -268,7 +305,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   }, [draftFilter, draftKind, draftName, draftStaticIds.length, lexicon, progress]);
 
   const writeEligibleEntries = useMemo(
-    () => activeEntries.filter((entry) => entry.members.length === 1 && !/[→↔/]/.test(entry.term)),
+    () => activeEntries.filter((entry) => entry.members.length === 1 && !/[→↔]/.test(entry.term)),
     [activeEntries],
   );
 
@@ -471,7 +508,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
 
   function checkTypedAnswer() {
     if (!current || answerCorrect !== null || typedAnswer.trim().length === 0) return;
-    const correct = normaliseVocabularyAnswer(typedAnswer) === normaliseVocabularyAnswer(current.term);
+    const correct = isAcceptableWrittenAnswer(typedAnswer, current.term);
     setAnswerCorrect(correct);
     if (correct) setScore((value) => value + 1);
     recordResult(current, correct, typedAnswer);
@@ -719,7 +756,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
         <div className={styles.sessionBar}>
           <div>
             <span>Sesiones de hasta {questionCount} elementos</span>
-            {mode === "write-word" && writeEligibleEntries.length !== activeEntries.length ? <small>Write it usa {writeEligibleEntries.length} entradas simples compatibles.</small> : null}
+            {mode === "write-word" && writeEligibleEntries.length !== activeEntries.length ? <small>Write it usa {writeEligibleEntries.length} entradas compatibles.</small> : null}
           </div>
           <button className="button button-primary" type="button" onClick={startSession} disabled={(mode === "write-word" ? writeEligibleEntries.length : activeEntries.length) === 0}>
             {sessionEntries.length > 0 ? "Nueva ronda" : "Empezar sesión"}
