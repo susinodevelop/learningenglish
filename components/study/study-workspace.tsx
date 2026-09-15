@@ -56,6 +56,7 @@ const typeLabels: Record<VocabularyEntryType, string> = {
   word: "Word",
   expression: "Expression",
   collocation: "Collocation",
+  idiom: "Idiom",
   "phrasal-verb": "Phrasal verb",
   "word-family": "Word family",
 };
@@ -63,6 +64,7 @@ const typeLabels: Record<VocabularyEntryType, string> = {
 const sectionLabels: Record<VocabularySectionKind, string> = {
   core: "Palabras clave",
   chunks: "Chunks & collocations",
+  idiom: "Idioms",
   phrasal: "Phrasal verbs",
   "word-family": "Word building",
   contrast: "Diferencias / traps",
