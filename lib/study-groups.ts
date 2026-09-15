@@ -88,6 +88,13 @@ export const systemStudyGroups: StudyGroup[] = [
     filter: { ...emptyDynamicStudyGroupFilter, levels: ["C1"] },
   },
   {
+    id: "system-c1-idioms",
+    name: "Idioms C1",
+    kind: "dynamic",
+    system: true,
+    filter: { ...emptyDynamicStudyGroupFilter, levels: ["C1"], topicSlugs: ["c1-idioms"] },
+  },
+  {
     id: "system-mistakes",
     name: "Errores pendientes",
     kind: "dynamic",

@@ -79,6 +79,29 @@ function relatedTermSet(sense: VocabularySense, key: "confusedWith" | "synonyms"
   return new Set(sense.relations[key].map(normaliseVocabularyText));
 }
 
+function promptFragments(value: string) {
+  return normaliseVocabularyText(value)
+    .split(/\s*[\/;]\s*/)
+    .map((fragment) => fragment.trim())
+    .filter(Boolean);
+}
+
+function promptsOverlap(a: string, b: string) {
+  const normalisedA = normaliseVocabularyText(a);
+  const normalisedB = normaliseVocabularyText(b);
+  if (normalisedA === normalisedB) return true;
+
+  const fragmentsA = promptFragments(a);
+  const fragmentsB = promptFragments(b);
+  if (fragmentsA.some((fragment) => fragmentsB.includes(fragment))) return true;
+
+  if (normalisedA.length >= 12 && normalisedB.length >= 12) {
+    return normalisedA.includes(normalisedB) || normalisedB.includes(normalisedA);
+  }
+
+  return false;
+}
+
 function candidateScore(
   current: VocabularySense,
   candidate: VocabularySense,
@@ -137,7 +160,8 @@ export function selectVocabularyDistractors({
 }) {
   const answer = optionValue(current, direction);
   const answerNormalised = normaliseVocabularyText(answer);
-  const explicitSynonyms = relatedTermSet(current, "synonyms");
+  const currentPrompt = promptValue(current, direction);
+  const currentSynonyms = relatedTermSet(current, "synonyms");
 
   const ranked = lexicon
     .filter((candidate) => candidate.senseId !== current.senseId)
@@ -145,11 +169,23 @@ export function selectVocabularyDistractors({
       const option = optionValue(candidate, direction);
       if (!option) return false;
       if (normaliseVocabularyText(option) === answerNormalised) return false;
-      // Explicit synonyms are intentionally excluded: they can create two semantically valid answers.
+
+      const candidateSynonyms = relatedTermSet(candidate, "synonyms");
+      const explicitSynonymPair =
+        currentSynonyms.has(candidate.normalizedTerm) ||
+        candidateSynonyms.has(current.normalizedTerm);
+      if (explicitSynonymPair) return false;
+
       if (
         (direction === "definition-to-word" || direction === "spanish-to-word") &&
-        explicitSynonyms.has(candidate.normalizedTerm)
+        promptsOverlap(currentPrompt, promptValue(candidate, direction))
       ) return false;
+
+      if (
+        (direction === "word-to-spanish" || direction === "word-to-definition") &&
+        promptsOverlap(answer, option)
+      ) return false;
+
       return true;
     })
     .map((candidate) => ({
@@ -194,7 +230,7 @@ export function generateVocabularyMultipleChoiceQuestion({
   if (distractors.length < 3) return null;
 
   const options = unique([answer, ...distractors]);
-    if (options.length !== 4) return null;
+  if (options.length !== 4) return null;
 
   options.sort((a, b) => hash(`${seed ?? current.senseId}|${a}`) - hash(`${seed ?? current.senseId}|${b}`));
 
@@ -212,6 +248,48 @@ export function generateVocabularyMultipleChoiceQuestion({
   };
 }
 
+function expandCommonContractions(value: string) {
+  return value
+    .replace(/\bi'm\b/g, "i am")
+    .replace(/\byou're\b/g, "you are")
+    .replace(/\bwe're\b/g, "we are")
+    .replace(/\bthey're\b/g, "they are")
+    .replace(/\bit's\b/g, "it is")
+    .replace(/\bthat's\b/g, "that is")
+    .replace(/\bthere's\b/g, "there is")
+    .replace(/\bhere's\b/g, "here is")
+    .replace(/\bwhat's\b/g, "what is")
+    .replace(/\bwho's\b/g, "who is")
+    .replace(/\blet's\b/g, "let us")
+    .replace(/\bcan't\b/g, "cannot")
+    .replace(/\bwon't\b/g, "will not")
+    .replace(/\bdon't\b/g, "do not")
+    .replace(/\bdoesn't\b/g, "does not")
+    .replace(/\bdidn't\b/g, "did not")
+    .replace(/\bisn't\b/g, "is not")
+    .replace(/\baren't\b/g, "are not")
+    .replace(/\bwasn't\b/g, "was not")
+    .replace(/\bweren't\b/g, "were not")
+    .replace(/\bhasn't\b/g, "has not")
+    .replace(/\bhaven't\b/g, "have not")
+    .replace(/\bhadn't\b/g, "had not")
+    .replace(/\bwouldn't\b/g, "would not")
+    .replace(/\bcouldn't\b/g, "could not")
+    .replace(/\bshouldn't\b/g, "should not")
+    .replace(/\bmustn't\b/g, "must not")
+    .replace(/\bcould've\b/g, "could have")
+    .replace(/\bwould've\b/g, "would have")
+    .replace(/\bshould've\b/g, "should have")
+    .replace(/\bmight've\b/g, "might have")
+    .replace(/\bmust've\b/g, "must have")
+    .replace(/\bcan not\b/g, "cannot");
+}
+
 export function normaliseVocabularyAnswer(value: string) {
-  return normaliseVocabularyText(value);
+  return expandCommonContractions(normaliseVocabularyText(value))
+    .replace(/[.,!?;:()[\]{}"“”]/g, "")
+    .replace(/[‐‑–—-]/g, " ")
+    .replace(/\b(?:am|is|are|was|were|been|being)\b/g, "be")
+    .replace(/\s+/g, " ")
+    .trim();
 }

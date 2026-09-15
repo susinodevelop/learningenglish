@@ -2,11 +2,12 @@ export type VocabularyLevel = "B2" | "C1";
 
 export type VocabularySource =
   | "Grammar and Vocabulary for First and First for Schools"
-  | "Gold C1 Advanced New Edition";
+  | "Gold C1 Advanced New Edition"
+  | "Personal C1 vocabulary";
 
-export type VocabularySectionKind = "core" | "chunks" | "phrasal" | "word-family" | "contrast";
+export type VocabularySectionKind = "core" | "chunks" | "idiom" | "phrasal" | "word-family" | "contrast";
 
-/** Raw, book-derived vocabulary. Keep this layer compact and source-faithful. */
+/** Raw source vocabulary. Keep this layer compact and source-faithful. */
 export type VocabularySeedEntry = readonly [
   term: string,
   meaningEs: string,
@@ -45,6 +46,7 @@ export type VocabularyEntryType =
   | "word"
   | "expression"
   | "collocation"
+  | "idiom"
   | "phrasal-verb"
   | "word-family";
 
@@ -122,7 +124,7 @@ export type VocabularySense = {
   notes: string[];
   provenance: {
     sources: VocabularySource[];
-    lexicalSelection: "book";
+    lexicalSelection: "book" | "personal" | "mixed";
     englishDefinition: "pedagogical-original";
     examples: "pedagogical-original";
   };
