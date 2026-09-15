@@ -10,6 +10,7 @@ import { c1ReadingTheMindVocabularyTopic } from "./reading-the-mind";
 import { c1PerfectMatchVocabularyTopic } from "./perfect-match";
 import { c1FaceValueVocabularyTopic } from "./face-value";
 import { c1BrilliantIdeasVocabularyTopic } from "./brilliant-ideas";
+import { c1IdiomsVocabularyTopic } from "./idioms";
 
 export const goldC1VocabularyTopics = [
   c1WhereWeLiveVocabularyTopic,
@@ -24,4 +25,5 @@ export const goldC1VocabularyTopics = [
   c1PerfectMatchVocabularyTopic,
   c1FaceValueVocabularyTopic,
   c1BrilliantIdeasVocabularyTopic,
+  c1IdiomsVocabularyTopic,
 ];
