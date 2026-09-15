@@ -51,7 +51,22 @@ const sourceVocabularyTopics: VocabularyTopic[] = [
 
 const compiledVocabulary = compileVocabulary(sourceVocabularyTopics);
 
-/** Learner-facing, rich topics from the B2 First and C1 Advanced source books. */
+for (const sense of compiledVocabulary.senses) {
+  const hasPersonalSource = sense.provenance.sources.includes("Personal C1 vocabulary");
+  const hasBookSource = sense.provenance.sources.some((source) => source !== "Personal C1 vocabulary");
+
+  sense.provenance.lexicalSelection = hasPersonalSource
+    ? hasBookSource
+      ? "mixed"
+      : "personal"
+    : "book";
+
+  if (sense.topics.includes("c1-idioms")) {
+    sense.type = "idiom";
+  }
+}
+
+/** Learner-facing, rich topics from the source books and personal C1 vocabulary. */
 export const vocabularyTopics = compiledVocabulary.topics;
 
 /** Canonical semantic senses. New games and persistence should use senseId. */
