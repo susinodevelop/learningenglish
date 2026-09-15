@@ -1,3 +1,4 @@
+import type { VocabularySeedEntry } from "../../types";
 import { c1WhereWeLiveVocabularyTopic } from "./where-we-live";
 import { c1ArtOfConversationVocabularyTopic } from "./art-of-conversation";
 import { c1AgesAndStagesVocabularyTopic } from "./ages-and-stages";
@@ -13,11 +14,27 @@ import { c1BrilliantIdeasVocabularyTopic } from "./brilliant-ideas";
 import { c1IdiomsVocabularyTopic } from "./idioms";
 import { c1IdiomsExtraEntries } from "./idioms-extra";
 
-const c1IdiomsVocabularyTopicWithExtra = {
+const correctedGiveSomeoneTheBird: VocabularySeedEntry = [
+  "give someone the bird",
+  "hacer la peineta / mostrar el dedo corazón; también (BrE) abuchear o mostrar desaprobación",
+  "El uso varía según la variedad: en inglés estadounidense actual suele referirse al gesto del dedo corazón; el uso británico también recoge abuchear o mostrar desaprobación.",
+  "to make an insulting middle-finger gesture at someone; also, especially in British usage, to boo or jeer at someone",
+];
+
+const c1IdiomsVocabularyTopicFinal = {
   ...c1IdiomsVocabularyTopic,
   sections: c1IdiomsVocabularyTopic.sections.map((section, index) =>
     index === 0
-      ? { ...section, entries: [...section.entries, ...c1IdiomsExtraEntries] }
+      ? {
+          ...section,
+          kind: "idiom" as const,
+          entries: [
+            ...section.entries.map((entry) =>
+              entry[0] === "give someone the bird" ? correctedGiveSomeoneTheBird : entry,
+            ),
+            ...c1IdiomsExtraEntries,
+          ],
+        }
       : section,
   ),
 };
@@ -35,5 +52,5 @@ export const goldC1VocabularyTopics = [
   c1PerfectMatchVocabularyTopic,
   c1FaceValueVocabularyTopic,
   c1BrilliantIdeasVocabularyTopic,
-  c1IdiomsVocabularyTopicWithExtra,
+  c1IdiomsVocabularyTopicFinal,
 ];
