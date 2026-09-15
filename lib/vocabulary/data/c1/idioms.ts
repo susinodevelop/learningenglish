@@ -11,7 +11,7 @@ export const c1IdiomsVocabularyTopic: VocabularyTopic = {
   sections: [
     {
       title: "Idioms",
-      kind: "chunks",
+      kind: "idiom",
       entries: [
         ["a big cheese", "una persona muy importante", undefined, "an important or influential person"],
         ["a bitter pill to swallow", "un mal trago / algo difícil de aceptar", undefined, "an unpleasant fact or situation that is difficult to accept"],
@@ -95,7 +95,7 @@ export const c1IdiomsVocabularyTopic: VocabularyTopic = {
         ["get to the point", "ir al grano", undefined, "to state the main idea or most important part directly"],
         ["give someone a piece of one's mind", "cantarle las cuarenta / decirle cuatro verdades a alguien", undefined, "to tell someone angrily and frankly what you think about their behaviour"],
         ["give someone the cold shoulder", "dar de lado a alguien / ignorarlo", undefined, "to deliberately ignore someone or treat them in an unfriendly way"],
-        ["give someone the bird", "abuchear a alguien", undefined, "to boo, jeer at or show strong disapproval of someone"],
+        ["give someone the bird", "hacer la peineta / mostrar el dedo corazón; también (BrE) abuchear o mostrar desaprobación", "El uso varía según la variedad: en inglés estadounidense actual suele referirse al gesto del dedo corazón; el uso británico también recoge abuchear o mostrar desaprobación.", "to make an insulting middle-finger gesture at someone; also, especially in British usage, to boo or jeer at someone"],
         ["give up the ghost", "pasar a mejor vida / dejar de funcionar", undefined, "to die or, of a machine, stop working completely"],
         ["go back to square one", "volver a empezar de cero", undefined, "to return to the beginning because an attempt or plan has failed"],
         ["get a slap on the wrist", "recibir un castigo poco severo", undefined, "to receive only a mild punishment or warning for something wrong"],
@@ -122,13 +122,13 @@ export const c1IdiomsVocabularyTopic: VocabularyTopic = {
         ["just around the corner", "estar a la vuelta de la esquina / estar muy cerca de ocurrir", undefined, "very near in place or time, especially likely to happen soon"],
         ["it takes all sorts to make a world", "en este mundo tiene que haber de todo", undefined, "used to say that people are very different and that this variety is normal"],
         ["jam tomorrow", "promesas de algo bueno en el futuro que nunca llega", undefined, "promised benefits or pleasures that are always postponed and never actually arrive"],
-        ["Jersey justice", "justicia muy severa", undefined, "very severe or harsh justice or punishment"],
+        ["Jersey justice", "justicia rápida e imparcial", "Expresión rara y regional; Wiktionary la recoge con el sentido de justicia rápida e imparcial, no como equivalente general de justicia severa.", "swift, impartial justice"],
         ["jobs for the boys", "enchufe / puestos dados a amigos o aliados", undefined, "jobs or advantages given to friends, supporters or associates rather than on merit"],
         ["Joe Public", "el ciudadano de a pie / la persona promedio", undefined, "an ordinary member of the public rather than an expert or public figure"],
         ["John Q. Public", "el ciudadano de a pie / la persona promedio", undefined, "a name used to represent an ordinary member of the public"],
         ["jog someone's memory", "refrescarle la memoria a alguien", undefined, "to help someone remember something they had forgotten"],
         ["John Doe", "fulanito de tal / nombre para un hombre no identificado", undefined, "a conventional name used for an unidentified or anonymous man"],
-        ["Jane Doe", "fulanita de tal / nombre para una mujer no identificada", undefined, "a conventional name used for an unidentified or anonymous woman"],
+        ["Jane Doe", "fulanita de tal / nombre para una mujer no identificado", undefined, "a conventional name used for an unidentified or anonymous woman"],
         ["Johnny-on-the-spot", "alguien siempre dispuesto y rápido en acudir", undefined, "a person who is ready and available exactly when needed"],
         ["juggle frogs", "intentar hacer algo muy difícil / manejar muchas tareas complicadas", undefined, "to try to deal with several difficult or unpredictable tasks at the same time"],
         ["jump down someone's throat", "arremeter contra alguien / ir a la yugular", undefined, "to react very angrily and criticise someone sharply"],
