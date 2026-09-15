@@ -11,6 +11,16 @@ import { c1PerfectMatchVocabularyTopic } from "./perfect-match";
 import { c1FaceValueVocabularyTopic } from "./face-value";
 import { c1BrilliantIdeasVocabularyTopic } from "./brilliant-ideas";
 import { c1IdiomsVocabularyTopic } from "./idioms";
+import { c1IdiomsExtraEntries } from "./idioms-extra";
+
+const c1IdiomsVocabularyTopicWithExtra = {
+  ...c1IdiomsVocabularyTopic,
+  sections: c1IdiomsVocabularyTopic.sections.map((section, index) =>
+    index === 0
+      ? { ...section, entries: [...section.entries, ...c1IdiomsExtraEntries] }
+      : section,
+  ),
+};
 
 export const goldC1VocabularyTopics = [
   c1WhereWeLiveVocabularyTopic,
@@ -25,5 +35,5 @@ export const goldC1VocabularyTopics = [
   c1PerfectMatchVocabularyTopic,
   c1FaceValueVocabularyTopic,
   c1BrilliantIdeasVocabularyTopic,
-  c1IdiomsVocabularyTopic,
+  c1IdiomsVocabularyTopicWithExtra,
 ];
