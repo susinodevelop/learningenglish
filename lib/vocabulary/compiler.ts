@@ -70,6 +70,7 @@ function inferType(kind: VocabularySectionKind, term: string): VocabularyEntryTy
   if (kind === "phrasal") return "phrasal-verb";
   if (kind === "word-family") return "word-family";
   if (kind === "chunks") return "collocation";
+  if (kind === "idiom") return "idiom";
   if (/\s|→|↔|\//.test(term.trim())) return "expression";
   return "word";
 }
