@@ -102,10 +102,10 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
     [topics],
   );
 
-  const filteredLexemes = useMemo(() => {
-    const normalizedQuery = normalise(query);
-    const isSearching = normalizedQuery.length >= 2;
+  const normalizedQuery = normalise(query);
+  const isSearching = normalizedQuery.length >= 2;
 
+  const filteredLexemes = useMemo(() => {
     return lexemes.filter((lexeme) => {
       const lexemeSenses = sensesByLexeme.get(lexeme.id) ?? [];
       const levelSenses = level === "all"
@@ -143,9 +143,8 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
           return true;
       }
     });
-  }, [level, lexemes, query, sensesByLexeme, topicSlug, view]);
+  }, [isSearching, level, lexemes, normalizedQuery, sensesByLexeme, topicSlug, view]);
 
-  const isSearching = query.trim().length >= 2;
   const showResults = isSearching || view !== "home" || Boolean(topicSlug);
   const activeTopic = topics.find((topic) => topic.slug === topicSlug);
   const showingIrregularVerbs = view === "irregular-verbs" || topicSlug === "irregular-verbs";
@@ -237,8 +236,11 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
           <div className={styles.lexemeGrid}>
             {filteredLexemes.slice(0, 240).map((lexeme) => {
               const lexemeSenses = (sensesByLexeme.get(lexeme.id) ?? []).filter((sense) => level === "all" || sense.levels.includes(level));
+              const matchingSense = isSearching
+                ? lexemeSenses.find((sense) => normalise(searchableSenseText(sense)).includes(normalizedQuery))
+                : undefined;
               const irregularSense = lexemeSenses.find((sense) => sense.topics.includes("irregular-verbs"));
-              const first = showingIrregularVerbs ? irregularSense ?? lexemeSenses[0] : lexemeSenses[0];
+              const first = matchingSense ?? (showingIrregularVerbs ? irregularSense ?? lexemeSenses[0] : lexemeSenses[0]);
               if (!first) return null;
               const verbForms = irregularVerbFormsByTerm[first.term];
               return (
