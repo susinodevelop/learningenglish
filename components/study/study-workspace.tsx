@@ -482,9 +482,12 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     const next = editingId
       ? userGroups.map((candidate) => candidate.id === editingId ? group : candidate)
       : [...userGroups, group];
+    const supportsIrregularForms = resolveStudyGroup(group, lexicon, progress).some((entry) =>
+      entry.topics.includes("irregular-verbs") && Boolean(irregularVerbFormsByTerm[entry.term]),
+    );
 
     persistGroups(next);
-    setActiveGroupId(group.id);
+    chooseGroup(group.id, supportsIrregularForms);
     setEditorOpen(false);
     resetEditor();
   }
@@ -493,7 +496,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     if (group.system) return;
     if (!window.confirm(`¿Eliminar el grupo “${group.name}”?`)) return;
     persistGroups(userGroups.filter((candidate) => candidate.id !== group.id));
-    if (activeGroupId === group.id) setActiveGroupId(systemStudyGroups[0].id);
+    if (activeGroupId === group.id) chooseGroup(systemStudyGroups[0].id);
     if (editingId === group.id) {
       setEditorOpen(false);
       resetEditor();
@@ -513,10 +516,15 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     setFinished(false);
   }
 
-  function chooseGroup(groupId: string) {
+  function chooseGroup(groupId: string, targetSupportsIrregularForms?: boolean) {
+    const supportsIrregularForms = targetSupportsIrregularForms ?? (resolvedGroups.get(groupId) ?? []).some((entry) =>
+      entry.topics.includes("irregular-verbs") && Boolean(irregularVerbFormsByTerm[entry.term]),
+    );
+
     setActiveGroupId(groupId);
     setMode((currentMode) => {
       if (groupId === "system-irregular-verbs") return "irregular-forms";
+      if (currentMode === "irregular-forms" && !supportsIrregularForms) return "flashcards";
       if (activeGroupId === "system-irregular-verbs" && currentMode === "irregular-forms") return "flashcards";
       return currentMode;
     });
