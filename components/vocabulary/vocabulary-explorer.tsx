@@ -58,7 +58,9 @@ function normalise(value: string) {
 }
 
 function searchableSenseText(sense: VocabularySense) {
-  const verbForms = irregularVerbFormsByTerm[sense.term];
+  const verbForms = sense.topics.includes("irregular-verbs")
+    ? irregularVerbFormsByTerm[sense.term]
+    : undefined;
   return [
     sense.term,
     sense.meaning.en,
