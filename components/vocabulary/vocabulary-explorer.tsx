@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { irregularVerbFormsByTerm } from "@/lib/vocabulary/data/irregular-verbs";
 import type {
   VocabularyCategory,
   VocabularyLevel,
@@ -17,6 +18,7 @@ type ExplorerView =
   | "phrasal"
   | "chunks"
   | "idioms"
+  | "irregular-verbs"
   | "synonyms"
   | "antonyms"
   | "confusables"
@@ -37,6 +39,7 @@ const viewCards: Array<{ view: ExplorerView; title: string; description: string 
   { view: "phrasal", title: "Phrasal verbs", description: "Verbos con partícula y sus significados." },
   { view: "chunks", title: "Chunks & collocations", description: "Combinaciones que conviene recordar como una unidad." },
   { view: "idioms", title: "Idioms", description: "Expresiones figuradas y frases hechas para sonar más natural." },
+  { view: "irregular-verbs", title: "Irregular verbs", description: "Base form, past simple, past participle, significado y patrón." },
   { view: "synonyms", title: "Sinónimos", description: "Palabras relacionadas por significado." },
   { view: "antonyms", title: "Antónimos", description: "Contrastes de significado." },
   { view: "confusables", title: "Confusables", description: "Palabras que Cambridge suele obligarte a distinguir." },
@@ -55,6 +58,7 @@ function normalise(value: string) {
 }
 
 function searchableSenseText(sense: VocabularySense) {
+  const verbForms = irregularVerbFormsByTerm[sense.term];
   return [
     sense.term,
     sense.meaning.en,
@@ -62,6 +66,10 @@ function searchableSenseText(sense: VocabularySense) {
     ...sense.levels,
     ...sense.topics,
     ...sense.sectionTitles,
+    ...sense.notes,
+    verbForms?.pastSimple ?? "",
+    verbForms?.pastParticiple ?? "",
+    verbForms?.rule ?? "",
     ...sense.relations.collocations,
     ...sense.relations.patterns,
     ...sense.relations.synonyms,
@@ -116,6 +124,8 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
           return levelSenses.some((sense) => sense.type === "collocation" || sense.sectionKinds.includes("chunks"));
         case "idioms":
           return levelSenses.some((sense) => sense.topics.includes("c1-idioms"));
+        case "irregular-verbs":
+          return levelSenses.some((sense) => sense.topics.includes("irregular-verbs"));
         case "synonyms":
           return levelSenses.some((sense) => sense.relations.synonyms.length > 0);
         case "antonyms":
@@ -136,6 +146,7 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
   const isSearching = query.trim().length >= 2;
   const showResults = isSearching || view !== "home" || Boolean(topicSlug);
   const activeTopic = topics.find((topic) => topic.slug === topicSlug);
+  const showingIrregularVerbs = view === "irregular-verbs" || topicSlug === "irregular-verbs";
 
   function chooseView(next: ExplorerView) {
     setView(next);
@@ -152,7 +163,7 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="gripping, quedarse sin, compelling, travel…"
+            placeholder="gripping, began, broken, compelling, travel…"
             aria-label="Buscar vocabulario B2 y C1"
           />
         </label>
@@ -214,7 +225,9 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
             <div>
               <span className="eyebrow">{isSearching ? "Resultados de búsqueda" : activeTopic?.title ?? viewCards.find((card) => card.view === view)?.title ?? "Vocabulario"}</span>
               <h2>{filteredLexemes.length} términos</h2>
-              <p>Las palabras con varios significados aparecen una sola vez y agrupan todas sus acepciones.</p>
+              <p>{showingIrregularVerbs && !isSearching
+                ? "Base form = forma de diccionario · Past simple = pasado terminado · Past participle = forma usada con have y en la voz pasiva."
+                : "Las palabras con varios significados aparecen una sola vez y agrupan todas sus acepciones."}</p>
             </div>
             <button type="button" className="button button-secondary" onClick={() => chooseView("home")}>Volver al inicio</button>
           </header>
@@ -222,16 +235,26 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
           <div className={styles.lexemeGrid}>
             {filteredLexemes.slice(0, 240).map((lexeme) => {
               const lexemeSenses = (sensesByLexeme.get(lexeme.id) ?? []).filter((sense) => level === "all" || sense.levels.includes(level));
-              const first = lexemeSenses[0];
+              const irregularSense = lexemeSenses.find((sense) => sense.topics.includes("irregular-verbs"));
+              const first = showingIrregularVerbs ? irregularSense ?? lexemeSenses[0] : lexemeSenses[0];
               if (!first) return null;
+              const verbForms = irregularVerbFormsByTerm[first.term];
               return (
                 <Link href={`/vocabulary/${lexeme.id}`} className={styles.lexemeCard} key={lexeme.id}>
                   <div className={styles.lexemeHeading}>
                     <strong>{lexeme.term}</strong>
                     <span>{lexeme.levels.join(" · ")}</span>
                   </div>
+                  {verbForms && first.topics.includes("irregular-verbs") ? (
+                    <div className={styles.verbForms}>
+                      <span><b>Base</b>{verbForms.base}</span>
+                      <span><b>Past</b>{verbForms.pastSimple}</span>
+                      <span><b>Participle</b>{verbForms.pastParticiple}</span>
+                    </div>
+                  ) : null}
                   <p>{first.meaning.en}</p>
                   <small>{first.meaning.es}</small>
+                  {verbForms && first.topics.includes("irregular-verbs") ? <small><strong>Patrón:</strong> {verbForms.rule}</small> : null}
                   <footer>
                     <span>{lexemeSenses.length} {lexemeSenses.length === 1 ? "acepción" : "acepciones"}</span>
                     <span>{first.topics.slice(0, 2).map((topic) => topicTitle.get(topic) ?? topic).join(" · ")}</span>
