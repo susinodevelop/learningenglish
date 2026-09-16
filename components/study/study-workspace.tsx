@@ -51,7 +51,6 @@ type StudyWorkspaceProps = {
 };
 
 type StudyMode = "flashcards" | VocabularyMultipleChoiceDirection | "write-word" | "irregular-forms";
-type IrregularFormTarget = "pastSimple" | "pastParticiple";
 type CloudState = "checking" | "local" | "syncing" | "synced" | "error";
 
 const typeLabels: Record<VocabularyEntryType, string> = {
@@ -107,7 +106,7 @@ const modeMeta: Record<StudyMode, { title: string; description: string }> = {
   },
   "irregular-forms": {
     title: "Irregular forms",
-    description: "Practica past simple y past participle; cada verbo alterna la forma objetivo entre intentos.",
+    description: "Escribe past simple y past participle en cada intento a partir de la forma base.",
   },
 };
 
@@ -230,9 +229,10 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   const [questionCount, setQuestionCount] = useState(20);
   const [sessionEntries, setSessionEntries] = useState<VocabularySense[]>([]);
   const [sessionIndex, setSessionIndex] = useState(0);
-  const [irregularTargets, setIrregularTargets] = useState<IrregularFormTarget[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [typedAnswer, setTypedAnswer] = useState("");
+  const [irregularPastSimpleAnswer, setIrregularPastSimpleAnswer] = useState("");
+  const [irregularPastParticipleAnswer, setIrregularPastParticipleAnswer] = useState("");
   const [answerCorrect, setAnswerCorrect] = useState<boolean | null>(null);
   const [flashcardRevealed, setFlashcardRevealed] = useState(false);
   const [score, setScore] = useState(0);
@@ -334,9 +334,6 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   const currentIrregularForms = current?.topics.includes("irregular-verbs")
     ? irregularVerbFormsByTerm[current.term]
     : undefined;
-  const irregularFormTarget = irregularTargets[sessionIndex] ?? "pastSimple";
-  const irregularExpectedAnswer = currentIrregularForms?.[irregularFormTarget];
-  const irregularTargetLabel = irregularFormTarget === "pastSimple" ? "past simple" : "past participle";
   const sessionCandidateCount = mode === "write-word"
     ? writeEligibleEntries.length
     : mode === "irregular-forms"
@@ -506,9 +503,10 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   function resetSessionState() {
     setSessionEntries([]);
     setSessionIndex(0);
-    setIrregularTargets([]);
     setSelectedAnswer(null);
     setTypedAnswer("");
+    setIrregularPastSimpleAnswer("");
+    setIrregularPastParticipleAnswer("");
     setAnswerCorrect(null);
     setFlashcardRevealed(false);
     setScore(0);
@@ -516,15 +514,10 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   }
 
   function chooseGroup(groupId: string) {
-    const nextEntries = resolvedGroups.get(groupId) ?? [];
-    const supportsIrregularForms = nextEntries.some((entry) =>
-      entry.topics.includes("irregular-verbs") && Boolean(irregularVerbFormsByTerm[entry.term]),
-    );
-
     setActiveGroupId(groupId);
     setMode((currentMode) => {
       if (groupId === "system-irregular-verbs") return "irregular-forms";
-      if (currentMode === "irregular-forms" && !supportsIrregularForms) return "flashcards";
+      if (activeGroupId === "system-irregular-verbs" && currentMode === "irregular-forms") return "flashcards";
       return currentMode;
     });
     resetSessionState();
@@ -539,16 +532,12 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     const size = Math.min(candidates.length, questionCount);
     if (size === 0) return;
 
-    const selectedEntries = shuffle(candidates).slice(0, size);
-    setSessionEntries(selectedEntries);
-    setIrregularTargets(mode === "irregular-forms"
-      ? selectedEntries.map((entry) =>
-        ((progressForSense(progress, entry)?.attempts ?? 0) % 2 === 0 ? "pastSimple" : "pastParticiple"),
-      )
-      : []);
+    setSessionEntries(shuffle(candidates).slice(0, size));
     setSessionIndex(0);
     setSelectedAnswer(null);
     setTypedAnswer("");
+    setIrregularPastSimpleAnswer("");
+    setIrregularPastParticipleAnswer("");
     setAnswerCorrect(null);
     setFlashcardRevealed(false);
     setScore(0);
@@ -565,10 +554,25 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   }
 
   function checkTypedAnswer() {
-    if (!current || answerCorrect !== null || typedAnswer.trim().length === 0) return;
-    const correct = mode === "irregular-forms"
-      ? Boolean(irregularExpectedAnswer && isAcceptableIrregularFormAnswer(typedAnswer, irregularExpectedAnswer))
-      : isAcceptableWrittenAnswer(typedAnswer, current.term);
+    if (!current || answerCorrect !== null) return;
+
+    if (mode === "irregular-forms") {
+      if (!currentIrregularForms || !irregularPastSimpleAnswer.trim() || !irregularPastParticipleAnswer.trim()) return;
+      const correct =
+        isAcceptableIrregularFormAnswer(irregularPastSimpleAnswer, currentIrregularForms.pastSimple) &&
+        isAcceptableIrregularFormAnswer(irregularPastParticipleAnswer, currentIrregularForms.pastParticiple);
+      setAnswerCorrect(correct);
+      if (correct) setScore((value) => value + 1);
+      recordResult(
+        current,
+        correct,
+        `past simple: ${irregularPastSimpleAnswer}; past participle: ${irregularPastParticipleAnswer}`,
+      );
+      return;
+    }
+
+    if (!typedAnswer.trim()) return;
+    const correct = isAcceptableWrittenAnswer(typedAnswer, current.term);
     setAnswerCorrect(correct);
     if (correct) setScore((value) => value + 1);
     recordResult(current, correct, typedAnswer);
@@ -590,6 +594,8 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     setSessionIndex((value) => value + 1);
     setSelectedAnswer(null);
     setTypedAnswer("");
+    setIrregularPastSimpleAnswer("");
+    setIrregularPastParticipleAnswer("");
     setAnswerCorrect(null);
     setFlashcardRevealed(false);
   }
@@ -847,12 +853,40 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
                   </div>
                 )}
               </div>
-            ) : mode === "irregular-forms" && currentIrregularForms && irregularExpectedAnswer ? (
+            ) : mode === "irregular-forms" && currentIrregularForms ? (
               <div className={styles.writeQuestion}>
-                <span>Escribe el {irregularTargetLabel}</span><p>{currentIrregularForms.base} · {current.meaning.es}</p>
+                <span>Escribe las dos formas</span><p>{currentIrregularForms.base} · {current.meaning.es}</p>
                 <div className={styles.writeControls}>
-                  <input value={typedAnswer} onChange={(event) => setTypedAnswer(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") checkTypedAnswer(); }} disabled={answerCorrect !== null} autoComplete="off" spellCheck={false} placeholder={irregularTargetLabel === "past simple" ? "e.g. began" : "e.g. begun"} />
-                  <button className="button button-primary" type="button" onClick={checkTypedAnswer} disabled={answerCorrect !== null || !typedAnswer.trim()}>Comprobar</button>
+                  <div style={{ display: "grid", gap: "9px" }}>
+                    <input
+                      value={irregularPastSimpleAnswer}
+                      onChange={(event) => setIrregularPastSimpleAnswer(event.target.value)}
+                      onKeyDown={(event) => { if (event.key === "Enter") checkTypedAnswer(); }}
+                      disabled={answerCorrect !== null}
+                      autoComplete="off"
+                      spellCheck={false}
+                      aria-label="Past simple"
+                      placeholder="Past simple, e.g. began"
+                    />
+                    <input
+                      value={irregularPastParticipleAnswer}
+                      onChange={(event) => setIrregularPastParticipleAnswer(event.target.value)}
+                      onKeyDown={(event) => { if (event.key === "Enter") checkTypedAnswer(); }}
+                      disabled={answerCorrect !== null}
+                      autoComplete="off"
+                      spellCheck={false}
+                      aria-label="Past participle"
+                      placeholder="Past participle, e.g. begun"
+                    />
+                  </div>
+                  <button
+                    className="button button-primary"
+                    type="button"
+                    onClick={checkTypedAnswer}
+                    disabled={answerCorrect !== null || !irregularPastSimpleAnswer.trim() || !irregularPastParticipleAnswer.trim()}
+                  >
+                    Comprobar
+                  </button>
                 </div>
               </div>
             ) : mode === "write-word" ? (
@@ -884,7 +918,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
                 <div>
                   <strong>{answerCorrect ? "✓ Correcto" : "✕ A repasar"}</strong>
                   {!answerCorrect && question ? <span>Respuesta: {question.answer}</span> : null}
-                  {!answerCorrect && mode === "irregular-forms" && irregularExpectedAnswer ? <span>Respuesta: {irregularExpectedAnswer}</span> : null}
+                  {!answerCorrect && mode === "irregular-forms" && currentIrregularForms ? <span>Respuesta: past simple {currentIrregularForms.pastSimple} · past participle {currentIrregularForms.pastParticiple}</span> : null}
                   {currentIrregularForms ? <span>Formas: {currentIrregularForms.base} · {currentIrregularForms.pastSimple} · {currentIrregularForms.pastParticiple}</span> : null}
                   {currentIrregularForms ? <span>Patrón: {currentIrregularForms.rule}{currentIrregularForms.note ? ` · ${currentIrregularForms.note}` : ""}</span> : null}
                   <span>EN: {current.meaning.en}</span>
