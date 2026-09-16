@@ -95,6 +95,13 @@ export const systemStudyGroups: StudyGroup[] = [
     filter: { ...emptyDynamicStudyGroupFilter, levels: ["C1"], topicSlugs: ["c1-idioms"] },
   },
   {
+    id: "system-irregular-verbs",
+    name: "Irregular verbs",
+    kind: "dynamic",
+    system: true,
+    filter: { ...emptyDynamicStudyGroupFilter, levels: ["B2"], topicSlugs: ["irregular-verbs"] },
+  },
+  {
     id: "system-mistakes",
     name: "Errores pendientes",
     kind: "dynamic",

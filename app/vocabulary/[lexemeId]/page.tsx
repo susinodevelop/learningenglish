@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { irregularVerbFormsByTerm } from "@/lib/vocabulary/data/irregular-verbs";
 import { vocabularyLexemes, vocabularySenses, vocabularyTopics } from "@/lib/vocabulary";
 import styles from "./page.module.css";
 
@@ -52,6 +53,15 @@ export default async function VocabularyLexemePage({ params }: PageProps) {
             ["Word family", sense.resolvedRelations.wordFamily],
           ] as const;
           const example = sense.examples.find((candidate) => candidate.kind === "usage") ?? sense.examples[0];
+          const verbForms = sense.topics.includes("irregular-verbs")
+            ? irregularVerbFormsByTerm[sense.term]
+            : undefined;
+          const irregularSourceNote = verbForms
+            ? [verbForms.rule, verbForms.note].filter(Boolean).join(" ")
+            : "";
+          const additionalNotes = sense.notes.filter((note) =>
+            !verbForms || (note !== irregularSourceNote && note !== verbForms.rule && note !== verbForms.note),
+          );
 
           return (
             <article className={styles.senseCard} key={sense.senseId}>
@@ -65,6 +75,20 @@ export default async function VocabularyLexemePage({ params }: PageProps) {
                   <span>{sense.type}</span>
                 </div>
               </header>
+
+              {verbForms ? (
+                <>
+                  <div className={styles.meta}>
+                    <div><span>Base form</span><p>{verbForms.base}</p></div>
+                    <div><span>Past simple</span><p>{verbForms.pastSimple}</p></div>
+                    <div><span>Past participle</span><p>{verbForms.pastParticiple}</p></div>
+                  </div>
+                  <aside className={styles.notes}>
+                    <strong>Patrón:</strong> {verbForms.rule}
+                    {verbForms.note ? <> · {verbForms.note}</> : null}
+                  </aside>
+                </>
+              ) : null}
 
               <section className={styles.meaningGrid}>
                 <div><span>EN</span><p>{sense.meaning.en}</p></div>
@@ -99,7 +123,7 @@ export default async function VocabularyLexemePage({ params }: PageProps) {
                 </section>
               ) : null}
 
-              {sense.notes.length > 0 ? <aside className={styles.notes}>{sense.notes.join(" · ")}</aside> : null}
+              {additionalNotes.length > 0 ? <aside className={styles.notes}>{additionalNotes.join(" · ")}</aside> : null}
             </article>
           );
         })}

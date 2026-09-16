@@ -7,6 +7,7 @@ import { placesVocabularyTopics } from "./data/places";
 import { timeVocabularyTopics } from "./data/time";
 import { studyWorkVocabularyTopics } from "./data/study-work";
 import { goldC1VocabularyTopics } from "./data/c1";
+import { irregularVerbsVocabularyTopic } from "./data/irregular-verbs";
 
 export type {
   VocabularyCategory,
@@ -37,6 +38,7 @@ export const vocabularyCategories: VocabularyCategory[] = [
   { id: "places", label: "Lugares y movimiento", description: "Viajes, ciudades, vivienda, ropa y espacios personales." },
   { id: "time", label: "Historia y tiempo", description: "Pasado, historia y expresiones temporales." },
   { id: "study-work", label: "Estudio y trabajo", description: "Escuela, empleo, universidad, opinión, negocios e investigación." },
+  { id: "language", label: "Lengua y estructura", description: "Formas verbales, patrones y vocabulario funcional." },
 ];
 
 const sourceVocabularyTopics: VocabularyTopic[] = [
@@ -47,9 +49,15 @@ const sourceVocabularyTopics: VocabularyTopic[] = [
   ...timeVocabularyTopics,
   ...studyWorkVocabularyTopics,
   ...goldC1VocabularyTopics,
+  irregularVerbsVocabularyTopic,
 ];
 
 const compiledVocabulary = compileVocabulary(sourceVocabularyTopics);
+
+const personalVocabularySources = new Set([
+  "Personal C1 vocabulary",
+  "User-provided irregular verbs",
+]);
 
 const personalVocabularyTypeOverrides: Record<string, VocabularyEntryType> = {
   "a self-made person": "expression",
@@ -75,8 +83,8 @@ const personalVocabularyTypeOverrides: Record<string, VocabularyEntryType> = {
 };
 
 for (const sense of compiledVocabulary.senses) {
-  const hasPersonalSource = sense.provenance.sources.includes("Personal C1 vocabulary");
-  const hasBookSource = sense.provenance.sources.some((source) => source !== "Personal C1 vocabulary");
+  const hasPersonalSource = sense.provenance.sources.some((source) => personalVocabularySources.has(source));
+  const hasBookSource = sense.provenance.sources.some((source) => !personalVocabularySources.has(source));
 
   sense.provenance.lexicalSelection = hasPersonalSource
     ? hasBookSource
@@ -89,7 +97,7 @@ for (const sense of compiledVocabulary.senses) {
   }
 }
 
-/** Learner-facing, rich topics from the source books and personal C1 vocabulary. */
+/** Learner-facing, rich topics from the source books and personal study material. */
 export const vocabularyTopics = compiledVocabulary.topics;
 
 /** Canonical semantic senses. New games and persistence should use senseId. */
