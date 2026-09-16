@@ -51,6 +51,7 @@ type StudyWorkspaceProps = {
 };
 
 type StudyMode = "flashcards" | VocabularyMultipleChoiceDirection | "write-word" | "irregular-forms";
+type IrregularFormTarget = "pastSimple" | "pastParticiple";
 type CloudState = "checking" | "local" | "syncing" | "synced" | "error";
 
 const typeLabels: Record<VocabularyEntryType, string> = {
@@ -106,7 +107,7 @@ const modeMeta: Record<StudyMode, { title: string; description: string }> = {
   },
   "irregular-forms": {
     title: "Irregular forms",
-    description: "Escribe el past simple o el past participle a partir de la forma base.",
+    description: "Practica past simple y past participle; cada verbo alterna la forma objetivo entre intentos.",
   },
 };
 
@@ -229,6 +230,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   const [questionCount, setQuestionCount] = useState(20);
   const [sessionEntries, setSessionEntries] = useState<VocabularySense[]>([]);
   const [sessionIndex, setSessionIndex] = useState(0);
+  const [irregularTargets, setIrregularTargets] = useState<IrregularFormTarget[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [typedAnswer, setTypedAnswer] = useState("");
   const [answerCorrect, setAnswerCorrect] = useState<boolean | null>(null);
@@ -332,7 +334,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   const currentIrregularForms = current?.topics.includes("irregular-verbs")
     ? irregularVerbFormsByTerm[current.term]
     : undefined;
-  const irregularFormTarget = sessionIndex % 2 === 0 ? "pastSimple" : "pastParticiple";
+  const irregularFormTarget = irregularTargets[sessionIndex] ?? "pastSimple";
   const irregularExpectedAnswer = currentIrregularForms?.[irregularFormTarget];
   const irregularTargetLabel = irregularFormTarget === "pastSimple" ? "past simple" : "past participle";
   const sessionCandidateCount = mode === "write-word"
@@ -504,6 +506,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   function resetSessionState() {
     setSessionEntries([]);
     setSessionIndex(0);
+    setIrregularTargets([]);
     setSelectedAnswer(null);
     setTypedAnswer("");
     setAnswerCorrect(null);
@@ -513,8 +516,17 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   }
 
   function chooseGroup(groupId: string) {
+    const nextEntries = resolvedGroups.get(groupId) ?? [];
+    const supportsIrregularForms = nextEntries.some((entry) =>
+      entry.topics.includes("irregular-verbs") && Boolean(irregularVerbFormsByTerm[entry.term]),
+    );
+
     setActiveGroupId(groupId);
-    if (groupId === "system-irregular-verbs") setMode("irregular-forms");
+    setMode((currentMode) => {
+      if (groupId === "system-irregular-verbs") return "irregular-forms";
+      if (currentMode === "irregular-forms" && !supportsIrregularForms) return "flashcards";
+      return currentMode;
+    });
     resetSessionState();
   }
 
@@ -527,7 +539,13 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     const size = Math.min(candidates.length, questionCount);
     if (size === 0) return;
 
-    setSessionEntries(shuffle(candidates).slice(0, size));
+    const selectedEntries = shuffle(candidates).slice(0, size);
+    setSessionEntries(selectedEntries);
+    setIrregularTargets(mode === "irregular-forms"
+      ? selectedEntries.map((entry) =>
+        ((progressForSense(progress, entry)?.attempts ?? 0) % 2 === 0 ? "pastSimple" : "pastParticiple"),
+      )
+      : []);
     setSessionIndex(0);
     setSelectedAnswer(null);
     setTypedAnswer("");
