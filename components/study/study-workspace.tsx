@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { irregularVerbFormsByTerm } from "@/lib/vocabulary/data/irregular-verbs";
 import type {
   VocabularyEntryType,
   VocabularyLevel,
@@ -49,7 +50,7 @@ type StudyWorkspaceProps = {
   topics: TopicOption[];
 };
 
-type StudyMode = "flashcards" | VocabularyMultipleChoiceDirection | "write-word";
+type StudyMode = "flashcards" | VocabularyMultipleChoiceDirection | "write-word" | "irregular-forms";
 type CloudState = "checking" | "local" | "syncing" | "synced" | "error";
 
 const typeLabels: Record<VocabularyEntryType, string> = {
@@ -102,6 +103,10 @@ const modeMeta: Record<StudyMode, { title: string; description: string }> = {
   "write-word": {
     title: "Write it",
     description: "Escribe el término o una variante gramatical válida desde una definición inglesa.",
+  },
+  "irregular-forms": {
+    title: "Irregular forms",
+    description: "Escribe el past simple o el past participle a partir de la forma base.",
   },
 };
 
@@ -156,6 +161,14 @@ function isAcceptableWrittenAnswer(value: string, expected: string) {
     .join("\\s+");
 
   return new RegExp(`^${pattern}$`, "i").test(actual);
+}
+
+function isAcceptableIrregularFormAnswer(value: string, expected: string) {
+  const actual = normaliseVocabularyAnswer(value);
+  return expected
+    .split("/")
+    .map((candidate) => normaliseVocabularyAnswer(candidate))
+    .some((candidate) => candidate === actual);
 }
 
 function safeReadGroups(raw: string | null): StudyGroup[] {
@@ -308,8 +321,26 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     () => activeEntries.filter((entry) => entry.members.length === 1 && !/[→↔]/.test(entry.term)),
     [activeEntries],
   );
+  const irregularEligibleEntries = useMemo(
+    () => activeEntries.filter((entry) =>
+      entry.topics.includes("irregular-verbs") && Boolean(irregularVerbFormsByTerm[entry.term]),
+    ),
+    [activeEntries],
+  );
 
   const current = sessionEntries[sessionIndex];
+  const currentIrregularForms = current?.topics.includes("irregular-verbs")
+    ? irregularVerbFormsByTerm[current.term]
+    : undefined;
+  const irregularFormTarget = sessionIndex % 2 === 0 ? "pastSimple" : "pastParticiple";
+  const irregularExpectedAnswer = currentIrregularForms?.[irregularFormTarget];
+  const irregularTargetLabel = irregularFormTarget === "pastSimple" ? "past simple" : "past participle";
+  const sessionCandidateCount = mode === "write-word"
+    ? writeEligibleEntries.length
+    : mode === "irregular-forms"
+      ? irregularEligibleEntries.length
+      : activeEntries.length;
+
   const question = useMemo(() => {
     if (!current || !multipleChoiceModes.has(mode)) return null;
     return generateVocabularyMultipleChoiceQuestion({
@@ -394,7 +425,11 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     persistProgress(next);
     sendAttempt({
       senseId: entry.senseId,
-      gameType: mode === "flashcards" ? "flashcards" : mode === "write-word" ? "write-word" : "multiple-choice",
+      gameType: mode === "flashcards"
+        ? "flashcards"
+        : mode === "write-word" || mode === "irregular-forms"
+          ? "write-word"
+          : "multiple-choice",
       direction: mode,
       difficulty: multipleChoiceModes.has(mode) ? difficulty : null,
       correct,
@@ -479,11 +514,16 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
 
   function chooseGroup(groupId: string) {
     setActiveGroupId(groupId);
+    if (groupId === "system-irregular-verbs") setMode("irregular-forms");
     resetSessionState();
   }
 
   function startSession() {
-    const candidates = mode === "write-word" ? writeEligibleEntries : activeEntries;
+    const candidates = mode === "write-word"
+      ? writeEligibleEntries
+      : mode === "irregular-forms"
+        ? irregularEligibleEntries
+        : activeEntries;
     const size = Math.min(candidates.length, questionCount);
     if (size === 0) return;
 
@@ -508,7 +548,9 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
 
   function checkTypedAnswer() {
     if (!current || answerCorrect !== null || typedAnswer.trim().length === 0) return;
-    const correct = isAcceptableWrittenAnswer(typedAnswer, current.term);
+    const correct = mode === "irregular-forms"
+      ? Boolean(irregularExpectedAnswer && isAcceptableIrregularFormAnswer(typedAnswer, irregularExpectedAnswer))
+      : isAcceptableWrittenAnswer(typedAnswer, current.term);
     setAnswerCorrect(correct);
     if (correct) setScore((value) => value + 1);
     recordResult(current, correct, typedAnswer);
@@ -730,7 +772,13 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
 
         <div className={styles.modeGrid}>
           {(Object.entries(modeMeta) as [StudyMode, { title: string; description: string }][]).map(([value, meta]) => (
-            <button type="button" className={mode === value ? styles.activeMode : ""} onClick={() => { setMode(value); resetSessionState(); }} key={value}>
+            <button
+              type="button"
+              className={mode === value ? styles.activeMode : ""}
+              onClick={() => { setMode(value); resetSessionState(); }}
+              disabled={value === "irregular-forms" && irregularEligibleEntries.length === 0}
+              key={value}
+            >
               <strong>{meta.title}</strong><span>{meta.description}</span>
             </button>
           ))}
@@ -757,8 +805,9 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
           <div>
             <span>Sesiones de hasta {questionCount} elementos</span>
             {mode === "write-word" && writeEligibleEntries.length !== activeEntries.length ? <small>Write it usa {writeEligibleEntries.length} entradas compatibles.</small> : null}
+            {mode === "irregular-forms" && irregularEligibleEntries.length !== activeEntries.length ? <small>Irregular forms usa {irregularEligibleEntries.length} verbos compatibles.</small> : null}
           </div>
-          <button className="button button-primary" type="button" onClick={startSession} disabled={(mode === "write-word" ? writeEligibleEntries.length : activeEntries.length) === 0}>
+          <button className="button button-primary" type="button" onClick={startSession} disabled={sessionCandidateCount === 0}>
             {sessionEntries.length > 0 ? "Nueva ronda" : "Empezar sesión"}
           </button>
         </div>
@@ -774,9 +823,19 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
                 {!flashcardRevealed ? <button className="button button-secondary" type="button" onClick={() => setFlashcardRevealed(true)}>Revelar respuesta</button> : (
                   <div className={styles.revealedAnswer}>
                     <strong>{current.term}</strong><span>{current.meaning.es}</span>
+                    {currentIrregularForms ? <span>Past simple: {currentIrregularForms.pastSimple} · Past participle: {currentIrregularForms.pastParticiple}</span> : null}
+                    {currentIrregularForms ? <small>Patrón: {currentIrregularForms.rule}</small> : null}
                     {answerCorrect === null ? <div className={styles.ratingButtons}><button type="button" onClick={() => rateFlashcard(false)}>Repasar</button><button type="button" onClick={() => rateFlashcard(true)}>Lo sabía</button></div> : null}
                   </div>
                 )}
+              </div>
+            ) : mode === "irregular-forms" && currentIrregularForms && irregularExpectedAnswer ? (
+              <div className={styles.writeQuestion}>
+                <span>Escribe el {irregularTargetLabel}</span><p>{currentIrregularForms.base} · {current.meaning.es}</p>
+                <div className={styles.writeControls}>
+                  <input value={typedAnswer} onChange={(event) => setTypedAnswer(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") checkTypedAnswer(); }} disabled={answerCorrect !== null} autoComplete="off" spellCheck={false} placeholder={irregularTargetLabel === "past simple" ? "e.g. began" : "e.g. begun"} />
+                  <button className="button button-primary" type="button" onClick={checkTypedAnswer} disabled={answerCorrect !== null || !typedAnswer.trim()}>Comprobar</button>
+                </div>
               </div>
             ) : mode === "write-word" ? (
               <div className={styles.writeQuestion}>
@@ -807,6 +866,9 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
                 <div>
                   <strong>{answerCorrect ? "✓ Correcto" : "✕ A repasar"}</strong>
                   {!answerCorrect && question ? <span>Respuesta: {question.answer}</span> : null}
+                  {!answerCorrect && mode === "irregular-forms" && irregularExpectedAnswer ? <span>Respuesta: {irregularExpectedAnswer}</span> : null}
+                  {currentIrregularForms ? <span>Formas: {currentIrregularForms.base} · {currentIrregularForms.pastSimple} · {currentIrregularForms.pastParticiple}</span> : null}
+                  {currentIrregularForms ? <span>Patrón: {currentIrregularForms.rule}{currentIrregularForms.note ? ` · ${currentIrregularForms.note}` : ""}</span> : null}
                   <span>EN: {current.meaning.en}</span>
                   <span>ES: {current.meaning.es}</span>
                   {current.examples[0] ? <span>Ejemplo: {current.examples[0].en} · {current.examples[0].es}</span> : null}
