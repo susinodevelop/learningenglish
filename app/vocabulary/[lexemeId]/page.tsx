@@ -56,6 +56,12 @@ export default async function VocabularyLexemePage({ params }: PageProps) {
           const verbForms = sense.topics.includes("irregular-verbs")
             ? irregularVerbFormsByTerm[sense.term]
             : undefined;
+          const irregularSourceNote = verbForms
+            ? [verbForms.rule, verbForms.note].filter(Boolean).join(" ")
+            : "";
+          const additionalNotes = sense.notes.filter((note) =>
+            !verbForms || (note !== irregularSourceNote && note !== verbForms.rule && note !== verbForms.note),
+          );
 
           return (
             <article className={styles.senseCard} key={sense.senseId}>
@@ -117,7 +123,7 @@ export default async function VocabularyLexemePage({ params }: PageProps) {
                 </section>
               ) : null}
 
-              {!verbForms && sense.notes.length > 0 ? <aside className={styles.notes}>{sense.notes.join(" · ")}</aside> : null}
+              {additionalNotes.length > 0 ? <aside className={styles.notes}>{additionalNotes.join(" · ")}</aside> : null}
             </article>
           );
         })}
