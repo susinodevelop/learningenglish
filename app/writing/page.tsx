@@ -69,7 +69,7 @@ export default function WritingPage() {
         </div>
       </section>
 
-      <section className={`${styles.panel} section`}>
+      <section className={`${styles.panel} ${styles.generalChecklist}`}>
         <span className="eyebrow">Checklist general</span>
         <h2>Antes de entregar cualquier writing</h2>
         <ul className={styles.checkList}>
