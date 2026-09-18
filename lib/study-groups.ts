@@ -291,7 +291,6 @@ export function migrateVocabularyProgress(
   return next;
 }
 
-/** Convert a v1 static group to stable senseIds without changing its user-facing identity. */
 export function createStudyGroupId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
     return `study-${crypto.randomUUID()}`;
