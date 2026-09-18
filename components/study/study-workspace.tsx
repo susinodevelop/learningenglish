@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { irregularVerbFormsByTerm } from "@/lib/vocabulary/data/irregular-verbs";
+import { phrasalVerbDataByTerm } from "@/lib/vocabulary/data/phrasal-verbs";
 import type {
   VocabularyEntryType,
   VocabularyLevel,
@@ -333,6 +334,9 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   const current = sessionEntries[sessionIndex];
   const currentIrregularForms = current?.topics.includes("irregular-verbs")
     ? irregularVerbFormsByTerm[current.term]
+    : undefined;
+  const currentPhrasalData = current?.topics.includes("phrasal-verbs")
+    ? phrasalVerbDataByTerm[current.term]
     : undefined;
   const sessionCandidateCount = mode === "write-word"
     ? writeEligibleEntries.length
@@ -857,6 +861,8 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
                     <strong>{current.term}</strong><span>{current.meaning.es}</span>
                     {currentIrregularForms ? <span>Past simple: {currentIrregularForms.pastSimple} · Past participle: {currentIrregularForms.pastParticiple}</span> : null}
                     {currentIrregularForms ? <small>Patrón: {currentIrregularForms.rule}</small> : null}
+                    {currentPhrasalData ? <span>Type: {currentPhrasalData.type}</span> : null}
+                    {currentPhrasalData ? <small>Example: {currentPhrasalData.example}</small> : null}
                     {answerCorrect === null ? <div className={styles.ratingButtons}><button type="button" onClick={() => rateFlashcard(false)}>Repasar</button><button type="button" onClick={() => rateFlashcard(true)}>Lo sabía</button></div> : null}
                   </div>
                 )}
@@ -931,7 +937,12 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
                   {currentIrregularForms ? <span>Patrón: {currentIrregularForms.rule}{currentIrregularForms.note ? ` · ${currentIrregularForms.note}` : ""}</span> : null}
                   <span>EN: {current.meaning.en}</span>
                   <span>ES: {current.meaning.es}</span>
-                  {current.examples[0] ? <span>Ejemplo: {current.examples[0].en} · {current.examples[0].es}</span> : null}
+                  {currentPhrasalData ? <span>Type: {currentPhrasalData.type}</span> : null}
+                  {currentPhrasalData
+                    ? <span>Ejemplo: {currentPhrasalData.example}</span>
+                    : current.examples[0]
+                      ? <span>Ejemplo: {current.examples[0].en} · {current.examples[0].es}</span>
+                      : null}
                   {current.relations.confusedWith.length > 0 ? <span>Confusables: {current.relations.confusedWith.join(" · ")}</span> : null}
                 </div>
                 <button className="button button-primary" type="button" onClick={nextQuestion}>{sessionIndex === sessionEntries.length - 1 ? "Ver resultado" : "Siguiente"}</button>
