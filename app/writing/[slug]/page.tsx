@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getWritingEntry, writingEntries } from "@/lib/writing";
+import { writingExampleAnswers } from "@/lib/writing-examples";
 import styles from "../writing.module.css";
 
 type PageProps = {
@@ -27,6 +28,7 @@ export default async function WritingDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const entry = getWritingEntry(slug);
   if (!entry) notFound();
+  const exampleAnswer = writingExampleAnswers[entry.slug];
 
   return (
     <div className={`shell page-shell ${styles.detailShell}`}>
@@ -112,7 +114,7 @@ export default async function WritingDetailPage({ params }: PageProps) {
       <section className={styles.exampleCard}>
         <span className="eyebrow">Modelo original</span>
         <h2>Example answer</h2>
-        <div className={styles.exampleText}>{entry.exampleAnswer}</div>
+        <div className={styles.exampleText}>{exampleAnswer}</div>
         <p className={styles.sourceNote}>Modelo creado para esta web siguiendo la estructura y recomendaciones del Gold C1 Advanced; no reproduce el model answer del libro.</p>
       </section>
     </div>
