@@ -118,6 +118,9 @@ const multipleChoiceModes = new Set<StudyMode>([
   "word-to-definition",
 ]);
 
+const phrasalObjectTokens = new Set(["someone", "something", "someone/something"]);
+const phrasalObjectPattern = "(?:\\S+(?:\\s+\\S+){0,4})";
+
 function shuffle<T>(values: T[]) {
   const result = [...values];
   for (let index = result.length - 1; index > 0; index -= 1) {
@@ -131,7 +134,17 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function writeAnswerTokenPattern(token: string) {
+function expandOptionalWrittenAnswerVariants(expected: string, isPhrasal: boolean) {
+  if (!isPhrasal || !/\([^)]+\)/.test(expected)) return [expected];
+
+  const withOptional = expected.replace(/\(([^)]+)\)/g, "$1").replace(/\s+/g, " ").trim();
+  const withoutOptional = expected.replace(/\s*\([^)]+\)/g, "").replace(/\s+/g, " ").trim();
+  return Array.from(new Set([withOptional, withoutOptional]));
+}
+
+function writeAnswerTokenPattern(token: string, allowPhrasalObject = false) {
+  if (allowPhrasalObject && phrasalObjectTokens.has(token)) return phrasalObjectPattern;
+
   switch (token) {
     case "one's":
       return "(?:one's|my|your|his|her|our|their|someone's|somebody's)";
@@ -151,17 +164,46 @@ function writeAnswerTokenPattern(token: string) {
   }
 }
 
-function isAcceptableWrittenAnswer(value: string, expected: string) {
+function isAcceptableWrittenAnswer(
+  value: string,
+  expected: string,
+  isPhrasal = false,
+  phrasalType?: string,
+) {
   const actual = normaliseVocabularyAnswer(value);
-  const canonical = normaliseVocabularyAnswer(expected);
-  if (actual === canonical) return true;
 
-  const pattern = canonical
-    .split(" ")
-    .map(writeAnswerTokenPattern)
-    .join("\\s+");
+  for (const expectedVariant of expandOptionalWrittenAnswerVariants(expected, isPhrasal)) {
+    const canonical = normaliseVocabularyAnswer(expectedVariant);
+    if (actual === canonical) return true;
 
-  return new RegExp(`^${pattern}$`, "i").test(actual);
+    const tokens = canonical.split(" ");
+    const pattern = tokens
+      .map((token) => writeAnswerTokenPattern(token, isPhrasal))
+      .join("\\s+");
+
+    if (new RegExp(`^${pattern}$`, "i").test(actual)) return true;
+
+    const isSimpleSeparablePattern =
+      isPhrasal &&
+      phrasalType?.startsWith("S") &&
+      tokens.length === 3 &&
+      phrasalObjectTokens.has(tokens[1]);
+
+    if (isSimpleSeparablePattern) {
+      const verbPattern = writeAnswerTokenPattern(tokens[0]);
+      const particlePattern = writeAnswerTokenPattern(tokens[2]);
+      const separatedPatterns = [
+        `${verbPattern}\\s+${phrasalObjectPattern}\\s+${particlePattern}`,
+        `${verbPattern}\\s+${particlePattern}\\s+${phrasalObjectPattern}`,
+      ];
+
+      if (separatedPatterns.some((candidate) => new RegExp(`^${candidate}$`, "i").test(actual))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 function isAcceptableIrregularFormAnswer(value: string, expected: string) {
@@ -584,7 +626,12 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     }
 
     if (!typedAnswer.trim()) return;
-    const correct = isAcceptableWrittenAnswer(typedAnswer, current.term);
+    const correct = isAcceptableWrittenAnswer(
+      typedAnswer,
+      current.term,
+      current.type === "phrasal-verb" || Boolean(currentPhrasalData),
+      currentPhrasalData?.type,
+    );
     setAnswerCorrect(correct);
     if (correct) setScore((value) => value + 1);
     recordResult(current, correct, typedAnswer);
