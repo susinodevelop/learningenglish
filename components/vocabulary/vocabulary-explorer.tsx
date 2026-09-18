@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { irregularVerbFormsByTerm } from "@/lib/vocabulary/data/irregular-verbs";
+import { phrasalVerbDataByTerm } from "@/lib/vocabulary/data/phrasal-verbs";
 import type {
   VocabularyCategory,
   VocabularyLevel,
@@ -36,7 +37,7 @@ type Props = {
 
 const viewCards: Array<{ view: ExplorerView; title: string; description: string }> = [
   { view: "topics", title: "Temas", description: "Explora el vocabulario por áreas y contextos." },
-  { view: "phrasal", title: "Phrasal verbs", description: "Verbos con partícula y sus significados." },
+  { view: "phrasal", title: "Phrasal verbs", description: "Tu lista de phrasal verbs con significado, ejemplo y tipo." },
   { view: "chunks", title: "Chunks & collocations", description: "Combinaciones que conviene recordar como una unidad." },
   { view: "idioms", title: "Idioms", description: "Expresiones figuradas y frases hechas para sonar más natural." },
   { view: "irregular-verbs", title: "Irregular verbs", description: "Base form, past simple, past participle, significado y patrón." },
@@ -61,6 +62,9 @@ function searchableSenseText(sense: VocabularySense) {
   const verbForms = sense.topics.includes("irregular-verbs")
     ? irregularVerbFormsByTerm[sense.term]
     : undefined;
+  const phrasalData = sense.topics.includes("phrasal-verbs")
+    ? phrasalVerbDataByTerm[sense.term]
+    : undefined;
   return [
     sense.term,
     sense.meaning.en,
@@ -72,6 +76,8 @@ function searchableSenseText(sense: VocabularySense) {
     verbForms?.pastSimple ?? "",
     verbForms?.pastParticiple ?? "",
     verbForms?.rule ?? "",
+    phrasalData?.example ?? "",
+    phrasalData?.type ?? "",
     ...sense.relations.collocations,
     ...sense.relations.patterns,
     ...sense.relations.synonyms,
@@ -121,7 +127,7 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
 
       switch (view) {
         case "phrasal":
-          return levelSenses.some((sense) => sense.type === "phrasal-verb");
+          return levelSenses.some((sense) => sense.topics.includes("phrasal-verbs"));
         case "chunks":
           return levelSenses.some((sense) => sense.type === "collocation" || sense.sectionKinds.includes("chunks"));
         case "idioms":
@@ -148,6 +154,7 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
   const showResults = isSearching || view !== "home" || Boolean(topicSlug);
   const activeTopic = topics.find((topic) => topic.slug === topicSlug);
   const showingIrregularVerbs = view === "irregular-verbs" || topicSlug === "irregular-verbs";
+  const showingPhrasalVerbs = view === "phrasal" || topicSlug === "phrasal-verbs";
 
   function chooseView(next: ExplorerView) {
     setView(next);
@@ -164,7 +171,7 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="gripping, began, broken, compelling, travel…"
+            placeholder="gripping, began, break down, compelling, travel…"
             aria-label="Buscar vocabulario B2 y C1"
           />
         </label>
@@ -228,7 +235,9 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
               <h2>{filteredLexemes.length} términos</h2>
               <p>{showingIrregularVerbs && !isSearching
                 ? "Base form = forma de diccionario · Past simple = pasado terminado · Past participle = forma usada con have y en la voz pasiva."
-                : "Las palabras con varios significados aparecen una sola vez y agrupan todas sus acepciones."}</p>
+                : showingPhrasalVerbs && !isSearching
+                  ? "Lista personal: significado EN/ES, ejemplo original y etiqueta Type conservada del documento fuente."
+                  : "Las palabras con varios significados aparecen una sola vez y agrupan todas sus acepciones."}</p>
             </div>
             <button type="button" className="button button-secondary" onClick={() => chooseView("home")}>Volver al inicio</button>
           </header>
@@ -240,9 +249,16 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
                 ? lexemeSenses.find((sense) => normalise(searchableSenseText(sense)).includes(normalizedQuery))
                 : undefined;
               const irregularSense = lexemeSenses.find((sense) => sense.topics.includes("irregular-verbs"));
-              const first = matchingSense ?? (showingIrregularVerbs ? irregularSense ?? lexemeSenses[0] : lexemeSenses[0]);
+              const phrasalSense = lexemeSenses.find((sense) => sense.topics.includes("phrasal-verbs"));
+              const first = matchingSense
+                ?? (showingIrregularVerbs ? irregularSense ?? lexemeSenses[0]
+                  : showingPhrasalVerbs ? phrasalSense ?? lexemeSenses[0]
+                    : lexemeSenses[0]);
               if (!first) return null;
               const verbForms = irregularVerbFormsByTerm[first.term];
+              const phrasalData = first.topics.includes("phrasal-verbs")
+                ? phrasalVerbDataByTerm[first.term]
+                : undefined;
               return (
                 <Link href={`/vocabulary/${lexeme.id}`} className={styles.lexemeCard} key={lexeme.id}>
                   <div className={styles.lexemeHeading}>
@@ -258,6 +274,8 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
                   ) : null}
                   <p>{first.meaning.en}</p>
                   <small>{first.meaning.es}</small>
+                  {phrasalData ? <small><strong>Type:</strong> {phrasalData.type}</small> : null}
+                  {phrasalData ? <small><strong>Example:</strong> {phrasalData.example}</small> : null}
                   {verbForms && first.topics.includes("irregular-verbs") ? <small><strong>Patrón:</strong> {verbForms.rule}</small> : null}
                   <footer>
                     <span>{lexemeSenses.length} {lexemeSenses.length === 1 ? "acepción" : "acepciones"}</span>
