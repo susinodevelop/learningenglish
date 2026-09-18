@@ -102,6 +102,13 @@ export const systemStudyGroups: StudyGroup[] = [
     filter: { ...emptyDynamicStudyGroupFilter, levels: ["B2"], topicSlugs: ["irregular-verbs"] },
   },
   {
+    id: "system-phrasal-verbs",
+    name: "Phrasal verbs",
+    kind: "dynamic",
+    system: true,
+    filter: { ...emptyDynamicStudyGroupFilter, levels: ["B2"], topicSlugs: ["phrasal-verbs"] },
+  },
+  {
     id: "system-mistakes",
     name: "Errores pendientes",
     kind: "dynamic",
