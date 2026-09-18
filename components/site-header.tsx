@@ -6,6 +6,7 @@ import styles from "./site-header.module.css";
 const links = [
   { href: "/grammar", label: "Gramática" },
   { href: "/vocabulary", label: "Vocabulario" },
+  { href: "/writing", label: "Writing" },
   { href: "/games", label: "Ejercicios" },
   { href: "/progress", label: "Progreso" },
 ];
