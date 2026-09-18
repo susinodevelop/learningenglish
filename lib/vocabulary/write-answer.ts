@@ -2,7 +2,9 @@ import { normaliseVocabularyAnswer } from "./game-engine";
 
 const phrasalObjectTokens = new Set(["someone", "something", "someone/something"]);
 const phrasalObjectPattern = "(?:\\S+(?:\\s+\\S+)*)";
-const postParticleObjectPattern = "(?!(?:me|you|him|her|it|us|them)(?:\\s|$))(?:\\S+(?:\\s+\\S+)*)";
+const postParticlePronounPattern =
+  "(?:me|you|him|her|it|us|them|myself|yourself|yourselves|himself|herself|itself|ourselves|themselves|someone|somebody|something|this|that|these|those|mine|yours|his|hers|ours|theirs)";
+const postParticleObjectPattern = `(?!${postParticlePronounPattern}$)(?:\\S+(?:\\s+\\S+)*)`;
 
 function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
