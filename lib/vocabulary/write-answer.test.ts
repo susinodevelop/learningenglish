@@ -25,13 +25,17 @@ describe("isAcceptableWrittenAnswer", () => {
     expect(isAcceptableWrittenAnswer("call off the match", "call something off", true, "S")).toBe(true);
     expect(isAcceptableWrittenAnswer("pick Sarah up", "pick someone up", true, "S")).toBe(true);
     expect(isAcceptableWrittenAnswer("pick up Sarah", "pick someone up", true, "S")).toBe(true);
+    expect(isAcceptableWrittenAnswer("pick up her sister", "pick someone up", true, "S")).toBe(true);
+    expect(isAcceptableWrittenAnswer("call off her meeting", "call something off", true, "S")).toBe(true);
   });
 
-  it("requires personal pronouns to stay between verb and particle", () => {
+  it("requires pronoun objects to stay between verb and particle", () => {
     expect(isAcceptableWrittenAnswer("call it off", "call something off", true, "S")).toBe(true);
     expect(isAcceptableWrittenAnswer("call off it", "call something off", true, "S")).toBe(false);
     expect(isAcceptableWrittenAnswer("pick her up", "pick someone up", true, "S")).toBe(true);
     expect(isAcceptableWrittenAnswer("pick up her", "pick someone up", true, "S")).toBe(false);
+    expect(isAcceptableWrittenAnswer("pick herself up", "pick someone up", true, "S")).toBe(true);
+    expect(isAcceptableWrittenAnswer("pick up herself", "pick someone up", true, "S")).toBe(false);
   });
 
   it("keeps somebody and someone interchangeable in phrasal placeholders", () => {
