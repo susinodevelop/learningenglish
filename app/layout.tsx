@@ -7,7 +7,7 @@ export const metadata: Metadata = {
     default: "Learning English | Aprende y practica inglés",
     template: "%s | Learning English",
   },
-  description: "Repositorio educativo de inglés con gramática, vocabulario, juegos y práctica por niveles.",
+  description: "Repositorio educativo de inglés con gramática, vocabulario, Writing C1, juegos y práctica por niveles.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
