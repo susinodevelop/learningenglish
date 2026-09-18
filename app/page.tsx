@@ -3,6 +3,7 @@ import Link from "next/link";
 const areas = [
   { href: "/grammar", icon: "Aa", title: "Gramática", text: "Explicaciones lógicas, ejemplos y patrones desde las bases hasta C1.", meta: "B2 + C1" },
   { href: "/vocabulary", icon: "W", title: "Vocabulario", text: "Palabras por contexto, nivel y uso real para que no estudies listas aisladas.", meta: "B2 + C1" },
+  { href: "/writing", icon: "✎", title: "Writing", text: "Essay, proposal, report, review y letter con estructura, registro, useful language, tips y modelos.", meta: "Cambridge C1" },
   { href: "/games", icon: "▶", title: "Ejercicios", text: "Practica gramática y vocabulario por separado con quizzes, grupos y recuperación activa.", meta: "Gramática + vocabulario" },
   { href: "/progress", icon: "↗", title: "Progreso", text: "Consulta tus mejores resultados y, más adelante, tu evolución completa.", meta: "Progreso local" },
 ];
@@ -15,7 +16,7 @@ export default function Home() {
           <div className="hero-copy">
             <span className="eyebrow">Tu repositorio de inglés</span>
             <h1>Entiende el inglés.<br /><em>Después, úsalo.</em></h1>
-            <p>Gramática explicada con lógica, vocabulario útil y práctica interactiva en un mismo sitio. Diseñado para avanzar desde las bases hasta un nivel avanzado.</p>
+            <p>Gramática explicada con lógica, vocabulario útil, Writing C1 y práctica interactiva en un mismo sitio. Diseñado para avanzar desde las bases hasta un nivel avanzado.</p>
             <div className="hero-actions">
               <Link className="button button-primary" href="/grammar">Empezar por gramática</Link>
               <Link className="button button-secondary" href="/games">Ir a ejercicios</Link>
