@@ -178,6 +178,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   const [cloudState, setCloudState] = useState<CloudState>("checking");
   const [cloudEmail, setCloudEmail] = useState<string | null>(null);
   const [remoteEnabled, setRemoteEnabled] = useState(false);
+
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftName, setDraftName] = useState("");
@@ -362,7 +363,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
         setCloudState("synced");
       })
       .catch((error) => {
-        console.error("Could not save study groups remotely", error);
+        console.error("Could not save vocabulary attempt remotely", error);
         queuePendingAttempt(attempt);
         setCloudState("error");
       });
@@ -436,6 +437,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
         : [...currentIds, senseId],
     );
   }
+
   function saveGroup() {
     const name = draftName.trim();
     if (!name) return;
