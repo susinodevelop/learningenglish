@@ -37,7 +37,7 @@ type Props = {
 
 const viewCards: Array<{ view: ExplorerView; title: string; description: string }> = [
   { view: "topics", title: "Temas", description: "Explora el vocabulario por áreas y contextos." },
-  { view: "phrasal", title: "Phrasal verbs", description: "Tu lista de phrasal verbs con significado, ejemplo y tipo." },
+  { view: "phrasal", title: "Phrasal verbs", description: "Todos los phrasal verbs de los libros y de tu lista personal." },
   { view: "chunks", title: "Chunks & collocations", description: "Combinaciones que conviene recordar como una unidad." },
   { view: "idioms", title: "Idioms", description: "Expresiones figuradas y frases hechas para sonar más natural." },
   { view: "irregular-verbs", title: "Irregular verbs", description: "Base form, past simple, past participle, significado y patrón." },
@@ -127,7 +127,7 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
 
       switch (view) {
         case "phrasal":
-          return levelSenses.some((sense) => sense.topics.includes("phrasal-verbs"));
+          return levelSenses.some((sense) => sense.type === "phrasal-verb");
         case "chunks":
           return levelSenses.some((sense) => sense.type === "collocation" || sense.sectionKinds.includes("chunks"));
         case "idioms":
@@ -154,7 +154,8 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
   const showResults = isSearching || view !== "home" || Boolean(topicSlug);
   const activeTopic = topics.find((topic) => topic.slug === topicSlug);
   const showingIrregularVerbs = view === "irregular-verbs" || topicSlug === "irregular-verbs";
-  const showingPhrasalVerbs = view === "phrasal" || topicSlug === "phrasal-verbs";
+  const showingPhrasalVerbs = view === "phrasal";
+  const showingPersonalPhrasalTopic = topicSlug === "phrasal-verbs";
 
   function chooseView(next: ExplorerView) {
     setView(next);
@@ -236,8 +237,10 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
               <p>{showingIrregularVerbs && !isSearching
                 ? "Base form = forma de diccionario · Past simple = pasado terminado · Past participle = forma usada con have y en la voz pasiva."
                 : showingPhrasalVerbs && !isSearching
-                  ? "Lista personal: significado EN/ES, ejemplo original y etiqueta Type conservada del documento fuente."
-                  : "Las palabras con varios significados aparecen una sola vez y agrupan todas sus acepciones."}</p>
+                  ? "Todos los phrasal verbs de los libros y de tu lista personal. Las entradas personales añaden Type y el ejemplo original del documento."
+                  : showingPersonalPhrasalTopic && !isSearching
+                    ? "Lista personal: significado EN/ES, ejemplo original y etiqueta Type conservada del documento fuente."
+                    : "Las palabras con varios significados aparecen una sola vez y agrupan todas sus acepciones."}</p>
             </div>
             <button type="button" className="button button-secondary" onClick={() => chooseView("home")}>Volver al inicio</button>
           </header>
@@ -249,10 +252,12 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
                 ? lexemeSenses.find((sense) => normalise(searchableSenseText(sense)).includes(normalizedQuery))
                 : undefined;
               const irregularSense = lexemeSenses.find((sense) => sense.topics.includes("irregular-verbs"));
-              const phrasalSense = lexemeSenses.find((sense) => sense.topics.includes("phrasal-verbs"));
+              const phrasalSense = showingPersonalPhrasalTopic
+                ? lexemeSenses.find((sense) => sense.topics.includes("phrasal-verbs"))
+                : lexemeSenses.find((sense) => sense.type === "phrasal-verb");
               const first = matchingSense
                 ?? (showingIrregularVerbs ? irregularSense ?? lexemeSenses[0]
-                  : showingPhrasalVerbs ? phrasalSense ?? lexemeSenses[0]
+                  : showingPhrasalVerbs || showingPersonalPhrasalTopic ? phrasalSense ?? lexemeSenses[0]
                     : lexemeSenses[0]);
               if (!first) return null;
               const verbForms = irregularVerbFormsByTerm[first.term];
