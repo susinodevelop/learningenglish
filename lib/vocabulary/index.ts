@@ -95,7 +95,9 @@ for (const sense of compiledVocabulary.senses) {
       : "personal"
     : "book";
 
-  if (hasPersonalSource && !hasBookSource) {
+  if (sense.topics.includes("phrasal-verbs")) {
+    sense.type = "phrasal-verb";
+  } else if (hasPersonalSource && !hasBookSource) {
     sense.type = personalVocabularyTypeOverrides[sense.term] ?? sense.type;
   }
 }
