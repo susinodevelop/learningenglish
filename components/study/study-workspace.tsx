@@ -183,6 +183,7 @@ function isAcceptableWrittenAnswer(
 
     if (new RegExp(`^${pattern}$`, "i").test(actual)) return true;
 
+    // The source examples marked S use both object placements, e.g. call the match off / call off the match.
     const isSimpleSeparablePattern =
       isPhrasal &&
       phrasalType?.startsWith("S") &&
