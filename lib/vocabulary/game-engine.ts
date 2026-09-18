@@ -287,6 +287,9 @@ function expandCommonContractions(value: string) {
 
 export function normaliseVocabularyAnswer(value: string) {
   return expandCommonContractions(normaliseVocabularyText(value))
+    .replace(/\s*\/\s*/g, "/")
+    .replace(/\bsomebody's\b/g, "someone's")
+    .replace(/\bsomebody\b/g, "someone")
     .replace(/[.,!?;:()[\]{}"“”]/g, "")
     .replace(/[‐‑–—-]/g, " ")
     .replace(/\b(?:am|is|are|was|were|been|being)\b/g, "be")
