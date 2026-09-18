@@ -16,6 +16,7 @@ import {
   type VocabularyDifficulty,
   type VocabularyMultipleChoiceDirection,
 } from "@/lib/vocabulary/game-engine";
+import { isAcceptableWrittenAnswer } from "@/lib/vocabulary/write-answer";
 import {
   createStudyGroupId,
   emptyDynamicStudyGroupFilter,
@@ -118,9 +119,6 @@ const multipleChoiceModes = new Set<StudyMode>([
   "word-to-definition",
 ]);
 
-const phrasalObjectTokens = new Set(["someone", "something", "someone/something"]);
-const phrasalObjectPattern = "(?:\\S+(?:\\s+\\S+){0,4})";
-
 function shuffle<T>(values: T[]) {
   const result = [...values];
   for (let index = result.length - 1; index > 0; index -= 1) {
@@ -128,83 +126,6 @@ function shuffle<T>(values: T[]) {
     [result[index], result[target]] = [result[target], result[index]];
   }
   return result;
-}
-
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function expandOptionalWrittenAnswerVariants(expected: string, isPhrasal: boolean) {
-  if (!isPhrasal || !/\([^)]+\)/.test(expected)) return [expected];
-
-  const withOptional = expected.replace(/\(([^)]+)\)/g, "$1").replace(/\s+/g, " ").trim();
-  const withoutOptional = expected.replace(/\s*\([^)]+\)/g, "").replace(/\s+/g, " ").trim();
-  return Array.from(new Set([withOptional, withoutOptional]));
-}
-
-function writeAnswerTokenPattern(token: string, allowPhrasalObject = false) {
-  if (allowPhrasalObject && phrasalObjectTokens.has(token)) return phrasalObjectPattern;
-
-  switch (token) {
-    case "one's":
-      return "(?:one's|my|your|his|her|our|their|someone's|somebody's)";
-    case "someone's":
-      return "(?:someone's|somebody's|my|your|his|her|our|their)";
-    case "someone/something":
-      return "(?:someone|somebody|something|me|you|him|her|us|them|it|this|that)";
-    case "someone":
-      return "(?:someone|somebody|me|you|him|her|us|them)";
-    case "something":
-      return "(?:something|it|this|that)";
-    default:
-      if (token.includes("/")) {
-        return `(?:${token.split("/").map(escapeRegExp).join("|")})`;
-      }
-      return escapeRegExp(token);
-  }
-}
-
-function isAcceptableWrittenAnswer(
-  value: string,
-  expected: string,
-  isPhrasal = false,
-  phrasalType?: string,
-) {
-  const actual = normaliseVocabularyAnswer(value);
-
-  for (const expectedVariant of expandOptionalWrittenAnswerVariants(expected, isPhrasal)) {
-    const canonical = normaliseVocabularyAnswer(expectedVariant);
-    if (actual === canonical) return true;
-
-    const tokens = canonical.split(" ");
-    const pattern = tokens
-      .map((token) => writeAnswerTokenPattern(token, isPhrasal))
-      .join("\\s+");
-
-    if (new RegExp(`^${pattern}$`, "i").test(actual)) return true;
-
-    // The source examples marked S use both object placements, e.g. call the match off / call off the match.
-    const isSimpleSeparablePattern =
-      isPhrasal &&
-      phrasalType?.startsWith("S") &&
-      tokens.length === 3 &&
-      phrasalObjectTokens.has(tokens[1]);
-
-    if (isSimpleSeparablePattern) {
-      const verbPattern = writeAnswerTokenPattern(tokens[0]);
-      const particlePattern = writeAnswerTokenPattern(tokens[2]);
-      const separatedPatterns = [
-        `${verbPattern}\\s+${phrasalObjectPattern}\\s+${particlePattern}`,
-        `${verbPattern}\\s+${particlePattern}\\s+${phrasalObjectPattern}`,
-      ];
-
-      if (separatedPatterns.some((candidate) => new RegExp(`^${candidate}$`, "i").test(actual))) {
-        return true;
-      }
-    }
-  }
-
-  return false;
 }
 
 function isAcceptableIrregularFormAnswer(value: string, expected: string) {
@@ -257,7 +178,6 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   const [cloudState, setCloudState] = useState<CloudState>("checking");
   const [cloudEmail, setCloudEmail] = useState<string | null>(null);
   const [remoteEnabled, setRemoteEnabled] = useState(false);
-
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draftName, setDraftName] = useState("");
@@ -442,7 +362,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
         setCloudState("synced");
       })
       .catch((error) => {
-        console.error("Could not save vocabulary attempt remotely", error);
+        console.error("Could not save study groups remotely", error);
         queuePendingAttempt(attempt);
         setCloudState("error");
       });
@@ -516,7 +436,6 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
         : [...currentIds, senseId],
     );
   }
-
   function saveGroup() {
     const name = draftName.trim();
     if (!name) return;
