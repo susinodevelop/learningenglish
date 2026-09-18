@@ -137,10 +137,10 @@ const sections: VocabularySection[] = [
 
 export const phrasalVerbsVocabularyTopic: VocabularyTopic = {
   slug: "phrasal-verbs",
-  title: "Phrasal verbs",
+  title: "Phrasal verbs · lista personal",
   category: "language",
-  level: "B2",
-  summary: "96 entradas de la lista personal de phrasal verbs, con significado, ejemplo y etiqueta de tipo conservados del documento fuente.",
+  level: "C1",
+  summary: "96 entradas de tu lista personal de phrasal verbs. El documento fuente no asigna nivel CEFR; se integran en C1 como material de preparación de esta web.",
   sourceUnit: 2002,
   source: "User-provided phrasal verbs",
   sections,
