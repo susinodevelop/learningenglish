@@ -8,6 +8,7 @@ import { timeVocabularyTopics } from "./data/time";
 import { studyWorkVocabularyTopics } from "./data/study-work";
 import { goldC1VocabularyTopics } from "./data/c1";
 import { irregularVerbsVocabularyTopic } from "./data/irregular-verbs";
+import { phrasalVerbsVocabularyTopic } from "./data/phrasal-verbs";
 
 export type {
   VocabularyCategory,
@@ -50,6 +51,7 @@ const sourceVocabularyTopics: VocabularyTopic[] = [
   ...studyWorkVocabularyTopics,
   ...goldC1VocabularyTopics,
   irregularVerbsVocabularyTopic,
+  phrasalVerbsVocabularyTopic,
 ];
 
 const compiledVocabulary = compileVocabulary(sourceVocabularyTopics);
@@ -57,6 +59,7 @@ const compiledVocabulary = compileVocabulary(sourceVocabularyTopics);
 const personalVocabularySources = new Set([
   "Personal C1 vocabulary",
   "User-provided irregular verbs",
+  "User-provided phrasal verbs",
 ]);
 
 const personalVocabularyTypeOverrides: Record<string, VocabularyEntryType> = {
@@ -92,7 +95,9 @@ for (const sense of compiledVocabulary.senses) {
       : "personal"
     : "book";
 
-  if (hasPersonalSource && !hasBookSource) {
+  if (sense.topics.includes("phrasal-verbs")) {
+    sense.type = "phrasal-verb";
+  } else if (hasPersonalSource && !hasBookSource) {
     sense.type = personalVocabularyTypeOverrides[sense.term] ?? sense.type;
   }
 }

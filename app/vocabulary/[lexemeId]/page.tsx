@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { irregularVerbFormsByTerm } from "@/lib/vocabulary/data/irregular-verbs";
+import { phrasalVerbDataByTerm } from "@/lib/vocabulary/data/phrasal-verbs";
 import { vocabularyLexemes, vocabularySenses, vocabularyTopics } from "@/lib/vocabulary";
 import styles from "./page.module.css";
 
@@ -52,7 +53,12 @@ export default async function VocabularyLexemePage({ params }: PageProps) {
             ["Confusables", sense.resolvedRelations.confusedWith],
             ["Word family", sense.resolvedRelations.wordFamily],
           ] as const;
-          const example = sense.examples.find((candidate) => candidate.kind === "usage") ?? sense.examples[0];
+          const phrasalData = sense.topics.includes("phrasal-verbs")
+            ? phrasalVerbDataByTerm[sense.term]
+            : undefined;
+          const example = phrasalData
+            ? undefined
+            : sense.examples.find((candidate) => candidate.kind === "usage") ?? sense.examples[0];
           const verbForms = sense.topics.includes("irregular-verbs")
             ? irregularVerbFormsByTerm[sense.term]
             : undefined;
@@ -90,12 +96,24 @@ export default async function VocabularyLexemePage({ params }: PageProps) {
                 </>
               ) : null}
 
+              {phrasalData ? (
+                <div className={styles.meta}>
+                  <div><span>Type</span><p>{phrasalData.type}</p></div>
+                  <div><span>Source</span><p>Personal phrasal verbs list</p></div>
+                </div>
+              ) : null}
+
               <section className={styles.meaningGrid}>
                 <div><span>EN</span><p>{sense.meaning.en}</p></div>
                 <div><span>ES</span><p>{sense.meaning.es}</p></div>
               </section>
 
-              {example ? (
+              {phrasalData ? (
+                <section className={styles.example}>
+                  <span>Source example</span>
+                  <p>{phrasalData.example}</p>
+                </section>
+              ) : example ? (
                 <section className={styles.example}>
                   <span>{example.kind === "usage" ? "Example" : "Definition example"}</span>
                   <p>{example.en}</p><small>{example.es}</small>
