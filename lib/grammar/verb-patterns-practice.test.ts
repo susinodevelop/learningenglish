@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
-  verbPatternBareInfinitiveGrammarFocusVerbs,
   verbPatternEffectiveBareInfinitiveVerbs,
   verbPatternEffectiveToInfinitiveVerbs,
   verbPatternEffectiveVerbIngVerbs,
   verbPatternLittleDifferenceGrammarReferenceVerbs,
+  verbPatternLittleDifferenceStructuralVerbs,
   verbPatternLittleDifferenceUnitTipVerbs,
   verbPatternLittleDifferenceVerbs,
   verbPatternMeaningChangeVerbs,
@@ -50,11 +50,10 @@ describe("verb patterns practice bank", () => {
     expect(verbPatternSourceEntryCount).toBe(117);
   });
 
-  it("preserves the extra classifications explicitly taught in Unit 4 Grammar Focus", () => {
-    expect(verbPatternBareInfinitiveGrammarFocusVerbs).toEqual(["recommend", "suggest"]);
-    expect(verbPatternEffectiveBareInfinitiveVerbs).toEqual([
-      "let", "make", "hear", "help", "recommend", "suggest",
-    ]);
+  it("keeps the bare-infinitive family aligned with the Grammar Reference", () => {
+    expect(verbPatternEffectiveBareInfinitiveVerbs).toEqual(["let", "make", "hear", "help"]);
+    expect(verbPatternEffectiveBareInfinitiveVerbs).not.toContain("recommend");
+    expect(verbPatternEffectiveBareInfinitiveVerbs).not.toContain("suggest");
   });
 
   it("preserves both special -ing/to classifications from the Gold source", () => {
@@ -68,16 +67,25 @@ describe("verb patterns practice bank", () => {
     ]);
   });
 
-  it("expands the two structural answers implied by the special groups", () => {
-    const allSpecialVerbs = [...verbPatternMeaningChangeVerbs, ...verbPatternLittleDifferenceVerbs];
-
-    for (const verb of allSpecialVerbs) {
+  it("expands structural answers only where Unit 4 supports the inference", () => {
+    for (const verb of verbPatternMeaningChangeVerbs) {
       expect(verbPatternEffectiveVerbIngVerbs).toContain(verb);
       expect(verbPatternEffectiveToInfinitiveVerbs).toContain(verb);
     }
 
-    expect(verbPatternEffectiveVerbIngVerbs).toHaveLength(42);
-    expect(verbPatternEffectiveToInfinitiveVerbs).toHaveLength(45);
+    expect(verbPatternLittleDifferenceStructuralVerbs).toEqual([
+      "attempt", "begin", "continue", "love", "prefer", "start", "hate",
+    ]);
+
+    for (const verb of verbPatternLittleDifferenceStructuralVerbs) {
+      expect(verbPatternEffectiveVerbIngVerbs).toContain(verb);
+      expect(verbPatternEffectiveToInfinitiveVerbs).toContain(verb);
+    }
+
+    expect(verbPatternEffectiveVerbIngVerbs).not.toContain("see");
+    expect(verbPatternEffectiveToInfinitiveVerbs).not.toContain("see");
+    expect(verbPatternEffectiveVerbIngVerbs).toHaveLength(41);
+    expect(verbPatternEffectiveToInfinitiveVerbs).toHaveLength(44);
   });
 
   it("keeps every practice family free of duplicate verb labels", () => {
@@ -122,16 +130,12 @@ describe("verb patterns practice bank", () => {
     ]);
   });
 
-  it("includes the Grammar Focus recommend/suggest bare-infinitive classifications", () => {
+  it("does not promote Activity 6 recommend/suggest wording to the bare-infinitive family", () => {
     expect(questionFor("recommend")?.correctFamilyIds).toEqual([
       "verb-ing",
       "object-to-infinitive",
-      "bare-infinitive",
     ]);
-    expect(questionFor("suggest")?.correctFamilyIds).toEqual([
-      "verb-ing",
-      "bare-infinitive",
-    ]);
+    expect(questionFor("suggest")?.correctFamilyIds).toEqual(["verb-ing"]);
   });
 
   it("marks all structural answers for different-meaning verbs", () => {
@@ -152,7 +156,7 @@ describe("verb patterns practice bank", () => {
     ]);
   });
 
-  it("marks all structural answers for little-difference verbs, including hate", () => {
+  it("marks structural answers for supported little-difference verbs, including hate", () => {
     expect(questionFor("continue")?.correctFamilyIds).toEqual([
       "verb-ing",
       "to-infinitive",
@@ -164,6 +168,10 @@ describe("verb patterns practice bank", () => {
       "object-to-infinitive",
       "both-forms",
     ]);
+  });
+
+  it("keeps see only in Gold's little-difference group without inferring structural families", () => {
+    expect(questionFor("see")?.correctFamilyIds).toEqual(["both-forms"]);
   });
 
   it("keeps single-pattern verbs with one correct classification", () => {
