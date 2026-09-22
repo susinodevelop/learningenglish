@@ -32,6 +32,8 @@ describe("verb patterns practice bank", () => {
       "overhear",
       "prevent",
     ]);
+    expect(objectIng?.verbs).not.toContain("catch");
+    expect(objectIng?.verbs).not.toContain("find");
   });
 
   it("keeps every family free of duplicate verb labels", () => {
