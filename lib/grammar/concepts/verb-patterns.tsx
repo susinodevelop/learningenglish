@@ -62,11 +62,10 @@ const c1Topics: GrammarTopic[] = [
         title: "Verb + object + to-infinitive / bare infinitive",
         forms: ["verb + object + to-infinitive", "verb + object + infinitive without to"],
         rules: [
-          `El Grammar Reference de p.154 incluye literalmente con object + to-infinitive: ${formatVerbList(verbPatternSourceLists.objectToInfinitive)}.`,
-          "Recommend aparece en esa lista de p.154, pero el tratamiento posterior de reporting verbs del propio Gold lo clasifica con verb (+ that) + clause y verb + -ing. Para evitar enseñar dos reglas incompatibles, el banco conserva recommend en la lista fuente literal, pero no lo corrige como object + to-infinitive.",
+          `El Grammar Reference de p.154 incluye con object + to-infinitive: ${formatVerbList(verbPatternSourceLists.objectToInfinitive)}.`,
           `En object + infinitive without to, el Grammar Reference recoge ${formatVerbList(verbPatternSourceLists.bareInfinitive)}.`,
           "Activity 6 presenta recommended/suggested + he work hard bajo esa etiqueta, pero el Grammar Reference no los incluye en la lista general de bare infinitive; por eso el banco no los clasifica como miembros generales de ese grupo.",
-          "Para corregir el banco se priorizan las listas consolidadas del Grammar Reference, el Language Tip de Unit 4 y, cuando el propio Gold entra en contradicción, su tratamiento posterior más explícito del mismo verbo.",
+          "Para corregir este banco se siguen las clasificaciones estructurales consolidadas de Gold C1 Unit 4: Grammar Reference y Language Tip.",
           "En pasiva, make, hear y help pasan a to-infinitive: was made to..., was heard to....",
           "Las formas pasivas con advise/order/etc. también van seguidas de to-infinitive.",
         ],
