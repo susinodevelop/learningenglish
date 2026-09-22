@@ -8,6 +8,7 @@ import {
   grammarExerciseQuestions,
   grammarExerciseSections,
 } from "@/lib/grammar/exercises";
+import { verbPatternPracticeQuestions } from "@/lib/grammar/verb-patterns-practice";
 import { vocabularyLexicon, vocabularyTopics } from "@/lib/vocabulary";
 
 export const metadata: Metadata = {
@@ -28,10 +29,11 @@ export default function GamesPage() {
         <h1>Practica gramática y vocabulario por separado.</h1>
         <p>
           Gramática cubre cada subapartado de la teoría B2 + C1 con práctica por nivel, concepto, regla
-          y formato. Vocabulario conserva tus grupos de estudio, filtros, progreso y modos de recuperación.
+          y formato, e incluye un banco exclusivo para practicar todos los Verb patterns de Unit 4.
+          Vocabulario conserva tus grupos de estudio, filtros, progreso y modos de recuperación.
         </p>
         <p>
-          {grammarExerciseCount} ejercicios · {grammarExerciseSections.length} subapartados · {grammarExerciseManualApplicationCount} de aplicación manual · {grammarExerciseGuidedApplicationCount} guiados
+          {grammarExerciseCount} ejercicios generales de gramática · {verbPatternPracticeQuestions.length} Verb patterns · {grammarExerciseSections.length} subapartados generales · {grammarExerciseManualApplicationCount} de aplicación manual · {grammarExerciseGuidedApplicationCount} guiados
         </p>
       </header>
 
