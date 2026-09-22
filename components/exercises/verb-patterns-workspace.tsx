@@ -1,17 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   verbPatternPracticeFamilies,
   verbPatternPracticeQuestions,
   verbPatternSourceEntryCount,
-  type VerbPatternFamilyId,
   type VerbPatternPracticeQuestion,
 } from "@/lib/grammar/verb-patterns-practice";
 import styles from "./verb-patterns-workspace.module.css";
-
-type FamilyFilter = "all" | VerbPatternFamilyId;
 
 function shuffle<T>(values: T[]) {
   const result = [...values];
@@ -23,7 +20,6 @@ function shuffle<T>(values: T[]) {
 }
 
 export function VerbPatternsWorkspace() {
-  const [family, setFamily] = useState<FamilyFilter>("all");
   const [session, setSession] = useState<VerbPatternPracticeQuestion[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -31,27 +27,8 @@ export function VerbPatternsWorkspace() {
   const [finished, setFinished] = useState(false);
   const [missedQuestions, setMissedQuestions] = useState<VerbPatternPracticeQuestion[]>([]);
 
-  const filteredQuestions = useMemo(
-    () => verbPatternPracticeQuestions.filter((question) => family === "all" || question.family === family),
-    [family],
-  );
-
   const current = session[questionIndex];
   const currentCorrect = current && selected !== null ? selected === current.answerIndex : false;
-
-  function resetSession() {
-    setSession([]);
-    setQuestionIndex(0);
-    setSelected(null);
-    setScore(0);
-    setFinished(false);
-    setMissedQuestions([]);
-  }
-
-  function chooseFamily(nextFamily: FamilyFilter) {
-    setFamily(nextFamily);
-    resetSession();
-  }
 
   function beginRound(questions: VerbPatternPracticeQuestion[], limit?: number) {
     const next = shuffle(questions);
@@ -90,19 +67,16 @@ export function VerbPatternsWorkspace() {
     beginRound(unique);
   }
 
-  const selectedFamily = family === "all"
-    ? null
-    : verbPatternPracticeFamilies.find((candidate) => candidate.id === family);
-
   return (
     <section className={styles.workspace} aria-label="Práctica exclusiva de verb patterns">
       <div className={styles.hero}>
         <div>
           <span className="eyebrow">Gramática · C1 · Verb patterns</span>
-          <h2>Practica qué estructura exige cada verbo.</h2>
+          <h2>Te doy el verbo. Tú eliges el patrón.</h2>
           <p>
-            Banco exclusivo para Unit 4: -ing, object + -ing, to-infinitive, object + to-infinitive,
-            infinitive without to y los verbos donde cambiar entre -ing y to cambia el significado.
+            El objetivo es reconocer qué estructura sigue cada verbo: -ing, object + -ing, to-infinitive,
+            object + to-infinitive o infinitive without to. Los verbos con varios patrones se preguntan
+            dentro de una frase para que la respuesta sea inequívoca.
           </p>
         </div>
         <div className={styles.heroStats}>
@@ -112,54 +86,43 @@ export function VerbPatternsWorkspace() {
         </div>
       </div>
 
-      <div className={styles.familyGrid}>
-        <button
-          type="button"
-          className={family === "all" ? styles.activeFamily : ""}
-          onClick={() => chooseFamily("all")}
-        >
-          <span>Mix</span>
-          <strong>Todos los verb patterns</strong>
-          <small>{verbPatternPracticeQuestions.length} preguntas</small>
-        </button>
-        {verbPatternPracticeFamilies.map((candidate) => {
-          const count = verbPatternPracticeQuestions.filter((question) => question.family === candidate.id).length;
+      <div className={styles.familyGrid} aria-label="Grupos de verb patterns incluidos">
+        {verbPatternPracticeFamilies.map((family) => {
+          const count = verbPatternPracticeQuestions.filter((question) => question.family === family.id).length;
           return (
-            <button
-              type="button"
-              className={family === candidate.id ? styles.activeFamily : ""}
-              onClick={() => chooseFamily(candidate.id)}
-              key={candidate.id}
-            >
-              <span>{candidate.verbs.length}</span>
-              <strong>{candidate.title}</strong>
+            <div className={styles.familyCard} key={family.id}>
+              <span>{family.verbs.length}</span>
+              <strong>{family.title}</strong>
               <small>{count} preguntas</small>
-            </button>
+            </div>
           );
         })}
       </div>
 
       <div className={styles.roundControls}>
         <div>
-          <strong>{selectedFamily?.title ?? "Todos los verb patterns"}</strong>
-          <span>{selectedFamily?.description ?? "Mezcla todas las familias para obligarte a identificar primero el patrón."}</span>
+          <strong>Todos los verb patterns mezclados</strong>
+          <span>
+            Las opciones son los propios grupos de verb patterns. No necesitas memorizar nombres de unidades
+            ni categorías internas: ves un verbo y decides qué estructura le corresponde.
+          </span>
         </div>
         <div className={styles.roundButtons}>
-          <button className="button button-secondary" type="button" onClick={() => beginRound(filteredQuestions, 20)}>
+          <button className="button button-secondary" type="button" onClick={() => beginRound(verbPatternPracticeQuestions, 20)}>
             Ronda de 20
           </button>
-          <button className="button button-primary" type="button" onClick={() => beginRound(filteredQuestions)}>
-            Practicar todas · {filteredQuestions.length}
+          <button className="button button-primary" type="button" onClick={() => beginRound(verbPatternPracticeQuestions)}>
+            Practicar todas · {verbPatternPracticeQuestions.length}
           </button>
         </div>
       </div>
 
       {session.length === 0 ? (
         <div className={styles.emptyState}>
-          <strong>Elige una familia o mézclalas todas.</strong>
+          <strong>Practica identificando el patrón, no memorizando la unidad.</strong>
           <p>
-            Cada verbo de las listas del tema aparece en el banco. Las preguntas de significado trabajan
-            por separado remember, forget, regret, stop y try.
+            Los verbos que aceptan más de una estructura aparecen con contexto. Remember, forget, regret,
+            stop y try mantienen además ejercicios específicos sobre el cambio de significado.
           </p>
           <Link href="/grammar#verb-patterns">Repasar primero la teoría →</Link>
         </div>
@@ -177,7 +140,7 @@ export function VerbPatternsWorkspace() {
             {missedQuestions.length > 0 ? (
               <button className="button button-secondary" type="button" onClick={practiseMistakes}>Solo mis fallos</button>
             ) : null}
-            <button className="button button-primary" type="button" onClick={() => beginRound(filteredQuestions, 20)}>Otra ronda</button>
+            <button className="button button-primary" type="button" onClick={() => beginRound(verbPatternPracticeQuestions, 20)}>Otra ronda</button>
           </div>
         </div>
       ) : current ? (
@@ -185,7 +148,7 @@ export function VerbPatternsWorkspace() {
           <div className={styles.questionHeader}>
             <div>
               <span>C1</span>
-              <strong>{current.familyTitle}</strong>
+              <strong>Verb patterns</strong>
             </div>
             <span>Pregunta {questionIndex + 1}/{session.length} · {score} aciertos</span>
           </div>
@@ -222,6 +185,7 @@ export function VerbPatternsWorkspace() {
               <div>
                 <strong>{currentCorrect ? "Correcto" : "Revisa este patrón"}</strong>
                 <p>{current.explanation}</p>
+                <small>Grupo: {current.familyTitle}</small>
                 {current.example ? <small>Ejemplo: {current.example}</small> : null}
               </div>
               <button className="button button-primary" type="button" onClick={nextQuestion}>
