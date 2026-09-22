@@ -86,16 +86,16 @@ export function VerbPatternsWorkspace() {
       <div className={styles.hero}>
         <div>
           <span className="eyebrow">Gramática · C1 · Verb patterns</span>
-          <h2>Verbo → pattern.</h2>
+          <h2>Verbo o expresión → pattern.</h2>
           <p>
-            Aparece un verbo y marcas todos los grupos que le corresponden según las listas del Grammar Reference
-            y el Language Tip de Gold C1 Unit 4. Grammar Focus se conserva como contexto teórico cuando presenta
-            una formulación que no coincide con esas listas generales.
+            Aparece un verbo o expresión verbal y marcas todos los grupos que le corresponden. El banco parte del
+            Grammar Reference y el Language Tip de Gold C1 Unit 4 y resuelve contradicciones internas con el
+            tratamiento posterior más explícito del propio Gold.
           </p>
         </div>
         <div className={styles.heroStats}>
           <strong>{verbPatternPracticeQuestions.length}</strong>
-          <span>verbos únicos</span>
+          <span>verbos o expresiones únicas</span>
           <small>{verbPatternSourceEntryCount} entradas en las cinco listas del Grammar Reference</small>
         </div>
       </div>
@@ -119,7 +119,7 @@ export function VerbPatternsWorkspace() {
         <div className={styles.emptyState}>
           <strong>Elige una ronda y empieza.</strong>
           <p>
-            Marca uno o varios patterns para cada verbo. La respuesta solo se revela después de pulsar Comprobar.
+            Marca uno o varios patterns para cada verbo o expresión verbal. La respuesta solo se revela después de pulsar Comprobar.
           </p>
           <Link href="/grammar/verb-patterns">Repasar primero la teoría →</Link>
         </div>
@@ -130,7 +130,7 @@ export function VerbPatternsWorkspace() {
           <h3>{score === session.length ? "Perfecto." : score / session.length >= 0.8 ? "Muy buen dominio." : "Conviene repetir los fallos."}</h3>
           <p>
             {score === session.length
-              ? "Has clasificado correctamente todos los verbos de esta ronda."
+              ? "Has clasificado correctamente todas las entradas de esta ronda."
               : `Has fallado ${missedQuestions.length} pregunta${missedQuestions.length === 1 ? "" : "s"}.`}
           </p>
           <div className={styles.resultActions}>
@@ -154,9 +154,9 @@ export function VerbPatternsWorkspace() {
             <span style={{ width: `${((questionIndex + 1) / session.length) * 100}%` }} />
           </div>
 
-          <h3>¿En qué Verb pattern se clasifica este verbo?</h3>
+          <h3>¿En qué Verb pattern se clasifica este verbo o expresión verbal?</h3>
           <div className={styles.focusVerb}>{current.verb}</div>
-          <p className={styles.multiHint}>Marca todos los grupos que le corresponden en Gold C1 Unit 4.</p>
+          <p className={styles.multiHint}>Marca todos los grupos que le corresponden según el criterio de estudio del Gold.</p>
 
           <div className={styles.answerGrid}>
             {verbPatternPracticeFamilies.map((family) => {
@@ -199,7 +199,7 @@ export function VerbPatternsWorkspace() {
             <div className={styles.feedback}>
               <div>
                 <strong>{currentCorrect ? "Correcto" : "Revisa la clasificación"}</strong>
-                <p>Clasificación de Unit 4: {correctLabels}</p>
+                <p>Clasificación de estudio: {correctLabels}</p>
               </div>
               <button className="button button-primary" type="button" onClick={nextQuestion}>
                 {questionIndex === session.length - 1 ? "Ver resultado" : "Siguiente"}
