@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
 import { StudyWorkspace } from "@/components/study/study-workspace";
 import type { GrammarExerciseConcept, GrammarExerciseQuestion } from "@/lib/grammar/exercises";
 import type { VocabularySense } from "@/lib/vocabulary";
@@ -67,6 +67,38 @@ export function ExercisesHub({
     window.history.replaceState(null, "", nextArea === "verb-patterns" ? "#verb-patterns" : "#grammar");
   }
 
+  function handleAreaTabKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
+    let nextArea: ExerciseArea | null = null;
+    if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+      nextArea = area === "grammar" ? "vocabulary" : "grammar";
+    } else if (event.key === "Home") {
+      nextArea = "grammar";
+    } else if (event.key === "End") {
+      nextArea = "vocabulary";
+    }
+    if (!nextArea) return;
+
+    event.preventDefault();
+    chooseArea(nextArea);
+    document.getElementById(nextArea === "grammar" ? "exercise-grammar-tab" : "exercise-vocabulary-tab")?.focus();
+  }
+
+  function handleGrammarTabKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
+    let nextArea: GrammarArea | null = null;
+    if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+      nextArea = grammarArea === "general" ? "verb-patterns" : "general";
+    } else if (event.key === "Home") {
+      nextArea = "general";
+    } else if (event.key === "End") {
+      nextArea = "verb-patterns";
+    }
+    if (!nextArea) return;
+
+    event.preventDefault();
+    chooseGrammarArea(nextArea);
+    document.getElementById(nextArea === "general" ? "grammar-general-tab" : "grammar-verb-patterns-tab")?.focus();
+  }
+
   return (
     <>
       <div className={styles.areaTabs} role="tablist" aria-label="Tipo de ejercicios">
@@ -74,10 +106,12 @@ export function ExercisesHub({
           id="exercise-grammar-tab"
           type="button"
           role="tab"
+          tabIndex={area === "grammar" ? 0 : -1}
           aria-selected={area === "grammar"}
           aria-controls="exercise-area-panel"
           className={area === "grammar" ? styles.activeTab : ""}
           onClick={() => chooseArea("grammar")}
+          onKeyDown={handleAreaTabKeyDown}
         >
           <span className={styles.tabIcon}>Aa</span>
           <span>
@@ -89,10 +123,12 @@ export function ExercisesHub({
           id="exercise-vocabulary-tab"
           type="button"
           role="tab"
+          tabIndex={area === "vocabulary" ? 0 : -1}
           aria-selected={area === "vocabulary"}
           aria-controls="exercise-area-panel"
           className={area === "vocabulary" ? styles.activeTab : ""}
           onClick={() => chooseArea("vocabulary")}
+          onKeyDown={handleAreaTabKeyDown}
         >
           <span className={styles.tabIcon}>W</span>
           <span>
@@ -114,10 +150,12 @@ export function ExercisesHub({
                 id="grammar-general-tab"
                 type="button"
                 role="tab"
+                tabIndex={grammarArea === "general" ? 0 : -1}
                 aria-selected={grammarArea === "general"}
                 aria-controls="grammar-mode-panel"
                 className={grammarArea === "general" ? styles.activeGrammarMode : ""}
                 onClick={() => chooseGrammarArea("general")}
+                onKeyDown={handleGrammarTabKeyDown}
               >
                 <strong>Práctica general</strong>
                 <small>Todo B2 + C1 con filtros por regla y formato</small>
@@ -126,10 +164,12 @@ export function ExercisesHub({
                 id="grammar-verb-patterns-tab"
                 type="button"
                 role="tab"
+                tabIndex={grammarArea === "verb-patterns" ? 0 : -1}
                 aria-selected={grammarArea === "verb-patterns"}
                 aria-controls="grammar-mode-panel"
                 className={grammarArea === "verb-patterns" ? styles.activeGrammarMode : ""}
                 onClick={() => chooseGrammarArea("verb-patterns")}
+                onKeyDown={handleGrammarTabKeyDown}
               >
                 <strong>Verb patterns</strong>
                 <small>Unit 4 · banco exclusivo de -ing, infinitive y object patterns</small>
