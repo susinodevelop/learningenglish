@@ -36,6 +36,10 @@ export const verbPatternLittleDifferenceGrammarReferenceVerbs = [
 // Unit 4 Language Tip also explicitly includes hate alongside start, love and prefer.
 export const verbPatternLittleDifferenceUnitTipVerbs = ["start", "love", "hate", "prefer"] as const;
 
+// Unit 4 Grammar Focus Activity 6 explicitly practises recommend/suggest in
+// the book's “verb + object + infinitive without to” category: “... he work hard”.
+export const verbPatternBareInfinitiveGrammarFocusVerbs = ["recommend", "suggest"] as const;
+
 export const verbPatternLittleDifferenceVerbs = unique([
   ...verbPatternLittleDifferenceGrammarReferenceVerbs,
   ...verbPatternLittleDifferenceUnitTipVerbs,
@@ -52,6 +56,11 @@ export const verbPatternEffectiveToInfinitiveVerbs = unique([
   ...verbPatternSourceLists.toInfinitive,
   ...verbPatternMeaningChangeVerbs,
   ...verbPatternLittleDifferenceVerbs,
+]);
+
+export const verbPatternEffectiveBareInfinitiveVerbs = unique([
+  ...verbPatternSourceLists.bareInfinitive,
+  ...verbPatternBareInfinitiveGrammarFocusVerbs,
 ]);
 
 export const verbPatternSourceEntryCount = Object.values(verbPatternSourceLists)
