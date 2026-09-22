@@ -18,7 +18,7 @@ const c1Topics: GrammarTopic[] = [
     slug: "c1-verb-patterns",
     title: "Verb patterns: -ing and infinitive",
     level: "C1",
-    examPractice: "Gold C1 · Unit 4 · Grammar reference pp. 153–154",
+    examPractice: "Gold C1 · Unit 4 · Grammar Focus + Grammar reference pp. 153–154",
     summary: "Taxonomía C1 de verb + -ing, infinitive, object patterns y cambios de significado.",
     sections: [
       {
