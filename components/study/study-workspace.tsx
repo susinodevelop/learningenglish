@@ -19,6 +19,7 @@ import {
 import { isAcceptableWrittenAnswer } from "@/lib/vocabulary/write-answer";
 import {
   createStudyGroupId,
+  customWordToSense,
   emptyDynamicStudyGroupFilter,
   PERSONAL_STUDY_GROUP_ID,
   migrateStaticGroupIds,
@@ -215,7 +216,10 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
       const storedGroups = safeReadGroups(window.localStorage.getItem(STUDY_GROUPS_STORAGE_KEY));
       const migratedGroups = storedGroups.map((group) => migrateStaticGroupIds(group, lexicon));
       const storedProgress = safeReadProgress(window.localStorage.getItem(VOCABULARY_PROGRESS_STORAGE_KEY));
-      const migratedProgress = migrateVocabularyProgress(storedProgress, lexicon);
+      const customSenses = migratedGroups.flatMap((group) =>
+        group.kind === "dynamic" ? (group.filter.customWords ?? []).map(customWordToSense) : [],
+      );
+      const migratedProgress = migrateVocabularyProgress(storedProgress, [...lexicon, ...customSenses]);
 
       if (cancelled) return;
       setUserGroups(migratedGroups);
