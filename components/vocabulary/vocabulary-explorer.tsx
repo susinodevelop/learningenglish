@@ -45,7 +45,7 @@ const viewCards: Array<{ view: ExplorerView; title: string; description: string 
   { view: "antonyms", title: "Antónimos", description: "Contrastes de significado." },
   { view: "confusables", title: "Confusables", description: "Palabras que Cambridge suele obligarte a distinguir." },
   { view: "word-family", title: "Word families", description: "Derivación y familias léxicas." },
-  { view: "all", title: "Todo el léxico", description: "Consulta todas las entradas B2 + C1." },
+  { view: "all", title: "Todo el léxico", description: "Consulta todas las entradas B1, B2 y C1." },
 ];
 
 function normalise(value: string) {
@@ -173,18 +173,18 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="gripping, began, break down, compelling, travel…"
-            aria-label="Buscar vocabulario B2 y C1"
+            aria-label="Buscar vocabulario B1, B2 y C1"
           />
         </label>
         <div className={styles.levelSwitch} aria-label="Filtrar por nivel">
-          {(["all", "B2", "C1"] as LevelFilter[]).map((value) => (
+          {(["all", "B1", "B2", "C1"] as LevelFilter[]).map((value) => (
             <button
               type="button"
               key={value}
               onClick={() => setLevel(value)}
               className={level === value ? styles.activeLevel : ""}
             >
-              {value === "all" ? "B2 + C1" : value}
+              {value === "all" ? "Todos" : value}
             </button>
           ))}
         </div>

@@ -9,6 +9,7 @@ import { studyWorkVocabularyTopics } from "./data/study-work";
 import { goldC1VocabularyTopics } from "./data/c1";
 import { irregularVerbsVocabularyTopic } from "./data/irregular-verbs";
 import { phrasalVerbsVocabularyTopic } from "./data/phrasal-verbs";
+import { enrichPersonalImport, personalImportTopics } from "./data/personal-import";
 
 export type {
   VocabularyCategory,
@@ -33,6 +34,7 @@ export type {
 } from "./types";
 
 export const vocabularyCategories: VocabularyCategory[] = [
+  { id: "personal", label: "Añadido por mí", description: "Palabras y expresiones de tu lista personal." },
   { id: "world", label: "Mundo y entorno", description: "Naturaleza, clima, ciencia y medio ambiente." },
   { id: "people", label: "Personas y relaciones", description: "Salud, emociones, personalidad y relaciones." },
   { id: "culture", label: "Cultura y ocio", description: "Música, deporte, hobbies, comida, arte y entretenimiento." },
@@ -52,14 +54,16 @@ const sourceVocabularyTopics: VocabularyTopic[] = [
   ...goldC1VocabularyTopics,
   irregularVerbsVocabularyTopic,
   phrasalVerbsVocabularyTopic,
+  ...personalImportTopics,
 ];
 
-const compiledVocabulary = compileVocabulary(sourceVocabularyTopics);
+const compiledVocabulary = compileVocabulary(sourceVocabularyTopics, enrichPersonalImport);
 
 const personalVocabularySources = new Set([
   "Personal C1 vocabulary",
   "User-provided irregular verbs",
   "User-provided phrasal verbs",
+  "Personal spreadsheet",
 ]);
 
 const personalVocabularyTypeOverrides: Record<string, VocabularyEntryType> = {
@@ -128,6 +132,9 @@ export const vocabularyEntryCount = vocabularyTopics.reduce(
 );
 
 export const vocabularyEntryCountByLevel = {
+  B1: vocabularyTopics
+    .filter((topic) => topic.level === "B1")
+    .reduce((total, topic) => total + topic.sections.reduce((sectionTotal, section) => sectionTotal + section.entries.length, 0), 0),
   B2: vocabularyTopics
     .filter((topic) => topic.level === "B2")
     .reduce(

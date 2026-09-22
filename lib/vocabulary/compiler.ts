@@ -240,7 +240,7 @@ function resolveRelationLabels(
   });
 }
 
-export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
+export function compileVocabulary(sourceTopics: VocabularyTopic[], enrich?: (topics: VocabularyStudyTopic[]) => void) {
   const sensesByMeaningKey = new Map<string, VocabularySense>();
   const stableIdToMeaningKey = new Map<string, string>();
   const usedGlossKeys = new Set<string>();
@@ -353,6 +353,8 @@ export function compileVocabulary(sourceTopics: VocabularyTopic[]) {
       }),
     };
   });
+
+  enrich?.(topics);
 
   if (missingDefinitions.length > 0) {
     throw new Error(

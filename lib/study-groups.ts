@@ -4,6 +4,7 @@ import type {
   VocabularySectionKind,
   VocabularySense,
 } from "./vocabulary";
+import { personalImportSlugs } from "./vocabulary/data/personal-import";
 
 export type VocabularyPerformanceFilter =
   | "all"
@@ -23,6 +24,16 @@ export type VocabularyProgressRecord = {
 /** During localStorage migration keys may be historic IDs or stable senseIds. */
 export type VocabularyProgress = Record<string, VocabularyProgressRecord>;
 
+export type CustomStudyWord = {
+  id: string;
+  term: string;
+  meaningEs: string;
+  definitionEn: string;
+  exampleEn: string;
+  exampleEs: string;
+  level: VocabularyLevel;
+};
+
 export type DynamicStudyGroupFilter = {
   query: string;
   topicSlugs: string[];
@@ -31,7 +42,12 @@ export type DynamicStudyGroupFilter = {
   entryTypes: VocabularyEntryType[];
   sectionKinds: VocabularySectionKind[];
   performance: VocabularyPerformanceFilter;
+  /** Explicit additions alongside the automatically matching words. */
+  includeSenseIds?: string[];
+  customWords?: CustomStudyWord[];
 };
+
+export const PERSONAL_STUDY_GROUP_ID = "system-personal-added";
 
 type StudyGroupBase = {
   id: string;
@@ -68,10 +84,17 @@ export const systemStudyGroups: StudyGroup[] = [
   {
     // Keep the historic id so existing client state cannot be invalidated by the B2+C1 expansion.
     id: "system-all-b2",
-    name: "Todo el vocabulario B2 + C1",
+    name: "Todo el vocabulario B1 + B2 + C1",
     kind: "dynamic",
     system: true,
     filter: { ...emptyDynamicStudyGroupFilter },
+  },
+  {
+    id: PERSONAL_STUDY_GROUP_ID,
+    name: "Añadido por mí",
+    kind: "dynamic",
+    system: true,
+    filter: { ...emptyDynamicStudyGroupFilter, topicSlugs: personalImportSlugs },
   },
   {
     id: "system-level-b2",
@@ -210,8 +233,10 @@ export function resolveStudyGroup(
 
   const query = normalise(group.filter.query);
   const levels = group.filter.levels ?? [];
+  const includedIds = new Set(group.filter.includeSenseIds ?? []);
 
-  return lexicon.filter((entry) => {
+  const matched = lexicon.filter((entry) => {
+    if (includedIds.has(entry.senseId)) return true;
     if (
       levels.length > 0 &&
       !entry.levels.some((level) => levels.includes(level))
@@ -246,6 +271,34 @@ export function resolveStudyGroup(
 
     return query.length === 0 || normalise(searchableSenseText(entry)).includes(query);
   });
+
+  return [...matched, ...(group.filter.customWords ?? []).map(customWordToSense)];
+}
+
+export function customWordToSense(word: CustomStudyWord): VocabularySense {
+  const senseId = `personal-custom-${word.id}`;
+  return {
+    id: senseId,
+    senseId,
+    lexemeId: `personal-lexeme-${word.id}`,
+    legacyIds: [],
+    term: word.term,
+    normalizedTerm: normalise(word.term),
+    type: "word",
+    cefr: word.level,
+    levels: [word.level],
+    meaning: { en: word.definitionEn, es: word.meaningEs },
+    members: [{ term: word.term, meaning: { en: word.definitionEn, es: word.meaningEs } }],
+    examples: [{ en: word.exampleEn, es: word.exampleEs, kind: "usage" }],
+    topics: ["personal-added-custom"],
+    sourceUnits: [],
+    sectionKinds: ["core"],
+    sectionTitles: ["Añadido por mí"],
+    relations: { collocations: [], patterns: [], synonyms: [], antonyms: [], confusedWith: [], wordFamily: [] },
+    resolvedRelations: { synonyms: [], antonyms: [], confusedWith: [], wordFamily: [] },
+    notes: [],
+    provenance: { sources: ["Personal entry"], lexicalSelection: "personal", englishDefinition: "pedagogical-original", examples: "pedagogical-original" },
+  };
 }
 
 /** Convert a v1 static group to stable senseIds without changing its user-facing identity. */

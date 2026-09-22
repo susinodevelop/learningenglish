@@ -1,11 +1,13 @@
-export type VocabularyLevel = "B2" | "C1";
+export type VocabularyLevel = "B1" | "B2" | "C1";
 
 export type VocabularySource =
   | "Grammar and Vocabulary for First and First for Schools"
   | "Gold C1 Advanced New Edition"
   | "Personal C1 vocabulary"
   | "User-provided irregular verbs"
-  | "User-provided phrasal verbs";
+  | "User-provided phrasal verbs"
+  | "Personal spreadsheet"
+  | "Personal entry";
 
 export type VocabularySectionKind = "core" | "chunks" | "idiom" | "phrasal" | "word-family" | "contrast";
 
