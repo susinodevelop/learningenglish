@@ -12,6 +12,7 @@ import {
   verbPatternSourceLists,
 } from "./verb-patterns-data";
 import {
+  buildVerbPatternRound,
   verbPatternPracticeFamilies,
   verbPatternPracticeQuestions,
 } from "./verb-patterns-practice";
@@ -67,14 +68,14 @@ describe("verb patterns practice bank", () => {
     ]);
   });
 
-  it("expands structural answers only where Unit 4 supports the inference", () => {
+  it("expands both structural answers for every little-difference verb", () => {
     for (const verb of verbPatternMeaningChangeVerbs) {
       expect(verbPatternEffectiveVerbIngVerbs).toContain(verb);
       expect(verbPatternEffectiveToInfinitiveVerbs).toContain(verb);
     }
 
     expect(verbPatternLittleDifferenceStructuralVerbs).toEqual([
-      "attempt", "begin", "continue", "love", "prefer", "start", "hate",
+      "attempt", "begin", "continue", "love", "prefer", "see", "start", "hate",
     ]);
 
     for (const verb of verbPatternLittleDifferenceStructuralVerbs) {
@@ -82,10 +83,8 @@ describe("verb patterns practice bank", () => {
       expect(verbPatternEffectiveToInfinitiveVerbs).toContain(verb);
     }
 
-    expect(verbPatternEffectiveVerbIngVerbs).not.toContain("see");
-    expect(verbPatternEffectiveToInfinitiveVerbs).not.toContain("see");
-    expect(verbPatternEffectiveVerbIngVerbs).toHaveLength(41);
-    expect(verbPatternEffectiveToInfinitiveVerbs).toHaveLength(44);
+    expect(verbPatternEffectiveVerbIngVerbs).toHaveLength(42);
+    expect(verbPatternEffectiveToInfinitiveVerbs).toHaveLength(45);
   });
 
   it("keeps every practice family free of duplicate verb labels", () => {
@@ -156,8 +155,13 @@ describe("verb patterns practice bank", () => {
     ]);
   });
 
-  it("marks structural answers for supported little-difference verbs, including hate", () => {
+  it("marks all structural answers for little-difference verbs, including see and hate", () => {
     expect(questionFor("continue")?.correctFamilyIds).toEqual([
+      "verb-ing",
+      "to-infinitive",
+      "both-forms",
+    ]);
+    expect(questionFor("see")?.correctFamilyIds).toEqual([
       "verb-ing",
       "to-infinitive",
       "both-forms",
@@ -170,11 +174,18 @@ describe("verb patterns practice bank", () => {
     ]);
   });
 
-  it("keeps see only in Gold's little-difference group without inferring structural families", () => {
-    expect(questionFor("see")?.correctFamilyIds).toEqual(["both-forms"]);
-  });
-
   it("keeps single-pattern verbs with one correct classification", () => {
     expect(questionFor("instruct")?.correctFamilyIds).toEqual(["object-to-infinitive"]);
+  });
+
+  it("builds a 20-question round that covers all seven families without duplicates", () => {
+    const round = buildVerbPatternRound(verbPatternPracticeQuestions, 20, () => 0.37);
+
+    expect(round).toHaveLength(20);
+    expect(new Set(round.map((question) => question.id)).size).toBe(20);
+
+    for (const family of verbPatternPracticeFamilies) {
+      expect(round.some((question) => question.correctFamilyIds.includes(family.id))).toBe(true);
+    }
   });
 });
