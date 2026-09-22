@@ -56,43 +56,6 @@
   color: var(--muted);
 }
 
-.familyGrid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.familyCard {
-  min-height: 112px;
-  display: grid;
-  align-content: start;
-  gap: 5px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--white);
-  color: var(--ink);
-  text-align: left;
-}
-
-.familyCard > span {
-  width: fit-content;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: var(--lime);
-  color: var(--green-dark);
-  font-size: .74rem;
-  font-weight: 900;
-}
-
-.familyCard strong {
-  line-height: 1.2;
-}
-
-.familyCard small {
-  color: var(--muted);
-}
-
 .roundControls {
   display: flex;
   align-items: center;
@@ -214,20 +177,6 @@
   background: var(--green);
 }
 
-.verbBadge {
-  width: fit-content;
-  margin-bottom: 12px;
-  padding: 7px 10px;
-  border-radius: 10px;
-  background: var(--soft);
-  color: var(--muted);
-  font-size: .86rem;
-}
-
-.verbBadge strong {
-  color: var(--green-dark);
-}
-
 .questionCard h3 {
   margin-bottom: 22px;
   font-size: clamp(1.35rem, 2.5vw, 1.95rem);
@@ -333,18 +282,6 @@
   color: var(--muted);
 }
 
-.feedback small {
-  display: block;
-  margin-top: 8px;
-  font-weight: 750;
-}
-
-@media (max-width: 980px) {
-  .familyGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 720px) {
   .hero,
   .roundControls,
@@ -356,10 +293,6 @@
 
   .heroStats {
     text-align: left;
-  }
-
-  .familyGrid {
-    grid-template-columns: 1fr;
   }
 
   .roundButtons,
