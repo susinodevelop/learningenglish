@@ -62,7 +62,7 @@
   gap: 10px;
 }
 
-.familyGrid button {
+.familyCard {
   min-height: 112px;
   display: grid;
   align-content: start;
@@ -73,21 +73,9 @@
   background: var(--white);
   color: var(--ink);
   text-align: left;
-  cursor: pointer;
-  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
 
-.familyGrid button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow);
-}
-
-.familyGrid button.activeFamily {
-  border-color: var(--green);
-  background: var(--soft);
-}
-
-.familyGrid button > span {
+.familyCard > span {
   width: fit-content;
   padding: 4px 8px;
   border-radius: 999px;
@@ -97,11 +85,11 @@
   font-weight: 900;
 }
 
-.familyGrid strong {
+.familyCard strong {
   line-height: 1.2;
 }
 
-.familyGrid small {
+.familyCard small {
   color: var(--muted);
 }
 
