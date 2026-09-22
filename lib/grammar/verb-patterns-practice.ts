@@ -39,6 +39,7 @@ export const verbPatternPracticeFamilies: VerbPatternPracticeFamily[] = [
     title: "Verb + object + -ing",
     pattern: "verb + object + -ing",
     description: "El verbo introduce un objeto y después una forma en -ing.",
+    // Exact Gold C1 Unit 4 list. Keep general-English extras out of this source-driven exercise.
     verbs: ["discover", "forbid", "notice", "observe", "overhear", "prevent"],
   },
   {
