@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
+  buildVerbPatternRound,
   verbPatternPracticeFamilies,
   verbPatternPracticeQuestions,
   verbPatternSourceEntryCount,
@@ -10,15 +11,6 @@ import {
   type VerbPatternPracticeQuestion,
 } from "@/lib/grammar/verb-patterns-practice";
 import styles from "./verb-patterns-workspace.module.css";
-
-function shuffle<T>(values: T[]) {
-  const result = [...values];
-  for (let index = result.length - 1; index > 0; index -= 1) {
-    const target = Math.floor(Math.random() * (index + 1));
-    [result[index], result[target]] = [result[target], result[index]];
-  }
-  return result;
-}
 
 function sameAnswers(selected: VerbPatternFamilyId[], expected: VerbPatternFamilyId[]) {
   return selected.length === expected.length && expected.every((familyId) => selected.includes(familyId));
@@ -37,8 +29,7 @@ export function VerbPatternsWorkspace() {
   const currentCorrect = current ? sameAnswers(selectedFamilies, current.correctFamilyIds) : false;
 
   function beginRound(questions: VerbPatternPracticeQuestion[], limit?: number) {
-    const shuffled = shuffle(questions);
-    const next = typeof limit === "number" ? shuffled.slice(0, Math.min(limit, shuffled.length)) : shuffled;
+    const next = buildVerbPatternRound(questions, limit);
     if (next.length === 0) return;
     setSession(next);
     setQuestionIndex(0);
@@ -97,8 +88,9 @@ export function VerbPatternsWorkspace() {
           <span className="eyebrow">Gramática · C1 · Verb patterns</span>
           <h2>Verbo → pattern.</h2>
           <p>
-            Aparece un verbo y marcas todos los grupos en los que Gold C1 Unit 4 lo clasifica.
-            Integramos Grammar Reference, Grammar Focus y sus Language Tips para evitar contradicciones dentro del propio tema.
+            Aparece un verbo y marcas todos los grupos que le corresponden según las listas del Grammar Reference
+            y el Language Tip de Gold C1 Unit 4. Grammar Focus se conserva como contexto teórico cuando presenta
+            una formulación que no coincide con esas listas generales.
           </p>
         </div>
         <div className={styles.heroStats}>
@@ -111,7 +103,7 @@ export function VerbPatternsWorkspace() {
       <div className={styles.roundControls}>
         <div>
           <strong>Todos los Verb patterns mezclados</strong>
-          <span>Las opciones son siempre los siete grupos de Unit 4. No hay filtros que te revelen la respuesta.</span>
+          <span>La ronda de 20 garantiza presencia de los siete grupos antes de completar el resto al azar.</span>
         </div>
         <div className={styles.roundButtons}>
           <button className="button button-secondary" type="button" onClick={() => beginRound(verbPatternPracticeQuestions, 20)}>
@@ -129,7 +121,7 @@ export function VerbPatternsWorkspace() {
           <p>
             Marca uno o varios patterns para cada verbo. La respuesta solo se revela después de pulsar Comprobar.
           </p>
-          <Link href="/grammar#verb-patterns">Repasar primero la teoría →</Link>
+          <Link href="/grammar/verb-patterns">Repasar primero la teoría →</Link>
         </div>
       ) : finished ? (
         <div className={styles.result} aria-live="polite">
