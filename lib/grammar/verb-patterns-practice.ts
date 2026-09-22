@@ -1,3 +1,12 @@
+import {
+  verbPatternEffectiveToInfinitiveVerbs,
+  verbPatternEffectiveVerbIngVerbs,
+  verbPatternLittleDifferenceVerbs,
+  verbPatternMeaningChangeVerbs,
+  verbPatternSourceEntryCount,
+  verbPatternSourceLists,
+} from "./verb-patterns-data";
+
 export type VerbPatternFamilyId =
   | "verb-ing"
   | "object-ing"
@@ -26,67 +35,50 @@ export const verbPatternPracticeFamilies: VerbPatternPracticeFamily[] = [
     id: "verb-ing",
     title: "Verb + -ing",
     pattern: "verb + -ing",
-    description: "El verbo va seguido de una forma en -ing.",
-    verbs: [
-      "admit", "appreciate", "avoid", "consider", "delay", "deny", "detest", "dislike",
-      "enjoy", "escape", "face", "feel like", "finish", "forgive", "give up", "imagine",
-      "involve", "keep", "mention", "mind", "miss", "postpone", "practise", "prefer",
-      "put off", "recommend", "regret", "resent", "risk", "suggest", "understand",
-    ],
+    description: "El verbo admite una forma en -ing.",
+    verbs: verbPatternEffectiveVerbIngVerbs,
   },
   {
     id: "object-ing",
     title: "Verb + object + -ing",
     pattern: "verb + object + -ing",
     description: "El verbo introduce un objeto y después una forma en -ing.",
-    // Exact Gold C1 Unit 4 list. Keep general-English extras out of this source-driven exercise.
-    verbs: ["discover", "forbid", "notice", "observe", "overhear", "prevent"],
+    verbs: [...verbPatternSourceLists.objectIng],
   },
   {
     id: "to-infinitive",
     title: "Verb + to-infinitive",
     pattern: "verb + to-infinitive",
-    description: "El verbo va seguido de to + infinitive.",
-    verbs: [
-      "afford", "agree", "appear", "arrange", "ask", "attempt", "bear", "begin", "care",
-      "choose", "consent", "decide", "determine", "expect", "fail", "forget", "happen",
-      "hate", "help", "hesitate", "hope", "intend", "learn", "like", "love", "manage",
-      "mean", "offer", "prefer", "prepare", "pretend", "promise", "propose", "refuse",
-      "remember", "seem", "start", "swear", "try", "want", "wish",
-    ],
+    description: "El verbo admite to + infinitive.",
+    verbs: verbPatternEffectiveToInfinitiveVerbs,
   },
   {
     id: "object-to-infinitive",
     title: "Verb + object + to-infinitive",
     pattern: "verb + object + to-infinitive",
     description: "El verbo lleva un objeto antes de to + infinitive.",
-    verbs: [
-      "advise", "allow", "ask", "cause", "command", "encourage", "expect", "forbid", "force",
-      "get", "hate", "help", "instruct", "intend", "invite", "leave", "like", "mean", "need",
-      "oblige", "order", "permit", "persuade", "prefer", "press", "recommend", "remind",
-      "request", "teach", "tell", "tempt", "trouble", "want", "warn", "wish",
-    ],
+    verbs: [...verbPatternSourceLists.objectToInfinitive],
   },
   {
     id: "bare-infinitive",
     title: "Verb + object + infinitive without to",
     pattern: "verb + object + infinitive without to",
     description: "El verbo lleva objeto + infinitive without to en este patrón.",
-    verbs: ["let", "make", "hear", "help"],
+    verbs: [...verbPatternSourceLists.bareInfinitive],
   },
   {
     id: "meaning-change",
     title: "-ing / to-infinitive · different meaning",
     pattern: "verb + -ing ≠ verb + to-infinitive",
     description: "El verbo admite -ing y to-infinitive, pero el significado cambia.",
-    verbs: ["remember", "forget", "regret", "stop", "try"],
+    verbs: [...verbPatternMeaningChangeVerbs],
   },
   {
     id: "both-forms",
     title: "-ing / to-infinitive · little difference",
     pattern: "verb + -ing / to-infinitive",
-    description: "El verbo puede admitir las dos formas con poca diferencia en muchos contextos.",
-    verbs: ["attempt", "begin", "continue", "love", "prefer", "see", "start"],
+    description: "El verbo admite las dos formas con poca diferencia en muchos contextos.",
+    verbs: verbPatternLittleDifferenceVerbs,
   },
 ];
 
@@ -109,6 +101,4 @@ export const verbPatternPracticeQuestions: VerbPatternPracticeQuestion[] = Array
   }),
 );
 
-export const verbPatternSourceEntryCount = verbPatternPracticeFamilies
-  .filter((family) => !["meaning-change", "both-forms"].includes(family.id))
-  .reduce((total, family) => total + family.verbs.length, 0);
+export { verbPatternSourceEntryCount };
