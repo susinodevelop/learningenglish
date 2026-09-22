@@ -98,7 +98,7 @@ export function VerbPatternsWorkspace() {
           <h2>Verbo → pattern.</h2>
           <p>
             Una sola mecánica: aparece un verbo y marcas todos los grupos de Verb patterns a los que pertenece.
-            Algunos verbos tienen una única respuesta correcta y otros pertenecen a más de un grupo.
+            Si un grupo especial implica también -ing y to-infinitive, esas estructuras cuentan como respuestas correctas.
           </p>
         </div>
         <div className={styles.heroStats}>
