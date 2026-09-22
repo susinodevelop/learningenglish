@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   verbPatternEffectiveBareInfinitiveVerbs,
+  verbPatternEffectiveObjectToInfinitiveVerbs,
   verbPatternEffectiveToInfinitiveVerbs,
   verbPatternEffectiveVerbIngVerbs,
   verbPatternLittleDifferenceGrammarReferenceVerbs,
@@ -48,7 +49,13 @@ function questionFor(verb: string) {
 describe("verb patterns practice bank", () => {
   it("preserves every structural Grammar Reference list exactly", () => {
     expect(verbPatternSourceLists).toEqual(expectedSourceLists);
+    expect(verbPatternSourceLists.objectToInfinitive).toContain("recommend");
     expect(verbPatternSourceEntryCount).toBe(117);
+  });
+
+  it("keeps the effective object-to-infinitive practice list aligned with Gold's later reporting-verb treatment", () => {
+    expect(verbPatternEffectiveObjectToInfinitiveVerbs).toHaveLength(34);
+    expect(verbPatternEffectiveObjectToInfinitiveVerbs).not.toContain("recommend");
   });
 
   it("keeps the bare-infinitive family aligned with the Grammar Reference", () => {
@@ -93,7 +100,7 @@ describe("verb patterns practice bank", () => {
     }
   });
 
-  it("creates one question per unique verb", () => {
+  it("creates one question per unique verb or verbal expression", () => {
     const allVerbs = verbPatternPracticeFamilies.flatMap((family) => family.verbs);
     const uniqueVerbs = new Set(allVerbs);
 
@@ -103,7 +110,7 @@ describe("verb patterns practice bank", () => {
     expect(new Set(verbPatternPracticeQuestions.map((question) => question.verb)).size).toBe(106);
   });
 
-  it("assigns every verb to all and only the Unit 4 families that contain it", () => {
+  it("assigns every entry to all and only the effective practice families that contain it", () => {
     for (const question of verbPatternPracticeQuestions) {
       const expectedFamilies = verbPatternPracticeFamilies
         .filter((family) => family.verbs.includes(question.verb))
@@ -129,11 +136,8 @@ describe("verb patterns practice bank", () => {
     ]);
   });
 
-  it("does not promote Activity 6 recommend/suggest wording to the bare-infinitive family", () => {
-    expect(questionFor("recommend")?.correctFamilyIds).toEqual([
-      "verb-ing",
-      "object-to-infinitive",
-    ]);
+  it("does not promote contradictory recommend/suggest forms into effective practice families", () => {
+    expect(questionFor("recommend")?.correctFamilyIds).toEqual(["verb-ing"]);
     expect(questionFor("suggest")?.correctFamilyIds).toEqual(["verb-ing"]);
   });
 
