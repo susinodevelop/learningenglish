@@ -58,9 +58,8 @@ export const verbPatternEffectiveToInfinitiveVerbs = unique([
   ...verbPatternLittleDifferenceStructuralVerbs,
 ]);
 
-// The dedicated practice bank follows the structural classifications taught in
-// Gold C1 Unit 4, so the effective object + to-infinitive family is the exact
-// Grammar Reference p.154 source list, including recommend.
+// The dedicated practice bank follows Gold C1 Unit 4, so this family mirrors
+// the Grammar Reference p.154 source list exactly, including recommend.
 export const verbPatternEffectiveObjectToInfinitiveVerbs = [...verbPatternSourceLists.objectToInfinitive];
 
 // Keep the Grammar Reference's bare-infinitive classification exact. Activity 6
