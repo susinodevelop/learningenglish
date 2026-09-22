@@ -36,32 +36,34 @@ export const verbPatternLittleDifferenceGrammarReferenceVerbs = [
 // Unit 4 Language Tip also explicitly includes hate alongside start, love and prefer.
 export const verbPatternLittleDifferenceUnitTipVerbs = ["start", "love", "hate", "prefer"] as const;
 
-// Unit 4 Grammar Focus Activity 6 explicitly practises recommend/suggest in
-// the book's “verb + object + infinitive without to” category: “... he work hard”.
-export const verbPatternBareInfinitiveGrammarFocusVerbs = ["recommend", "suggest"] as const;
-
 export const verbPatternLittleDifferenceVerbs = unique([
   ...verbPatternLittleDifferenceGrammarReferenceVerbs,
   ...verbPatternLittleDifferenceUnitTipVerbs,
 ]);
 
-// For classification practice, the special -ing/to groups also imply both structural patterns.
+// The special groups imply both structural patterns only when Unit 4 supports
+// that structural classification. `see` remains in Gold's little-difference
+// group, but is not promoted to the two generic structural lists by inference.
+export const verbPatternLittleDifferenceStructuralVerbs = verbPatternLittleDifferenceVerbs
+  .filter((verb) => verb !== "see");
+
 export const verbPatternEffectiveVerbIngVerbs = unique([
   ...verbPatternSourceLists.verbIng,
   ...verbPatternMeaningChangeVerbs,
-  ...verbPatternLittleDifferenceVerbs,
+  ...verbPatternLittleDifferenceStructuralVerbs,
 ]);
 
 export const verbPatternEffectiveToInfinitiveVerbs = unique([
   ...verbPatternSourceLists.toInfinitive,
   ...verbPatternMeaningChangeVerbs,
-  ...verbPatternLittleDifferenceVerbs,
+  ...verbPatternLittleDifferenceStructuralVerbs,
 ]);
 
-export const verbPatternEffectiveBareInfinitiveVerbs = unique([
-  ...verbPatternSourceLists.bareInfinitive,
-  ...verbPatternBareInfinitiveGrammarFocusVerbs,
-]);
+// Keep the Grammar Reference's bare-infinitive classification exact. Activity 6
+// also uses recommend/suggest with “he work hard”, but elsewhere Gold treats
+// those as clause patterns, so the exercise wording is not promoted to a
+// general bare-infinitive classification here.
+export const verbPatternEffectiveBareInfinitiveVerbs = [...verbPatternSourceLists.bareInfinitive];
 
 export const verbPatternSourceEntryCount = Object.values(verbPatternSourceLists)
   .reduce((total, verbs) => total + verbs.length, 0);
