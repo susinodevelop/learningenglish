@@ -71,9 +71,11 @@ export function ExercisesHub({
     <>
       <div className={styles.areaTabs} role="tablist" aria-label="Tipo de ejercicios">
         <button
+          id="exercise-grammar-tab"
           type="button"
           role="tab"
           aria-selected={area === "grammar"}
+          aria-controls="exercise-area-panel"
           className={area === "grammar" ? styles.activeTab : ""}
           onClick={() => chooseArea("grammar")}
         >
@@ -84,9 +86,11 @@ export function ExercisesHub({
           </span>
         </button>
         <button
+          id="exercise-vocabulary-tab"
           type="button"
           role="tab"
           aria-selected={area === "vocabulary"}
+          aria-controls="exercise-area-panel"
           className={area === "vocabulary" ? styles.activeTab : ""}
           onClick={() => chooseArea("vocabulary")}
         >
@@ -98,14 +102,20 @@ export function ExercisesHub({
         </button>
       </div>
 
-      <div role="tabpanel">
+      <div
+        id="exercise-area-panel"
+        role="tabpanel"
+        aria-labelledby={area === "grammar" ? "exercise-grammar-tab" : "exercise-vocabulary-tab"}
+      >
         {area === "grammar" ? (
           <section className={styles.grammarArea}>
             <div className={styles.grammarModeTabs} role="tablist" aria-label="Tipo de práctica gramatical">
               <button
+                id="grammar-general-tab"
                 type="button"
                 role="tab"
                 aria-selected={grammarArea === "general"}
+                aria-controls="grammar-mode-panel"
                 className={grammarArea === "general" ? styles.activeGrammarMode : ""}
                 onClick={() => chooseGrammarArea("general")}
               >
@@ -113,9 +123,11 @@ export function ExercisesHub({
                 <small>Todo B2 + C1 con filtros por regla y formato</small>
               </button>
               <button
+                id="grammar-verb-patterns-tab"
                 type="button"
                 role="tab"
                 aria-selected={grammarArea === "verb-patterns"}
+                aria-controls="grammar-mode-panel"
                 className={grammarArea === "verb-patterns" ? styles.activeGrammarMode : ""}
                 onClick={() => chooseGrammarArea("verb-patterns")}
               >
@@ -124,7 +136,11 @@ export function ExercisesHub({
               </button>
             </div>
 
-            <div role="tabpanel">
+            <div
+              id="grammar-mode-panel"
+              role="tabpanel"
+              aria-labelledby={grammarArea === "general" ? "grammar-general-tab" : "grammar-verb-patterns-tab"}
+            >
               {grammarArea === "general" ? (
                 <GrammarExerciseWorkspace questions={grammarQuestions} concepts={grammarConcepts} />
               ) : (
