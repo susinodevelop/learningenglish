@@ -21,7 +21,6 @@ export default function GamesPage() {
     slug: topic.slug,
     title: `${topic.title} · ${topic.level}`,
   }));
-  const totalGrammarExercises = grammarExerciseCount + verbPatternPracticeQuestions.length;
 
   return (
     <div className="shell page-shell">
@@ -34,7 +33,7 @@ export default function GamesPage() {
           Vocabulario conserva tus grupos de estudio, filtros, progreso y modos de recuperación.
         </p>
         <p>
-          {totalGrammarExercises} ejercicios de gramática · {grammarExerciseSections.length} subapartados · {grammarExerciseManualApplicationCount} de aplicación manual · {grammarExerciseGuidedApplicationCount} guiados
+          {grammarExerciseCount} ejercicios generales de gramática · {verbPatternPracticeQuestions.length} Verb patterns · {grammarExerciseSections.length} subapartados generales · {grammarExerciseManualApplicationCount} de aplicación manual · {grammarExerciseGuidedApplicationCount} guiados
         </p>
       </header>
 
