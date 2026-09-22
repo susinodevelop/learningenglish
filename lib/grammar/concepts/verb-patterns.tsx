@@ -18,7 +18,7 @@ const c1Topics: GrammarTopic[] = [
     slug: "c1-verb-patterns",
     title: "Verb patterns: -ing and infinitive",
     level: "C1",
-    examPractice: "Gold C1 · Unit 4 · Grammar Focus + Grammar reference pp. 153–154",
+    examPractice: "Gold C1 · Unit 4 · Grammar Focus + Language Tip + Grammar Reference pp. 153–154",
     summary: "Taxonomía C1 de verb + -ing, infinitive, object patterns y cambios de significado.",
     sections: [
       {
@@ -62,10 +62,11 @@ const c1Topics: GrammarTopic[] = [
         title: "Verb + object + to-infinitive / bare infinitive",
         forms: ["verb + object + to-infinitive", "verb + object + infinitive without to"],
         rules: [
-          `El Grammar Reference incluye con object + to-infinitive: ${formatVerbList(verbPatternSourceLists.objectToInfinitive)}.`,
+          `El Grammar Reference de p.154 incluye literalmente con object + to-infinitive: ${formatVerbList(verbPatternSourceLists.objectToInfinitive)}.`,
+          "Recommend aparece en esa lista de p.154, pero el tratamiento posterior de reporting verbs del propio Gold lo clasifica con verb (+ that) + clause y verb + -ing. Para evitar enseñar dos reglas incompatibles, el banco conserva recommend en la lista fuente literal, pero no lo corrige como object + to-infinitive.",
           `En object + infinitive without to, el Grammar Reference recoge ${formatVerbList(verbPatternSourceLists.bareInfinitive)}.`,
           "Activity 6 presenta recommended/suggested + he work hard bajo esa etiqueta, pero el Grammar Reference no los incluye en la lista general de bare infinitive; por eso el banco no los clasifica como miembros generales de ese grupo.",
-          "Para corregir el banco de clasificación se priorizan las listas del Grammar Reference y el Language Tip de Unit 4; Grammar Focus se conserva como contexto cuando presenta una formulación particular.",
+          "Para corregir el banco se priorizan las listas consolidadas del Grammar Reference, el Language Tip de Unit 4 y, cuando el propio Gold entra en contradicción, su tratamiento posterior más explícito del mismo verbo.",
           "En pasiva, make, hear y help pasan a to-infinitive: was made to..., was heard to....",
           "Las formas pasivas con advise/order/etc. también van seguidas de to-infinitive.",
         ],
