@@ -1,5 +1,6 @@
 import type { GrammarTopic } from "../types";
 import {
+  verbPatternBareInfinitiveGrammarFocusVerbs,
   verbPatternLittleDifferenceGrammarReferenceVerbs,
   verbPatternLittleDifferenceUnitTipVerbs,
   verbPatternMeaningChangeVerbs,
@@ -60,10 +61,11 @@ const c1Topics: GrammarTopic[] = [
       },
       {
         title: "Verb + object + to-infinitive / bare infinitive",
-        forms: ["verb + object + to-infinitive", "let/make/hear/help + object + bare infinitive"],
+        forms: ["verb + object + to-infinitive", "verb + object + infinitive without to"],
         rules: [
-          `El libro incluye con object + to-infinitive: ${formatVerbList(verbPatternSourceLists.objectToInfinitive)}.`,
-          `${formatVerbList(verbPatternSourceLists.bareInfinitive)} aparecen con object + infinitive without to.`,
+          `El Grammar Reference incluye con object + to-infinitive: ${formatVerbList(verbPatternSourceLists.objectToInfinitive)}.`,
+          `En object + infinitive without to, el Grammar Reference recoge ${formatVerbList(verbPatternSourceLists.bareInfinitive)}.`,
+          `Además, el Grammar Focus de Unit 4 Activity 6 clasifica explícitamente ${formatVerbList(verbPatternBareInfinitiveGrammarFocusVerbs)} dentro de “verb + object + infinitive without to”, con el modelo “... he work hard”.`,
           "En pasiva, make, hear y help pasan a to-infinitive: was made to..., was heard to....",
           "Las formas pasivas con advise/order/etc. también van seguidas de to-infinitive.",
         ],
