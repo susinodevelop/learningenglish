@@ -1,5 +1,16 @@
 import type { GrammarTopic } from "../types";
+import {
+  verbPatternLittleDifferenceGrammarReferenceVerbs,
+  verbPatternLittleDifferenceUnitTipVerbs,
+  verbPatternMeaningChangeVerbs,
+  verbPatternSourceLists,
+} from "../verb-patterns-data";
 import { defineGrammarConcept } from "./factory";
+
+function formatVerbList(verbs: readonly string[]) {
+  if (verbs.length <= 1) return verbs.join("");
+  return `${verbs.slice(0, -1).join(", ")} y ${verbs.at(-1)}`;
+}
 
 const c1Topics: GrammarTopic[] = [
   {
@@ -14,7 +25,7 @@ const c1Topics: GrammarTopic[] = [
         title: "Verb + -ing",
         forms: ["verb + verb-ing"],
         rules: [
-          "Entre los verbos frecuentes seguidos de -ing están admit, appreciate, avoid, consider, delay, deny, detest, dislike, enjoy, escape, face, feel like, finish, forgive, give up, imagine, involve, keep, mention, mind, miss, postpone, practise, prefer, put off, recommend, regret, resent, risk, suggest y understand.",
+          `Entre los verbos frecuentes seguidos de -ing están ${formatVerbList(verbPatternSourceLists.verbIng)}.`,
           "El patrón pertenece al primer verbo: no se decide por traducción literal desde el español.",
           "Algunas combinaciones incluyen phrasal/prepositional verbs como give up o put off y mantienen -ing después.",
         ],
@@ -27,7 +38,7 @@ const c1Topics: GrammarTopic[] = [
         title: "Verb + object + -ing",
         forms: ["verb + object + verb-ing"],
         rules: [
-          "Verbos como catch, discover, find, forbid, notice, observe, overhear y prevent pueden introducir un objeto seguido de -ing.",
+          `El Grammar Reference incluye en esta familia ${formatVerbList(verbPatternSourceLists.objectIng)}.`,
           "La -ing clause presenta la acción que se observa, descubre, impide, etc.",
         ],
         examples: [
@@ -39,7 +50,7 @@ const c1Topics: GrammarTopic[] = [
         title: "Verb + to-infinitive",
         forms: ["verb + to + infinitive"],
         rules: [
-          "El libro incluye entre los verbos frecuentes seguidos de to-infinitive: afford, agree, appear, arrange, ask, attempt, bear, begin, care, choose, consent, decide, determine, expect, fail, forget, happen, hate, help, hesitate, hope, intend, learn, like, love, manage, mean, offer, prefer, prepare, pretend, promise, propose, refuse, remember, seem, start, swear, try, want y wish.",
+          `El libro incluye entre los verbos frecuentes seguidos de to-infinitive: ${formatVerbList(verbPatternSourceLists.toInfinitive)}.`,
           "Algunos de ellos también admiten otros patrones; el significado y el contexto determinan la opción correcta.",
         ],
         examples: [
@@ -51,8 +62,8 @@ const c1Topics: GrammarTopic[] = [
         title: "Verb + object + to-infinitive / bare infinitive",
         forms: ["verb + object + to-infinitive", "let/make/hear/help + object + bare infinitive"],
         rules: [
-          "El libro incluye con object + to-infinitive: advise, allow, ask, cause, command, encourage, expect, forbid, force, get, hate, help, instruct, intend, invite, leave, like, mean, need, oblige, order, permit, persuade, prefer, press, recommend, remind, request, teach, tell, tempt, trouble, want, warn y wish.",
-          "Let, make, hear y help aparecen con object + infinitive without to.",
+          `El libro incluye con object + to-infinitive: ${formatVerbList(verbPatternSourceLists.objectToInfinitive)}.`,
+          `${formatVerbList(verbPatternSourceLists.bareInfinitive)} aparecen con object + infinitive without to.`,
           "En pasiva, make, hear y help pasan a to-infinitive: was made to..., was heard to....",
           "Las formas pasivas con advise/order/etc. también van seguidas de to-infinitive.",
         ],
@@ -66,11 +77,12 @@ const c1Topics: GrammarTopic[] = [
       {
         title: "-ing or infinitive: change of meaning",
         rules: [
+          `Los verbos que el Grammar Reference agrupa aquí son ${formatVerbList(verbPatternMeaningChangeVerbs)}. Todos admiten -ing y to-infinitive, pero el significado cambia.`,
           "Remember/forget + -ing mira hacia atrás: la acción ya ocurrió; + to-infinitive mira hacia delante: primero recuerdas y después haces la acción.",
           "Regret + -ing expresa arrepentimiento por una acción pasada; regret + to-infinitive introduce formalmente una noticia presente desagradable.",
           "Stop + -ing = dejar de hacer la actividad; stop + to-infinitive = detener una actividad para hacer otra.",
           "Try + -ing = probar un método como experimento; try + to-infinitive = esforzarse por conseguir algo difícil.",
-          "Attempt, begin, continue, love, prefer, see y start pueden admitir -ing o infinitive con poca diferencia en muchos contextos.",
+          `Con poca diferencia de significado, el Grammar Reference recoge ${formatVerbList(verbPatternLittleDifferenceGrammarReferenceVerbs)}. El Language Tip de Unit 4 también menciona explícitamente ${formatVerbList(verbPatternLittleDifferenceUnitTipVerbs)} como verbos que admiten ambas formas con muy poca diferencia.`,
         ],
         examples: [
           { english: "I remember meeting her at a conference." },
