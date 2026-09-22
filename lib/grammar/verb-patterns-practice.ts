@@ -39,7 +39,7 @@ export const verbPatternPracticeFamilies: VerbPatternPracticeFamily[] = [
     title: "Verb + object + -ing",
     pattern: "verb + object + -ing",
     description: "El verbo introduce un objeto y después una forma en -ing.",
-    verbs: ["catch", "discover", "find", "forbid", "notice", "observe", "overhear", "prevent"],
+    verbs: ["discover", "forbid", "notice", "observe", "overhear", "prevent"],
   },
   {
     id: "to-infinitive",
