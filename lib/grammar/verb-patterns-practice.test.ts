@@ -41,10 +41,11 @@ describe("verb patterns practice bank", () => {
     }
   });
 
-  it("keeps structural family questions unambiguous even when a verb belongs to several patterns", () => {
+  it("asks for the pattern from the verb instead of asking which verb belongs to a named unit group", () => {
     const structuralFamilies = verbPatternPracticeFamilies.filter(
       (family) => family.id !== "meaning-change" && family.id !== "both-forms",
     );
+    const structuralTitles = structuralFamilies.map((family) => family.title);
 
     for (const family of structuralFamilies) {
       const questions = verbPatternPracticeQuestions.filter(
@@ -53,9 +54,27 @@ describe("verb patterns practice bank", () => {
       expect(questions).toHaveLength(family.verbs.length);
 
       for (const question of questions) {
-        const familyOptions = question.options.filter((option) => family.verbs.includes(option));
-        expect(familyOptions).toEqual([question.verb]);
-        expect(question.options[question.answerIndex]).toBe(question.verb);
+        expect(question.options[question.answerIndex]).toBe(family.title);
+        expect(question.options.every((option) => structuralTitles.includes(option))).toBe(true);
+        expect(question.prompt).not.toContain("Which verb belongs to");
+        expect(question.prompt).not.toContain("Unit 4 group");
+      }
+    }
+  });
+
+  it("adds context when a verb can belong to more than one pattern family", () => {
+    const membershipCount = (verb: string) => verbPatternPracticeFamilies.filter(
+      (family) => family.verbs.includes(verb),
+    ).length;
+
+    const structuralQuestions = verbPatternPracticeQuestions.filter((question) => question.id.startsWith("pattern-"));
+
+    for (const question of structuralQuestions) {
+      if (membershipCount(question.verb) > 1) {
+        expect(question.prompt).toContain("In “");
+        expect(question.example).toBeTruthy();
+      } else {
+        expect(question.prompt).toBe(`Which verb pattern does “${question.verb}” take?`);
       }
     }
   });
