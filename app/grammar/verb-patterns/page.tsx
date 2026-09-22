@@ -8,7 +8,9 @@ export const metadata: Metadata = {
 };
 
 const verbPatternsConcept = grammarConcepts.find((concept) => concept.slug === "verb-patterns");
-const c1VerbPatternSections = verbPatternsConcept?.sections.filter((section) => section.level === "C1") ?? [];
+const c1VerbPatternSections = verbPatternsConcept?.sections.filter(
+  (section) => section.level === "C1" && section.sourceUnit === 4,
+) ?? [];
 
 export default function VerbPatternsTheoryPage() {
   return (
