@@ -1,4 +1,5 @@
 import {
+  verbPatternEffectiveBareInfinitiveVerbs,
   verbPatternEffectiveToInfinitiveVerbs,
   verbPatternEffectiveVerbIngVerbs,
   verbPatternLittleDifferenceVerbs,
@@ -63,8 +64,8 @@ export const verbPatternPracticeFamilies: VerbPatternPracticeFamily[] = [
     id: "bare-infinitive",
     title: "Verb + object + infinitive without to",
     pattern: "verb + object + infinitive without to",
-    description: "El verbo lleva objeto + infinitive without to en este patrón.",
-    verbs: [...verbPatternSourceLists.bareInfinitive],
+    description: "Incluye la lista del Grammar Reference y las clasificaciones explícitas del Grammar Focus de Unit 4.",
+    verbs: verbPatternEffectiveBareInfinitiveVerbs,
   },
   {
     id: "meaning-change",
