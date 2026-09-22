@@ -1,0 +1,350 @@
+.workspace {
+  display: grid;
+  gap: 20px;
+}
+
+.hero {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--white);
+}
+
+.hero h2 {
+  margin: 8px 0;
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  letter-spacing: -.04em;
+}
+
+.hero p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+}
+
+.heroStats {
+  min-width: 180px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: var(--soft);
+  text-align: right;
+}
+
+.heroStats strong,
+.heroStats span,
+.heroStats small {
+  display: block;
+}
+
+.heroStats strong {
+  color: var(--green);
+  font-size: 2.15rem;
+  line-height: 1;
+}
+
+.heroStats span {
+  margin-top: 5px;
+  font-weight: 800;
+}
+
+.heroStats small {
+  margin-top: 5px;
+  color: var(--muted);
+}
+
+.familyGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.familyGrid button {
+  min-height: 112px;
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.familyGrid button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.familyGrid button.activeFamily {
+  border-color: var(--green);
+  background: var(--soft);
+}
+
+.familyGrid button > span {
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--lime);
+  color: var(--green-dark);
+  font-size: .74rem;
+  font-weight: 900;
+}
+
+.familyGrid strong {
+  line-height: 1.2;
+}
+
+.familyGrid small {
+  color: var(--muted);
+}
+
+.roundControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--white);
+}
+
+.roundControls strong,
+.roundControls span {
+  display: block;
+}
+
+.roundControls span {
+  max-width: 700px;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: .88rem;
+}
+
+.roundButtons,
+.resultActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.emptyState,
+.result {
+  padding: 42px 30px;
+  border: 1px dashed var(--line);
+  border-radius: 22px;
+  background: var(--white);
+  text-align: center;
+}
+
+.emptyState p,
+.result p {
+  max-width: 650px;
+  margin: 8px auto 0;
+  color: var(--muted);
+}
+
+.emptyState a {
+  display: inline-block;
+  margin-top: 14px;
+  color: var(--green);
+  font-weight: 800;
+}
+
+.result > strong {
+  display: block;
+  margin: 10px 0;
+  color: var(--green);
+  font-size: clamp(3rem, 7vw, 5rem);
+  line-height: 1;
+}
+
+.result h3 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.resultActions {
+  justify-content: center;
+  margin-top: 22px;
+}
+
+.questionCard {
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+}
+
+.questionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.questionHeader > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.questionHeader > div > span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--lime);
+  color: var(--green-dark);
+  font-weight: 900;
+}
+
+.questionHeader strong {
+  color: var(--ink);
+}
+
+.progressTrack {
+  height: 6px;
+  margin: 14px 0 24px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--soft);
+}
+
+.progressTrack > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+}
+
+.verbBadge {
+  width: fit-content;
+  margin-bottom: 12px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: var(--soft);
+  color: var(--muted);
+  font-size: .86rem;
+}
+
+.verbBadge strong {
+  color: var(--green-dark);
+}
+
+.questionCard h3 {
+  margin-bottom: 22px;
+  font-size: clamp(1.35rem, 2.5vw, 1.95rem);
+  line-height: 1.3;
+}
+
+.answerGrid {
+  display: grid;
+  gap: 10px;
+}
+
+.answerGrid button {
+  min-height: 58px;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.answerGrid button > span {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--soft);
+  color: var(--green);
+  font-size: .8rem;
+  font-weight: 900;
+}
+
+.answerGrid button:disabled {
+  cursor: default;
+}
+
+.answerGrid button.correct {
+  border-color: var(--green);
+  background: var(--soft);
+}
+
+.answerGrid button.wrong {
+  border-color: var(--orange);
+  background: #fff8ef;
+}
+
+.feedback {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.feedback p {
+  max-width: 760px;
+  margin: 5px 0 0;
+  color: var(--muted);
+}
+
+.feedback small {
+  display: block;
+  margin-top: 8px;
+  font-weight: 750;
+}
+
+@media (max-width: 980px) {
+  .familyGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .hero,
+  .roundControls,
+  .feedback,
+  .questionHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .heroStats {
+    text-align: left;
+  }
+
+  .familyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .roundButtons,
+  .resultActions {
+    width: 100%;
+  }
+
+  .roundButtons > button,
+  .resultActions > button,
+  .feedback > button {
+    width: 100%;
+  }
+}
