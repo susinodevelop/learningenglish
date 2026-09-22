@@ -1,6 +1,5 @@
 import type { GrammarTopic } from "../types";
 import {
-  verbPatternBareInfinitiveGrammarFocusVerbs,
   verbPatternLittleDifferenceGrammarReferenceVerbs,
   verbPatternLittleDifferenceUnitTipVerbs,
   verbPatternMeaningChangeVerbs,
@@ -65,7 +64,7 @@ const c1Topics: GrammarTopic[] = [
         rules: [
           `El Grammar Reference incluye con object + to-infinitive: ${formatVerbList(verbPatternSourceLists.objectToInfinitive)}.`,
           `En object + infinitive without to, el Grammar Reference recoge ${formatVerbList(verbPatternSourceLists.bareInfinitive)}.`,
-          `Además, el Grammar Focus de Unit 4 Activity 6 clasifica explícitamente ${formatVerbList(verbPatternBareInfinitiveGrammarFocusVerbs)} dentro de “verb + object + infinitive without to”, con el modelo “... he work hard”.`,
+          "Activity 6 presenta recommended/suggested + he work hard bajo esa etiqueta, pero el Grammar Reference no los incluye en la lista general de bare infinitive; por eso el banco no los clasifica como miembros generales de ese grupo.",
           "En pasiva, make, hear y help pasan a to-infinitive: was made to..., was heard to....",
           "Las formas pasivas con advise/order/etc. también van seguidas de to-infinitive.",
         ],
@@ -85,6 +84,7 @@ const c1Topics: GrammarTopic[] = [
           "Stop + -ing = dejar de hacer la actividad; stop + to-infinitive = detener una actividad para hacer otra.",
           "Try + -ing = probar un método como experimento; try + to-infinitive = esforzarse por conseguir algo difícil.",
           `Con poca diferencia de significado, el Grammar Reference recoge ${formatVerbList(verbPatternLittleDifferenceGrammarReferenceVerbs)}. El Language Tip de Unit 4 también menciona explícitamente ${formatVerbList(verbPatternLittleDifferenceUnitTipVerbs)} como verbos que admiten ambas formas con muy poca diferencia.`,
+          "En la práctica, see se conserva exactamente en el grupo little difference del Gold, pero no se le añaden por inferencia las dos familias estructurales genéricas.",
         ],
         examples: [
           { english: "I remember meeting her at a conference." },
