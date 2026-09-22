@@ -122,7 +122,10 @@ function stableHash(value: string) {
 
 function rotateCorrectOption(correct: string, distractors: string[], seed: string) {
   const answerIndex = stableHash(seed) % 4;
-  const alternatives = distractors.filter((candidate) => candidate !== correct).slice(0, 3);
+  const alternatives = Array.from(new Set(distractors.filter((candidate) => candidate !== correct))).slice(0, 3);
+  if (alternatives.length !== 3) {
+    throw new Error(`Verb-pattern question needs three unique distractors: ${seed}`);
+  }
   const options = [...alternatives];
   options.splice(answerIndex, 0, correct);
   return { options, answerIndex };
@@ -145,14 +148,30 @@ function patternExample(family: VerbPatternFamilyId, verb: string) {
   }
 }
 
-const allPatternLabels = Object.values(patternLabels);
+const allPatternVerbs = Array.from(new Set(patternFamilies.flatMap((family) => family.verbs)));
+
+function familyDistractors(family: VerbPatternPracticeFamily, verb: string) {
+  const pool = allPatternVerbs.filter(
+    (candidate) => candidate !== verb && !family.verbs.includes(candidate),
+  );
+  const start = stableHash(`${family.id}-${verb}-distractors`) % pool.length;
+  const distractors: string[] = [];
+  let offset = 0;
+
+  while (distractors.length < 3) {
+    const candidate = pool[(start + offset * 7) % pool.length];
+    if (!distractors.includes(candidate)) distractors.push(candidate);
+    offset += 1;
+  }
+
+  return distractors;
+}
 
 const familyRecognitionQuestions: VerbPatternPracticeQuestion[] = patternFamilies.flatMap((family) =>
   family.verbs.map((verb) => {
-    const correct = family.pattern;
     const { options, answerIndex } = rotateCorrectOption(
-      correct,
-      allPatternLabels,
+      verb,
+      familyDistractors(family, verb),
       `${family.id}-${verb}`,
     );
 
@@ -161,10 +180,10 @@ const familyRecognitionQuestions: VerbPatternPracticeQuestion[] = patternFamilie
       family: family.id,
       familyTitle: family.title,
       verb,
-      prompt: `In the Unit 4 pattern list, which structure do you practise with “${verb}”?`,
+      prompt: `Which verb belongs to the Unit 4 group “${family.title}”?`,
       options,
       answerIndex,
-      explanation: `For this pattern, learn “${verb}” together with ${family.pattern}. The first verb determines the structure that follows.`,
+      explanation: `“${verb}” appears in this group. Learn it here as ${family.pattern}.`,
       example: patternExample(family.id, verb),
     };
   }),
@@ -178,7 +197,6 @@ const flexibleQuestions: VerbPatternPracticeQuestion[] = bothFormsFamily.verbs.m
       "It only takes -ing.",
       "It only takes object + to-infinitive.",
       "It must always take an infinitive without to.",
-      correct,
     ],
     `both-${verb}`,
   );
