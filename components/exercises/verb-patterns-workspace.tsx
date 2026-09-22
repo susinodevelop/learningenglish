@@ -6,6 +6,7 @@ import {
   verbPatternPracticeFamilies,
   verbPatternPracticeQuestions,
   verbPatternSourceEntryCount,
+  type VerbPatternFamilyId,
   type VerbPatternPracticeQuestion,
 } from "@/lib/grammar/verb-patterns-practice";
 import styles from "./verb-patterns-workspace.module.css";
@@ -19,33 +20,49 @@ function shuffle<T>(values: T[]) {
   return result;
 }
 
+function sameAnswers(selected: VerbPatternFamilyId[], expected: VerbPatternFamilyId[]) {
+  return selected.length === expected.length && expected.every((familyId) => selected.includes(familyId));
+}
+
 export function VerbPatternsWorkspace() {
   const [session, setSession] = useState<VerbPatternPracticeQuestion[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
+  const [selectedFamilies, setSelectedFamilies] = useState<VerbPatternFamilyId[]>([]);
+  const [checked, setChecked] = useState(false);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
   const [missedQuestions, setMissedQuestions] = useState<VerbPatternPracticeQuestion[]>([]);
 
   const current = session[questionIndex];
-  const currentCorrect = current && selected !== null ? selected === current.answerIndex : false;
+  const currentCorrect = current ? sameAnswers(selectedFamilies, current.correctFamilyIds) : false;
 
   function beginRound(questions: VerbPatternPracticeQuestion[], limit?: number) {
-    const next = shuffle(questions);
-    const selectedQuestions = typeof limit === "number" ? next.slice(0, Math.min(limit, next.length)) : next;
-    if (selectedQuestions.length === 0) return;
-    setSession(selectedQuestions);
+    const shuffled = shuffle(questions);
+    const next = typeof limit === "number" ? shuffled.slice(0, Math.min(limit, shuffled.length)) : shuffled;
+    if (next.length === 0) return;
+    setSession(next);
     setQuestionIndex(0);
-    setSelected(null);
+    setSelectedFamilies([]);
+    setChecked(false);
     setScore(0);
     setFinished(false);
     setMissedQuestions([]);
   }
 
-  function chooseAnswer(optionIndex: number) {
-    if (!current || selected !== null) return;
-    setSelected(optionIndex);
-    if (optionIndex === current.answerIndex) {
+  function toggleFamily(familyId: VerbPatternFamilyId) {
+    if (checked) return;
+    setSelectedFamilies((currentSelection) =>
+      currentSelection.includes(familyId)
+        ? currentSelection.filter((candidate) => candidate !== familyId)
+        : [...currentSelection, familyId],
+    );
+  }
+
+  function checkAnswer() {
+    if (!current || checked || selectedFamilies.length === 0) return;
+    const correct = sameAnswers(selectedFamilies, current.correctFamilyIds);
+    setChecked(true);
+    if (correct) {
       setScore((value) => value + 1);
     } else {
       setMissedQuestions((value) => [...value, current]);
@@ -53,13 +70,14 @@ export function VerbPatternsWorkspace() {
   }
 
   function nextQuestion() {
-    if (selected === null) return;
+    if (!checked) return;
     if (questionIndex >= session.length - 1) {
       setFinished(true);
       return;
     }
     setQuestionIndex((value) => value + 1);
-    setSelected(null);
+    setSelectedFamilies([]);
+    setChecked(false);
   }
 
   function practiseMistakes() {
@@ -67,62 +85,49 @@ export function VerbPatternsWorkspace() {
     beginRound(unique);
   }
 
+  const correctLabels = current?.correctFamilyIds
+    .map((familyId) => verbPatternPracticeFamilies.find((family) => family.id === familyId)?.title)
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <section className={styles.workspace} aria-label="Práctica exclusiva de verb patterns">
       <div className={styles.hero}>
         <div>
           <span className="eyebrow">Gramática · C1 · Verb patterns</span>
-          <h2>Te doy el verbo. Tú eliges el patrón.</h2>
+          <h2>Verbo → pattern.</h2>
           <p>
-            El objetivo es reconocer qué estructura sigue cada verbo: -ing, object + -ing, to-infinitive,
-            object + to-infinitive o infinitive without to. Los verbos con varios patrones se preguntan
-            dentro de una frase para que la respuesta sea inequívoca.
+            Una sola mecánica: aparece un verbo y marcas todos los grupos de Verb patterns a los que pertenece.
+            Algunos verbos tienen una única respuesta correcta y otros pertenecen a más de un grupo.
           </p>
         </div>
         <div className={styles.heroStats}>
-          <strong>{verbPatternSourceEntryCount}</strong>
-          <span>entradas de patrón</span>
-          <small>{verbPatternPracticeQuestions.length} preguntas en el banco</small>
+          <strong>{verbPatternPracticeQuestions.length}</strong>
+          <span>verbos únicos</span>
+          <small>{verbPatternSourceEntryCount} entradas en las cinco listas estructurales</small>
         </div>
-      </div>
-
-      <div className={styles.familyGrid} aria-label="Grupos de verb patterns incluidos">
-        {verbPatternPracticeFamilies.map((family) => {
-          const count = verbPatternPracticeQuestions.filter((question) => question.family === family.id).length;
-          return (
-            <div className={styles.familyCard} key={family.id}>
-              <span>{family.verbs.length}</span>
-              <strong>{family.title}</strong>
-              <small>{count} preguntas</small>
-            </div>
-          );
-        })}
       </div>
 
       <div className={styles.roundControls}>
         <div>
-          <strong>Todos los verb patterns mezclados</strong>
-          <span>
-            Las opciones son los propios grupos de verb patterns. No necesitas memorizar nombres de unidades
-            ni categorías internas: ves un verbo y decides qué estructura le corresponde.
-          </span>
+          <strong>Todos los Verb patterns mezclados</strong>
+          <span>Las opciones son siempre los siete grupos del tema. No hay filtros que te revelen la respuesta.</span>
         </div>
         <div className={styles.roundButtons}>
           <button className="button button-secondary" type="button" onClick={() => beginRound(verbPatternPracticeQuestions, 20)}>
             Ronda de 20
           </button>
           <button className="button button-primary" type="button" onClick={() => beginRound(verbPatternPracticeQuestions)}>
-            Practicar todas · {verbPatternPracticeQuestions.length}
+            Practicar todos · {verbPatternPracticeQuestions.length}
           </button>
         </div>
       </div>
 
       {session.length === 0 ? (
         <div className={styles.emptyState}>
-          <strong>Practica identificando el patrón, no memorizando la unidad.</strong>
+          <strong>Elige una ronda y empieza.</strong>
           <p>
-            Los verbos que aceptan más de una estructura aparecen con contexto. Remember, forget, regret,
-            stop y try mantienen además ejercicios específicos sobre el cambio de significado.
+            Marca uno o varios patterns para cada verbo. La respuesta solo se revela después de pulsar Comprobar.
           </p>
           <Link href="/grammar#verb-patterns">Repasar primero la teoría →</Link>
         </div>
@@ -133,7 +138,7 @@ export function VerbPatternsWorkspace() {
           <h3>{score === session.length ? "Perfecto." : score / session.length >= 0.8 ? "Muy buen dominio." : "Conviene repetir los fallos."}</h3>
           <p>
             {score === session.length
-              ? "Has identificado correctamente todos los patrones de esta ronda."
+              ? "Has clasificado correctamente todos los verbos de esta ronda."
               : `Has fallado ${missedQuestions.length} pregunta${missedQuestions.length === 1 ? "" : "s"}.`}
           </p>
           <div className={styles.resultActions}>
@@ -157,42 +162,58 @@ export function VerbPatternsWorkspace() {
             <span style={{ width: `${((questionIndex + 1) / session.length) * 100}%` }} />
           </div>
 
-          <div className={styles.verbBadge}>Verb: <strong>{current.verb}</strong></div>
-          <h3>{current.prompt}</h3>
+          <h3>¿En qué Verb pattern se clasifica este verbo?</h3>
+          <div className={styles.focusVerb}>{current.verb}</div>
+          <p className={styles.multiHint}>Puede haber más de una respuesta correcta. Marca todas las que correspondan.</p>
 
           <div className={styles.answerGrid}>
-            {current.options.map((option, optionIndex) => {
-              const answered = selected !== null;
-              const isCorrect = answered && optionIndex === current.answerIndex;
-              const isWrong = selected === optionIndex && optionIndex !== current.answerIndex;
+            {verbPatternPracticeFamilies.map((family) => {
+              const isSelected = selectedFamilies.includes(family.id);
+              const isExpected = current.correctFamilyIds.includes(family.id);
+              const isCorrect = checked && isExpected;
+              const isWrong = checked && isSelected && !isExpected;
+
               return (
                 <button
                   type="button"
-                  onClick={() => chooseAnswer(optionIndex)}
-                  disabled={answered}
-                  className={`${isCorrect ? styles.correct : ""} ${isWrong ? styles.wrong : ""}`}
-                  key={`${current.id}-${optionIndex}`}
+                  onClick={() => toggleFamily(family.id)}
+                  disabled={checked}
+                  aria-pressed={isSelected}
+                  className={`${isSelected ? styles.selected : ""} ${isCorrect ? styles.correct : ""} ${isWrong ? styles.wrong : ""}`}
+                  key={family.id}
                 >
-                  <span>{String.fromCharCode(65 + optionIndex)}</span>
-                  {option}
+                  <span className={styles.checkBox}>{isSelected ? "✓" : ""}</span>
+                  <span>
+                    <strong>{family.title}</strong>
+                    <small>{family.pattern}</small>
+                  </span>
                 </button>
               );
             })}
           </div>
 
-          {selected !== null ? (
+          {!checked ? (
+            <div className={styles.checkAction}>
+              <button
+                className="button button-primary"
+                type="button"
+                onClick={checkAnswer}
+                disabled={selectedFamilies.length === 0}
+              >
+                Comprobar
+              </button>
+            </div>
+          ) : (
             <div className={styles.feedback}>
               <div>
-                <strong>{currentCorrect ? "Correcto" : "Revisa este patrón"}</strong>
-                <p>{current.explanation}</p>
-                <small>Grupo: {current.familyTitle}</small>
-                {current.example ? <small>Ejemplo: {current.example}</small> : null}
+                <strong>{currentCorrect ? "Correcto" : "Revisa la clasificación"}</strong>
+                <p>Respuesta correcta: {correctLabels}</p>
               </div>
               <button className="button button-primary" type="button" onClick={nextQuestion}>
                 {questionIndex === session.length - 1 ? "Ver resultado" : "Siguiente"}
               </button>
             </div>
-          ) : null}
+          )}
         </article>
       ) : null}
     </section>
