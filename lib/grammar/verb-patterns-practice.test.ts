@@ -35,8 +35,28 @@ describe("verb patterns practice bank", () => {
       expect(question.prompt.trim()).not.toBe("");
       expect(question.explanation.trim()).not.toBe("");
       expect(question.options).toHaveLength(4);
+      expect(new Set(question.options).size).toBe(4);
       expect(question.answerIndex).toBeGreaterThanOrEqual(0);
       expect(question.answerIndex).toBeLessThan(4);
+    }
+  });
+
+  it("keeps structural family questions unambiguous even when a verb belongs to several patterns", () => {
+    const structuralFamilies = verbPatternPracticeFamilies.filter(
+      (family) => family.id !== "meaning-change" && family.id !== "both-forms",
+    );
+
+    for (const family of structuralFamilies) {
+      const questions = verbPatternPracticeQuestions.filter(
+        (question) => question.id.startsWith(`pattern-${family.id}-`),
+      );
+      expect(questions).toHaveLength(family.verbs.length);
+
+      for (const question of questions) {
+        const familyOptions = question.options.filter((option) => family.verbs.includes(option));
+        expect(familyOptions).toEqual([question.verb]);
+        expect(question.options[question.answerIndex]).toBe(question.verb);
+      }
     }
   });
 
