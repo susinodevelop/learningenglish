@@ -97,21 +97,21 @@ export function VerbPatternsWorkspace() {
           <span className="eyebrow">Gramática · C1 · Verb patterns</span>
           <h2>Verbo → pattern.</h2>
           <p>
-            Una sola mecánica: aparece un verbo y marcas todos los grupos de Verb patterns a los que pertenece.
-            Si un grupo especial implica también -ing y to-infinitive, esas estructuras cuentan como respuestas correctas.
+            Aparece un verbo y marcas todos los grupos en los que Gold C1 Unit 4 lo clasifica.
+            Integramos Grammar Reference, Grammar Focus y sus Language Tips para evitar contradicciones dentro del propio tema.
           </p>
         </div>
         <div className={styles.heroStats}>
           <strong>{verbPatternPracticeQuestions.length}</strong>
           <span>verbos únicos</span>
-          <small>{verbPatternSourceEntryCount} entradas en las cinco listas estructurales</small>
+          <small>{verbPatternSourceEntryCount} entradas en las cinco listas del Grammar Reference</small>
         </div>
       </div>
 
       <div className={styles.roundControls}>
         <div>
           <strong>Todos los Verb patterns mezclados</strong>
-          <span>Las opciones son siempre los siete grupos del tema. No hay filtros que te revelen la respuesta.</span>
+          <span>Las opciones son siempre los siete grupos de Unit 4. No hay filtros que te revelen la respuesta.</span>
         </div>
         <div className={styles.roundButtons}>
           <button className="button button-secondary" type="button" onClick={() => beginRound(verbPatternPracticeQuestions, 20)}>
@@ -164,7 +164,7 @@ export function VerbPatternsWorkspace() {
 
           <h3>¿En qué Verb pattern se clasifica este verbo?</h3>
           <div className={styles.focusVerb}>{current.verb}</div>
-          <p className={styles.multiHint}>Puede haber más de una respuesta correcta. Marca todas las que correspondan.</p>
+          <p className={styles.multiHint}>Marca todos los grupos que le corresponden en Gold C1 Unit 4.</p>
 
           <div className={styles.answerGrid}>
             {verbPatternPracticeFamilies.map((family) => {
@@ -207,7 +207,7 @@ export function VerbPatternsWorkspace() {
             <div className={styles.feedback}>
               <div>
                 <strong>{currentCorrect ? "Correcto" : "Revisa la clasificación"}</strong>
-                <p>Respuesta correcta: {correctLabels}</p>
+                <p>Clasificación de Unit 4: {correctLabels}</p>
               </div>
               <button className="button button-primary" type="button" onClick={nextQuestion}>
                 {questionIndex === session.length - 1 ? "Ver resultado" : "Siguiente"}
