@@ -6,7 +6,7 @@ import {
 } from "./verb-patterns-practice";
 
 describe("verb patterns practice bank", () => {
-  it("covers every Unit 4 pattern list entry", () => {
+  it("preserves every source family and its expected size", () => {
     const counts = Object.fromEntries(
       verbPatternPracticeFamilies.map((family) => [family.id, family.verbs.length]),
     );
@@ -27,64 +27,48 @@ describe("verb patterns practice bank", () => {
     }
   });
 
-  it("creates a unique and complete exercise bank", () => {
-    expect(verbPatternPracticeQuestions).toHaveLength(139);
-    expect(new Set(verbPatternPracticeQuestions.map((question) => question.id)).size).toBe(139);
+  it("creates one question per unique verb", () => {
+    const allVerbs = verbPatternPracticeFamilies.flatMap((family) => family.verbs);
+    const uniqueVerbs = new Set(allVerbs);
 
+    expect(uniqueVerbs.size).toBe(108);
+    expect(verbPatternPracticeQuestions).toHaveLength(108);
+    expect(new Set(verbPatternPracticeQuestions.map((question) => question.id)).size).toBe(108);
+    expect(new Set(verbPatternPracticeQuestions.map((question) => question.verb)).size).toBe(108);
+  });
+
+  it("assigns every verb to all and only the source families that contain it", () => {
     for (const question of verbPatternPracticeQuestions) {
-      expect(question.prompt.trim()).not.toBe("");
-      expect(question.explanation.trim()).not.toBe("");
-      expect(question.options).toHaveLength(4);
-      expect(new Set(question.options).size).toBe(4);
-      expect(question.answerIndex).toBeGreaterThanOrEqual(0);
-      expect(question.answerIndex).toBeLessThan(4);
+      const expectedFamilies = verbPatternPracticeFamilies
+        .filter((family) => family.verbs.includes(question.verb))
+        .map((family) => family.id);
+
+      expect(question.correctFamilyIds).toEqual(expectedFamilies);
+      expect(question.correctFamilyIds.length).toBeGreaterThan(0);
     }
   });
 
-  it("asks for the pattern from the verb instead of asking which verb belongs to a named unit group", () => {
-    const structuralFamilies = verbPatternPracticeFamilies.filter(
-      (family) => family.id !== "meaning-change" && family.id !== "both-forms",
-    );
-    const structuralTitles = structuralFamilies.map((family) => family.title);
+  it("supports verbs with more than one correct pattern", () => {
+    const ask = verbPatternPracticeQuestions.find((question) => question.verb === "ask");
+    const help = verbPatternPracticeQuestions.find((question) => question.verb === "help");
+    const prefer = verbPatternPracticeQuestions.find((question) => question.verb === "prefer");
 
-    for (const family of structuralFamilies) {
-      const questions = verbPatternPracticeQuestions.filter(
-        (question) => question.id.startsWith(`pattern-${family.id}-`),
-      );
-      expect(questions).toHaveLength(family.verbs.length);
-
-      for (const question of questions) {
-        expect(question.options[question.answerIndex]).toBe(family.title);
-        expect(question.options.every((option) => structuralTitles.includes(option))).toBe(true);
-        expect(question.prompt).not.toContain("Which verb belongs to");
-        expect(question.prompt).not.toContain("Unit 4 group");
-      }
-    }
+    expect(ask?.correctFamilyIds).toEqual(["to-infinitive", "object-to-infinitive"]);
+    expect(help?.correctFamilyIds).toEqual([
+      "to-infinitive",
+      "object-to-infinitive",
+      "bare-infinitive",
+    ]);
+    expect(prefer?.correctFamilyIds).toEqual([
+      "verb-ing",
+      "to-infinitive",
+      "object-to-infinitive",
+      "both-forms",
+    ]);
   });
 
-  it("adds context when a verb can belong to more than one pattern family", () => {
-    const membershipCount = (verb: string) => verbPatternPracticeFamilies.filter(
-      (family) => family.verbs.includes(verb),
-    ).length;
-
-    const structuralQuestions = verbPatternPracticeQuestions.filter((question) => question.id.startsWith("pattern-"));
-
-    for (const question of structuralQuestions) {
-      if (membershipCount(question.verb) > 1) {
-        expect(question.prompt).toContain("In “");
-        expect(question.example).toBeTruthy();
-      } else {
-        expect(question.prompt).toBe(`Which verb pattern does “${question.verb}” take?`);
-      }
-    }
-  });
-
-  it("includes both meaning-changing forms for the five Cambridge trap verbs", () => {
-    for (const verb of ["remember", "forget", "regret", "stop", "try"]) {
-      const questions = verbPatternPracticeQuestions.filter(
-        (question) => question.family === "meaning-change" && question.verb === verb,
-      );
-      expect(questions).toHaveLength(2);
-    }
+  it("keeps single-pattern verbs with one correct classification", () => {
+    const instruct = verbPatternPracticeQuestions.find((question) => question.verb === "instruct");
+    expect(instruct?.correctFamilyIds).toEqual(["object-to-infinitive"]);
   });
 });
