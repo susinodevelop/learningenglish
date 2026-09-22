@@ -58,16 +58,14 @@ export const verbPatternEffectiveToInfinitiveVerbs = unique([
   ...verbPatternLittleDifferenceStructuralVerbs,
 ]);
 
-// Preserve the literal p.154 source list above, but do not teach recommend as
-// object + to-infinitive in classification practice: Gold's later reporting-
-// verb reference classifies recommend with a that-clause and with -ing instead.
-export const verbPatternEffectiveObjectToInfinitiveVerbs = verbPatternSourceLists.objectToInfinitive
-  .filter((verb) => verb !== "recommend");
+// The dedicated practice bank follows the structural classifications taught in
+// Gold C1 Unit 4, so the effective object + to-infinitive family is the exact
+// Grammar Reference p.154 source list, including recommend.
+export const verbPatternEffectiveObjectToInfinitiveVerbs = [...verbPatternSourceLists.objectToInfinitive];
 
 // Keep the Grammar Reference's bare-infinitive classification exact. Activity 6
-// also uses recommend/suggest with “he work hard”, but elsewhere Gold treats
-// those as clause patterns, so the exercise wording is not promoted to a
-// general bare-infinitive classification here.
+// also uses recommend/suggest with “he work hard”, but the Grammar Reference
+// defines the general bare-infinitive family as let, make, hear and help only.
 export const verbPatternEffectiveBareInfinitiveVerbs = [...verbPatternSourceLists.bareInfinitive];
 
 export const verbPatternSourceEntryCount = Object.values(verbPatternSourceLists)
