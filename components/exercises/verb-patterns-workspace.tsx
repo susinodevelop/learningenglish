@@ -88,10 +88,9 @@ export function VerbPatternsWorkspace() {
           <span className="eyebrow">Gramática · C1 · Verb patterns</span>
           <h2>Verbo o expresión → pattern.</h2>
           <p>
-            Aparece un verbo o expresión verbal y marcas todos los grupos que le corresponden. El banco parte del
-            Grammar Reference y el Language Tip de Gold C1 Unit 4 y resuelve contradicciones internas con el
-            tratamiento posterior más explícito del propio Gold. La teoría B2 relacionada no forma parte de la
-            corrección de este banco.
+            Aparece un verbo o expresión verbal y marcas todos los grupos que le corresponden. El banco sigue las
+            clasificaciones del Grammar Reference y el Language Tip de Gold C1 Unit 4. La teoría B2 relacionada no
+            forma parte de la corrección de este banco.
           </p>
         </div>
         <div className={styles.heroStats}>
