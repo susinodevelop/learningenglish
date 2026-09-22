@@ -148,30 +148,17 @@ function patternExample(family: VerbPatternFamilyId, verb: string) {
   }
 }
 
-const allPatternVerbs = Array.from(new Set(patternFamilies.flatMap((family) => family.verbs)));
-
-function familyDistractors(family: VerbPatternPracticeFamily, verb: string) {
-  const pool = allPatternVerbs.filter(
-    (candidate) => candidate !== verb && !family.verbs.includes(candidate),
-  );
-  const start = stableHash(`${family.id}-${verb}-distractors`) % pool.length;
-  const distractors: string[] = [];
-  let offset = 0;
-
-  while (distractors.length < 3) {
-    const candidate = pool[(start + offset * 7) % pool.length];
-    if (!distractors.includes(candidate)) distractors.push(candidate);
-    offset += 1;
-  }
-
-  return distractors;
+function familyMembershipCount(verb: string) {
+  return verbPatternPracticeFamilies.filter((family) => family.verbs.includes(verb)).length;
 }
 
-const familyRecognitionQuestions: VerbPatternPracticeQuestion[] = patternFamilies.flatMap((family) =>
+const structuralPatternQuestions: VerbPatternPracticeQuestion[] = patternFamilies.flatMap((family) =>
   family.verbs.map((verb) => {
+    const example = patternExample(family.id, verb);
+    const hasMoreThanOnePattern = familyMembershipCount(verb) > 1;
     const { options, answerIndex } = rotateCorrectOption(
-      verb,
-      familyDistractors(family, verb),
+      family.title,
+      patternFamilies.map((candidate) => candidate.title),
       `${family.id}-${verb}`,
     );
 
@@ -180,11 +167,13 @@ const familyRecognitionQuestions: VerbPatternPracticeQuestion[] = patternFamilie
       family: family.id,
       familyTitle: family.title,
       verb,
-      prompt: `Which verb belongs to the Unit 4 group “${family.title}”?`,
+      prompt: hasMoreThanOnePattern && example
+        ? `In “${example}”, which verb pattern is being used with “${verb}”?`
+        : `Which verb pattern does “${verb}” take?`,
       options,
       answerIndex,
-      explanation: `“${verb}” appears in this group. Learn it here as ${family.pattern}.`,
-      example: patternExample(family.id, verb),
+      explanation: `In this use, “${verb}” follows ${family.pattern}.`,
+      example,
     };
   }),
 );
@@ -206,10 +195,10 @@ const flexibleQuestions: VerbPatternPracticeQuestion[] = bothFormsFamily.verbs.m
     family: "both-forms",
     familyTitle: bothFormsFamily.title,
     verb,
-    prompt: `What should you remember about “${verb}” in this Unit 4 contrast?`,
+    prompt: `What should you remember about “${verb}” in this contrast?`,
     options,
     answerIndex,
-    explanation: `The grammar reference groups “${verb}” among verbs that can admit -ing or an infinitive with little difference in many contexts.`,
+    explanation: `“${verb}” can admit -ing or an infinitive with little difference in many contexts.`,
   };
 });
 
@@ -363,7 +352,7 @@ const passiveBareInfinitiveQuestions: VerbPatternPracticeQuestion[] = [
 ];
 
 export const verbPatternPracticeQuestions: VerbPatternPracticeQuestion[] = [
-  ...familyRecognitionQuestions,
+  ...structuralPatternQuestions,
   ...meaningQuestions,
   ...flexibleQuestions,
   ...passiveBareInfinitiveQuestions,
