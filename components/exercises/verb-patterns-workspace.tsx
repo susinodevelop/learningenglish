@@ -82,7 +82,7 @@ export function VerbPatternsWorkspace() {
     .join(" · ");
 
   return (
-    <section className={styles.workspace} aria-label="Práctica exclusiva de verb patterns">
+    <section className={styles.workspace} aria-label="Práctica exclusiva de verb patterns de Gold C1 Unit 4">
       <div className={styles.hero}>
         <div>
           <span className="eyebrow">Gramática · C1 · Verb patterns</span>
@@ -90,7 +90,8 @@ export function VerbPatternsWorkspace() {
           <p>
             Aparece un verbo o expresión verbal y marcas todos los grupos que le corresponden. El banco parte del
             Grammar Reference y el Language Tip de Gold C1 Unit 4 y resuelve contradicciones internas con el
-            tratamiento posterior más explícito del propio Gold.
+            tratamiento posterior más explícito del propio Gold. La teoría B2 relacionada no forma parte de la
+            corrección de este banco.
           </p>
         </div>
         <div className={styles.heroStats}>
@@ -102,7 +103,7 @@ export function VerbPatternsWorkspace() {
 
       <div className={styles.roundControls}>
         <div>
-          <strong>Todos los Verb patterns mezclados</strong>
+          <strong>Verb patterns de Gold C1 Unit 4</strong>
           <span>La ronda de 20 garantiza presencia de los siete grupos antes de completar el resto al azar.</span>
         </div>
         <div className={styles.roundButtons}>
@@ -121,7 +122,7 @@ export function VerbPatternsWorkspace() {
           <p>
             Marca uno o varios patterns para cada verbo o expresión verbal. La respuesta solo se revela después de pulsar Comprobar.
           </p>
-          <Link href="/grammar/verb-patterns">Repasar primero la teoría →</Link>
+          <Link href="/grammar/verb-patterns">Repasar primero la teoría de Unit 4 →</Link>
         </div>
       ) : finished ? (
         <div className={styles.result} aria-live="polite">
@@ -156,7 +157,7 @@ export function VerbPatternsWorkspace() {
 
           <h3>¿En qué Verb pattern se clasifica este verbo o expresión verbal?</h3>
           <div className={styles.focusVerb}>{current.verb}</div>
-          <p className={styles.multiHint}>Marca todos los grupos que le corresponden según el criterio de estudio del Gold.</p>
+          <p className={styles.multiHint}>Marca todos los grupos que le corresponden según el criterio de estudio de Gold C1 Unit 4.</p>
 
           <div className={styles.answerGrid}>
             {verbPatternPracticeFamilies.map((family) => {
@@ -199,7 +200,7 @@ export function VerbPatternsWorkspace() {
             <div className={styles.feedback}>
               <div>
                 <strong>{currentCorrect ? "Correcto" : "Revisa la clasificación"}</strong>
-                <p>Clasificación de estudio: {correctLabels}</p>
+                <p>Clasificación de estudio de Unit 4: {correctLabels}</p>
               </div>
               <button className="button button-primary" type="button" onClick={nextQuestion}>
                 {questionIndex === session.length - 1 ? "Ver resultado" : "Siguiente"}
