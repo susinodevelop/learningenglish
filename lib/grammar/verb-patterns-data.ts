@@ -41,11 +41,10 @@ export const verbPatternLittleDifferenceVerbs = unique([
   ...verbPatternLittleDifferenceUnitTipVerbs,
 ]);
 
-// The special groups imply both structural patterns only when Unit 4 supports
-// that structural classification. `see` remains in Gold's little-difference
-// group, but is not promoted to the two generic structural lists by inference.
-export const verbPatternLittleDifferenceStructuralVerbs = verbPatternLittleDifferenceVerbs
-  .filter((verb) => verb !== "see");
+// Gold explicitly classifies every verb in the little-difference group as
+// accepting both -ing and to-infinitive, so those two structural answers are
+// also valid in classification practice.
+export const verbPatternLittleDifferenceStructuralVerbs = [...verbPatternLittleDifferenceVerbs];
 
 export const verbPatternEffectiveVerbIngVerbs = unique([
   ...verbPatternSourceLists.verbIng,
