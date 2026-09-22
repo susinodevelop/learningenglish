@@ -1,5 +1,6 @@
 import {
   verbPatternEffectiveBareInfinitiveVerbs,
+  verbPatternEffectiveObjectToInfinitiveVerbs,
   verbPatternEffectiveToInfinitiveVerbs,
   verbPatternEffectiveVerbIngVerbs,
   verbPatternLittleDifferenceVerbs,
@@ -58,7 +59,7 @@ export const verbPatternPracticeFamilies: VerbPatternPracticeFamily[] = [
     title: "Verb + object + to-infinitive",
     pattern: "verb + object + to-infinitive",
     description: "El verbo lleva un objeto antes de to + infinitive.",
-    verbs: [...verbPatternSourceLists.objectToInfinitive],
+    verbs: verbPatternEffectiveObjectToInfinitiveVerbs,
   },
   {
     id: "bare-infinitive",
