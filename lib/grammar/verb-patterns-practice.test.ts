@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  verbPatternBareInfinitiveGrammarFocusVerbs,
+  verbPatternEffectiveBareInfinitiveVerbs,
   verbPatternEffectiveToInfinitiveVerbs,
   verbPatternEffectiveVerbIngVerbs,
   verbPatternLittleDifferenceGrammarReferenceVerbs,
@@ -43,9 +45,16 @@ function questionFor(verb: string) {
 }
 
 describe("verb patterns practice bank", () => {
-  it("preserves every structural source list exactly", () => {
+  it("preserves every structural Grammar Reference list exactly", () => {
     expect(verbPatternSourceLists).toEqual(expectedSourceLists);
     expect(verbPatternSourceEntryCount).toBe(117);
+  });
+
+  it("preserves the extra classifications explicitly taught in Unit 4 Grammar Focus", () => {
+    expect(verbPatternBareInfinitiveGrammarFocusVerbs).toEqual(["recommend", "suggest"]);
+    expect(verbPatternEffectiveBareInfinitiveVerbs).toEqual([
+      "let", "make", "hear", "help", "recommend", "suggest",
+    ]);
   });
 
   it("preserves both special -ing/to classifications from the Gold source", () => {
@@ -87,7 +96,7 @@ describe("verb patterns practice bank", () => {
     expect(new Set(verbPatternPracticeQuestions.map((question) => question.verb)).size).toBe(106);
   });
 
-  it("assigns every verb to all and only the practice families that contain it", () => {
+  it("assigns every verb to all and only the Unit 4 families that contain it", () => {
     for (const question of verbPatternPracticeQuestions) {
       const expectedFamilies = verbPatternPracticeFamilies
         .filter((family) => family.verbs.includes(question.verb))
@@ -110,6 +119,18 @@ describe("verb patterns practice bank", () => {
       "to-infinitive",
       "object-to-infinitive",
       "both-forms",
+    ]);
+  });
+
+  it("includes the Grammar Focus recommend/suggest bare-infinitive classifications", () => {
+    expect(questionFor("recommend")?.correctFamilyIds).toEqual([
+      "verb-ing",
+      "object-to-infinitive",
+      "bare-infinitive",
+    ]);
+    expect(questionFor("suggest")?.correctFamilyIds).toEqual([
+      "verb-ing",
+      "bare-infinitive",
     ]);
   });
 
