@@ -53,9 +53,10 @@ describe("verb patterns practice bank", () => {
     expect(verbPatternSourceEntryCount).toBe(117);
   });
 
-  it("keeps the effective object-to-infinitive practice list aligned with Gold's later reporting-verb treatment", () => {
-    expect(verbPatternEffectiveObjectToInfinitiveVerbs).toHaveLength(34);
-    expect(verbPatternEffectiveObjectToInfinitiveVerbs).not.toContain("recommend");
+  it("keeps the effective object-to-infinitive practice list aligned with Unit 4", () => {
+    expect(verbPatternEffectiveObjectToInfinitiveVerbs).toEqual(expectedSourceLists.objectToInfinitive);
+    expect(verbPatternEffectiveObjectToInfinitiveVerbs).toHaveLength(35);
+    expect(verbPatternEffectiveObjectToInfinitiveVerbs).toContain("recommend");
   });
 
   it("keeps the bare-infinitive family aligned with the Grammar Reference", () => {
@@ -136,8 +137,11 @@ describe("verb patterns practice bank", () => {
     ]);
   });
 
-  it("does not promote contradictory recommend/suggest forms into effective practice families", () => {
-    expect(questionFor("recommend")?.correctFamilyIds).toEqual(["verb-ing"]);
+  it("keeps recommend aligned with Unit 4 without promoting recommend/suggest to bare infinitive", () => {
+    expect(questionFor("recommend")?.correctFamilyIds).toEqual([
+      "verb-ing",
+      "object-to-infinitive",
+    ]);
     expect(questionFor("suggest")?.correctFamilyIds).toEqual(["verb-ing"]);
   });
 
