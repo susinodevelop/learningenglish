@@ -5,6 +5,7 @@ import { StudyWorkspace } from "@/components/study/study-workspace";
 import type { GrammarExerciseConcept, GrammarExerciseQuestion } from "@/lib/grammar/exercises";
 import type { VocabularySense } from "@/lib/vocabulary";
 import { GrammarExerciseWorkspace } from "./grammar-exercise-workspace";
+import { VerbPatternsWorkspace } from "./verb-patterns-workspace";
 import styles from "./exercises.module.css";
 
 type TopicOption = {
@@ -20,10 +21,16 @@ type ExercisesHubProps = {
 };
 
 type ExerciseArea = "grammar" | "vocabulary";
+type GrammarArea = "general" | "verb-patterns";
 
 function areaFromHash(): ExerciseArea {
   if (typeof window !== "undefined" && window.location.hash === "#vocabulary") return "vocabulary";
   return "grammar";
+}
+
+function grammarAreaFromHash(): GrammarArea {
+  if (typeof window !== "undefined" && window.location.hash === "#verb-patterns") return "verb-patterns";
+  return "general";
 }
 
 export function ExercisesHub({
@@ -33,9 +40,13 @@ export function ExercisesHub({
   vocabularyTopics,
 }: ExercisesHubProps) {
   const [area, setArea] = useState<ExerciseArea>("grammar");
+  const [grammarArea, setGrammarArea] = useState<GrammarArea>("general");
 
   useEffect(() => {
-    const syncArea = () => setArea(areaFromHash());
+    const syncArea = () => {
+      setArea(areaFromHash());
+      setGrammarArea(grammarAreaFromHash());
+    };
     syncArea();
     window.addEventListener("hashchange", syncArea);
     return () => window.removeEventListener("hashchange", syncArea);
@@ -43,7 +54,17 @@ export function ExercisesHub({
 
   function chooseArea(nextArea: ExerciseArea) {
     setArea(nextArea);
-    window.history.replaceState(null, "", `#${nextArea}`);
+    if (nextArea === "grammar") {
+      setGrammarArea("general");
+      window.history.replaceState(null, "", "#grammar");
+    } else {
+      window.history.replaceState(null, "", "#vocabulary");
+    }
+  }
+
+  function chooseGrammarArea(nextArea: GrammarArea) {
+    setGrammarArea(nextArea);
+    window.history.replaceState(null, "", nextArea === "verb-patterns" ? "#verb-patterns" : "#grammar");
   }
 
   return (
@@ -79,7 +100,38 @@ export function ExercisesHub({
 
       <div role="tabpanel">
         {area === "grammar" ? (
-          <GrammarExerciseWorkspace questions={grammarQuestions} concepts={grammarConcepts} />
+          <section className={styles.grammarArea}>
+            <div className={styles.grammarModeTabs} role="tablist" aria-label="Tipo de práctica gramatical">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={grammarArea === "general"}
+                className={grammarArea === "general" ? styles.activeGrammarMode : ""}
+                onClick={() => chooseGrammarArea("general")}
+              >
+                <strong>Práctica general</strong>
+                <small>Todo B2 + C1 con filtros por regla y formato</small>
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={grammarArea === "verb-patterns"}
+                className={grammarArea === "verb-patterns" ? styles.activeGrammarMode : ""}
+                onClick={() => chooseGrammarArea("verb-patterns")}
+              >
+                <strong>Verb patterns</strong>
+                <small>Unit 4 · banco exclusivo de -ing, infinitive y object patterns</small>
+              </button>
+            </div>
+
+            <div role="tabpanel">
+              {grammarArea === "general" ? (
+                <GrammarExerciseWorkspace questions={grammarQuestions} concepts={grammarConcepts} />
+              ) : (
+                <VerbPatternsWorkspace />
+              )}
+            </div>
+          </section>
         ) : (
           <section className={styles.vocabularyArea}>
             <div className={styles.vocabularyIntro}>
