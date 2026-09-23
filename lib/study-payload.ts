@@ -1,5 +1,6 @@
 import type {
   DynamicStudyGroupFilter,
+  CustomStudyWord,
   StudyGroup,
   VocabularyPerformanceFilter,
   VocabularyProgress,
@@ -14,7 +15,7 @@ const performanceValues = new Set<VocabularyPerformanceFilter>([
   "learning",
   "mastered",
 ]);
-const levelValues = new Set<VocabularyLevel>(["B2", "C1"]);
+const levelValues = new Set<VocabularyLevel>(["B1", "B2", "C1"]);
 const entryTypeValues = new Set<VocabularyEntryType>([
   "word",
   "expression",
@@ -54,12 +55,33 @@ function parseFilter(value: unknown): DynamicStudyGroupFilter | null {
     ? candidate.performance as VocabularyPerformanceFilter
     : "all";
 
+  const customWords: CustomStudyWord[] = Array.isArray(candidate.customWords)
+    ? candidate.customWords.slice(0, 500).flatMap((raw) => {
+      const word = objectValue(raw);
+      if (!word || typeof word.id !== "string" || word.id.length > 160) return [];
+      const fields = ["term", "meaningEs", "definitionEn", "exampleEn", "exampleEs"] as const;
+      if (!fields.every((key) => typeof word[key] === "string" && (word[key] as string).trim())) return [];
+      if (!levelValues.has(word.level as VocabularyLevel)) return [];
+      return [{
+        id: word.id,
+        term: (word.term as string).slice(0, 160),
+        meaningEs: (word.meaningEs as string).slice(0, 300),
+        definitionEn: (word.definitionEn as string).slice(0, 500),
+        exampleEn: (word.exampleEn as string).slice(0, 500),
+        exampleEs: (word.exampleEs as string).slice(0, 500),
+        level: word.level as VocabularyLevel,
+      }];
+    })
+    : [];
+
   return {
     query: typeof candidate.query === "string" ? candidate.query.slice(0, 300) : "",
     topicSlugs: stringArray(candidate.topicSlugs, 50),
-    levels: stringArray(candidate.levels, 2).filter((level): level is VocabularyLevel =>
+    levels: stringArray(candidate.levels, 3).filter((level): level is VocabularyLevel =>
       levelValues.has(level as VocabularyLevel),
     ),
+    includeSenseIds: Array.from(new Set(stringArray(candidate.includeSenseIds, 5000))),
+    customWords,
     entryTypes: stringArray(candidate.entryTypes, 10).filter((type): type is VocabularyEntryType =>
       entryTypeValues.has(type as VocabularyEntryType),
     ),

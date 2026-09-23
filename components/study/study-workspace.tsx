@@ -19,7 +19,9 @@ import {
 import { isAcceptableWrittenAnswer } from "@/lib/vocabulary/write-answer";
 import {
   createStudyGroupId,
+  customWordToSense,
   emptyDynamicStudyGroupFilter,
+  PERSONAL_STUDY_GROUP_ID,
   migrateStaticGroupIds,
   migrateVocabularyProgress,
   progressForSense,
@@ -28,6 +30,7 @@ import {
   systemStudyGroups,
   VOCABULARY_PROGRESS_STORAGE_KEY,
   type DynamicStudyGroupFilter,
+  type CustomStudyWord,
   type StudyGroup,
   type VocabularyPerformanceFilter,
   type VocabularyProgress,
@@ -188,6 +191,9 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   const [draftFilter, setDraftFilter] = useState<DynamicStudyGroupFilter>({
     ...emptyDynamicStudyGroupFilter,
   });
+  const [customDraft, setCustomDraft] = useState<Omit<CustomStudyWord, "id">>({
+    term: "", meaningEs: "", definitionEn: "", exampleEn: "", exampleEs: "", level: "B2",
+  });
 
   const [mode, setMode] = useState<StudyMode>("flashcards");
   const [difficulty, setDifficulty] = useState<VocabularyDifficulty>("medium");
@@ -210,7 +216,10 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
       const storedGroups = safeReadGroups(window.localStorage.getItem(STUDY_GROUPS_STORAGE_KEY));
       const migratedGroups = storedGroups.map((group) => migrateStaticGroupIds(group, lexicon));
       const storedProgress = safeReadProgress(window.localStorage.getItem(VOCABULARY_PROGRESS_STORAGE_KEY));
-      const migratedProgress = migrateVocabularyProgress(storedProgress, lexicon);
+      const customSenses = migratedGroups.flatMap((group) =>
+        group.kind === "dynamic" ? (group.filter.customWords ?? []).map(customWordToSense) : [],
+      );
+      const migratedProgress = migrateVocabularyProgress(storedProgress, [...lexicon, ...customSenses]);
 
       if (cancelled) return;
       setUserGroups(migratedGroups);
@@ -244,7 +253,10 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     return () => { cancelled = true; };
   }, [lexicon]);
 
-  const groups = useMemo(() => [...systemStudyGroups, ...userGroups], [userGroups]);
+  const groups = useMemo(() => [
+    ...systemStudyGroups.filter((system) => !userGroups.some((group) => group.id === system.id)),
+    ...userGroups,
+  ], [userGroups]);
   const resolvedGroups = useMemo(
     () => new Map(groups.map((group) => [group.id, resolveStudyGroup(group, lexicon, progress)])),
     [groups, lexicon, progress],
@@ -411,6 +423,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     setDraftStaticIds([]);
     setStaticQuery("");
     setDraftFilter({ ...emptyDynamicStudyGroupFilter });
+    setCustomDraft({ term: "", meaningEs: "", definitionEn: "", exampleEn: "", exampleEs: "", level: "B2" });
   }
 
   function openNewGroup(kind: StudyGroup["kind"]) {
@@ -420,7 +433,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
   }
 
   function openEditGroup(group: StudyGroup) {
-    if (group.system) return;
+    if (group.system && group.id !== PERSONAL_STUDY_GROUP_ID) return;
     setEditingId(group.id);
     setDraftName(group.name);
     setDraftKind(group.kind);
@@ -438,6 +451,31 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
     );
   }
 
+  function toggleDynamicEntry(senseId: string) {
+    setDraftFilter((filter) => ({
+      ...filter,
+      includeSenseIds: filter.includeSenseIds?.includes(senseId)
+        ? filter.includeSenseIds.filter((id) => id !== senseId)
+        : [...(filter.includeSenseIds ?? []), senseId],
+    }));
+  }
+
+  function addCustomWord() {
+    if (![customDraft.term, customDraft.meaningEs, customDraft.definitionEn, customDraft.exampleEn, customDraft.exampleEs]
+      .every((field) => field.trim())) return;
+    const word: CustomStudyWord = {
+      ...customDraft,
+      id: createStudyGroupId(),
+      term: customDraft.term.trim(),
+      meaningEs: customDraft.meaningEs.trim(),
+      definitionEn: customDraft.definitionEn.trim(),
+      exampleEn: customDraft.exampleEn.trim(),
+      exampleEs: customDraft.exampleEs.trim(),
+    };
+    setDraftFilter((filter) => ({ ...filter, customWords: [...(filter.customWords ?? []), word] }));
+    setCustomDraft({ term: "", meaningEs: "", definitionEn: "", exampleEn: "", exampleEs: "", level: customDraft.level });
+  }
+
   function saveGroup() {
     const name = draftName.trim();
     if (!name) return;
@@ -447,7 +485,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
       ? { id: editingId ?? createStudyGroupId(), name, kind: "static", lexemeIds: draftStaticIds }
       : { id: editingId ?? createStudyGroupId(), name, kind: "dynamic", filter: draftFilter };
 
-    const next = editingId
+    const next = editingId && userGroups.some((candidate) => candidate.id === editingId)
       ? userGroups.map((candidate) => candidate.id === editingId ? group : candidate)
       : [...userGroups, group];
     const supportsIrregularForms = resolveStudyGroup(group, lexicon, progress).some((entry) =>
@@ -624,10 +662,10 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
                   <strong>{group.name}</strong>
                   <small>{count} {count === 1 ? "elemento" : "elementos"}</small>
                 </button>
-                {!group.system ? (
+                {(!group.system || group.id === PERSONAL_STUDY_GROUP_ID) ? (
                   <div className={styles.rowActions}>
                     <button type="button" onClick={() => openEditGroup(group)} aria-label={`Editar ${group.name}`}>Editar</button>
-                    <button type="button" onClick={() => removeGroup(group)} aria-label={`Eliminar ${group.name}`}>×</button>
+                    {group.id !== PERSONAL_STUDY_GROUP_ID ? <button type="button" onClick={() => removeGroup(group)} aria-label={`Eliminar ${group.name}`}>×</button> : null}
                   </div>
                 ) : null}
               </div>
@@ -695,7 +733,7 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
               </>
             ) : (
               <>
-                <p className={styles.editorHelp}>El grupo se recalcula automáticamente cuando cambian el léxico o tu progreso.</p>
+                <p className={styles.editorHelp}>El grupo se recalcula automáticamente cuando cambian el léxico o tu progreso. También puedes añadir acepciones concretas.</p>
                 <label className={styles.field}>
                   <span>Texto / concepto</span>
                   <input value={draftFilter.query} onChange={(event) => setDraftFilter((value) => ({ ...value, query: event.target.value }))} placeholder="Opcional: travel, work, reliable…" />
@@ -710,15 +748,17 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
                         levels: event.target.value ? [event.target.value as VocabularyLevel] : [],
                       }))}
                     >
-                      <option value="">B2 + C1</option>
+                      <option value="">B1 + B2 + C1</option>
+                      <option value="B1">Solo B1</option>
                       <option value="B2">Solo B2</option>
                       <option value="C1">Solo C1</option>
                     </select>
                   </label>
                   <label className={styles.field}>
                     <span>Tema</span>
-                    <select value={draftFilter.topicSlugs[0] ?? ""} onChange={(event) => setDraftFilter((value) => ({ ...value, topicSlugs: event.target.value ? [event.target.value] : [] }))}>
+                    <select value={draftFilter.topicSlugs.length === 3 && draftFilter.topicSlugs.every((slug) => slug.startsWith("personal-added-")) ? "personal-added" : draftFilter.topicSlugs[0] ?? ""} onChange={(event) => setDraftFilter((value) => ({ ...value, topicSlugs: event.target.value === "personal-added" ? ["personal-added-b1", "personal-added-b2", "personal-added-c1"] : event.target.value ? [event.target.value] : [] }))}>
                       <option value="">Todos</option>
+                      <option value="personal-added">Añadido por mí · todos los niveles</option>
                       {topics.map((topic) => <option value={topic.slug} key={topic.slug}>{topic.title}</option>)}
                     </select>
                   </label>
@@ -742,6 +782,42 @@ export function StudyWorkspace({ lexicon, topics }: StudyWorkspaceProps) {
                       {(Object.entries(performanceLabels) as [VocabularyPerformanceFilter, string][]).map(([value, label]) => <option value={value} key={value}>{label}</option>)}
                     </select>
                   </label>
+                </div>
+                <label className={styles.field}>
+                  <span>Añadir otras palabras al grupo</span>
+                  <input value={staticQuery} onChange={(event) => setStaticQuery(event.target.value)} placeholder="Busca una palabra o su significado…" />
+                </label>
+                {(draftFilter.includeSenseIds?.length ?? 0) > 0 ? (
+                  <div className={styles.selectedTerms}>
+                    {lexicon.filter((entry) => draftFilter.includeSenseIds?.includes(entry.senseId)).map((entry) => (
+                      <button type="button" key={entry.senseId} onClick={() => toggleDynamicEntry(entry.senseId)} title="Quitar del grupo">{entry.term} <span>×</span></button>
+                    ))}
+                  </div>
+                ) : null}
+                <div className={styles.candidateList}>
+                  {staticCandidates.map((entry) => (
+                    <label key={entry.senseId} className={draftFilter.includeSenseIds?.includes(entry.senseId) ? styles.checkedCandidate : ""}>
+                      <input type="checkbox" checked={draftFilter.includeSenseIds?.includes(entry.senseId) ?? false} onChange={() => toggleDynamicEntry(entry.senseId)} />
+                      <span><strong>{entry.term}</strong><small>{entry.meaning.es} · {typeLabels[entry.type]}</small></span>
+                    </label>
+                  ))}
+                </div>
+                <div className={styles.field}>
+                  <span>Crear una palabra nueva</span>
+                  {(draftFilter.customWords ?? []).map((word) => (
+                    <button type="button" key={word.id} onClick={() => setDraftFilter((filter) => ({ ...filter, customWords: filter.customWords?.filter((item) => item.id !== word.id) }))}>
+                      {word.term} · {word.meaningEs} ×
+                    </button>
+                  ))}
+                  <input aria-label="Palabra en inglés" placeholder="Palabra en inglés" maxLength={160} value={customDraft.term} onChange={(event) => setCustomDraft((draft) => ({ ...draft, term: event.target.value }))} />
+                  <input aria-label="Significado en español" placeholder="Significado en español" maxLength={300} value={customDraft.meaningEs} onChange={(event) => setCustomDraft((draft) => ({ ...draft, meaningEs: event.target.value }))} />
+                  <input aria-label="Definición en inglés" placeholder="Definición en inglés" maxLength={500} value={customDraft.definitionEn} onChange={(event) => setCustomDraft((draft) => ({ ...draft, definitionEn: event.target.value }))} />
+                  <input aria-label="Ejemplo en inglés" placeholder="Ejemplo en inglés" maxLength={500} value={customDraft.exampleEn} onChange={(event) => setCustomDraft((draft) => ({ ...draft, exampleEn: event.target.value }))} />
+                  <input aria-label="Traducción del ejemplo" placeholder="Traducción del ejemplo" maxLength={500} value={customDraft.exampleEs} onChange={(event) => setCustomDraft((draft) => ({ ...draft, exampleEs: event.target.value }))} />
+                  <select aria-label="Nivel de la palabra" value={customDraft.level} onChange={(event) => setCustomDraft((draft) => ({ ...draft, level: event.target.value as VocabularyLevel }))}>
+                    <option value="B1">B1</option><option value="B2">B2</option><option value="C1">C1</option>
+                  </select>
+                  <button type="button" className="button button-secondary" disabled={![customDraft.term, customDraft.meaningEs, customDraft.definitionEn, customDraft.exampleEn, customDraft.exampleEs].every((field) => field.trim())} onClick={addCustomWord}>Añadir palabra nueva</button>
                 </div>
               </>
             )}
