@@ -21,6 +21,7 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
           ["indeed", "realmente / ciertamente / de hecho", "Útil para reforzar una afirmación; también aparece en el patrón very + adjective + indeed.", "used to emphasize a statement or confirm that something is true"],
           ["straightforward", "sencillo / claro / directo", undefined, "simple and easy to understand or deal with"],
           ["acquire", "adquirir / obtener", undefined, "to get or obtain something, often gradually or through effort"],
+          ["script", "guion", undefined, "the written text of a film, play, broadcast or recording"],
         ],
       },
       {
