@@ -115,7 +115,7 @@ export const systemStudyGroups: StudyGroup[] = [
     name: "Idioms C1",
     kind: "dynamic",
     system: true,
-    filter: { ...emptyDynamicStudyGroupFilter, levels: ["C1"], topicSlugs: ["c1-idioms"] },
+    filter: { ...emptyDynamicStudyGroupFilter, levels: ["C1"], sectionKinds: ["idiom"] },
   },
   {
     id: "system-irregular-verbs",
