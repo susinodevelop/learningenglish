@@ -5,10 +5,45 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
     title: "The feel-good factor",
     category: "people",
     level: "C1",
-    summary: "Word formation con mis-/falsos opuestos y sentence adverbs para comentar una oración completa.",
+    summary: "Vocabulario de la Unit 5 sobre money and happiness, word formation con mis-/falsos opuestos y sentence adverbs.",
     sourceUnit: 5,
     source: "Gold C1 Advanced New Edition",
     sections: [
+      {
+        title: "Listening 20 · Money and happiness — core vocabulary",
+        kind: "core",
+        entries: [
+          ["though", "aunque / sin embargo", "Introduce un contraste o una limitación respecto a lo anterior.", "used to introduce a contrast or limitation to what has just been said"],
+          ["shelter", "refugio / cobijo / alojamiento", undefined, "protection from bad weather or danger, or a place that provides this protection"],
+          ["warmth", "calor", undefined, "the state or quality of being warm"],
+          ["self-esteem", "autoestima", undefined, "confidence in your own worth and abilities"],
+          ["squander", "malgastar / derrochar", "Pattern: squander money/wealth/time on sth.", "to waste money, time or another valuable resource in a careless way"],
+          ["indeed", "realmente / ciertamente / de hecho", "Útil para reforzar una afirmación; también aparece en el patrón very + adjective + indeed.", "used to emphasize a statement or confirm that something is true"],
+          ["straightforward", "sencillo / claro / directo", undefined, "simple and easy to understand or deal with"],
+          ["acquire", "adquirir / obtener", undefined, "to get or obtain something, often gradually or through effort"],
+        ],
+      },
+      {
+        title: "Listening 20 · Money and happiness — patterns and collocations",
+        kind: "chunks",
+        entries: [
+          ["indulge in sth", "darse el gusto de / entregarse a algo", undefined, "to allow yourself to enjoy or have something, especially more than is good for you"],
+          ["be willing to do sth", "estar dispuesto a hacer algo", undefined, "to be prepared to do something"],
+          ["take up a challenge", "aceptar / asumir un reto", undefined, "to accept a challenge and start dealing with it"],
+          ["in a vain attempt to do sth", "en un intento inútil de hacer algo", "Aquí vain significa unsuccessful, no 'vanidoso'.", "while trying unsuccessfully to do something"],
+          ["make ends meet", "llegar a fin de mes", undefined, "to have just enough money to pay for the things you need"],
+          ["be inclined to do sth", "tender a / estar inclinado a hacer algo", undefined, "to tend to do something or be likely to do it"],
+          ["obsess about sth", "obsesionarse con algo", undefined, "to think or worry about something too much"],
+        ],
+      },
+      {
+        title: "Listening 20 · Money and happiness — phrasal verbs",
+        kind: "phrasal",
+        entries: [
+          ["come in for criticism", "recibir críticas", undefined, "to receive criticism or blame"],
+          ["come up with sth", "idear / dar con algo", undefined, "to think of or produce an idea, plan or solution"],
+        ],
+      },
       {
         title: "Prefix mis- and false opposites",
         kind: "word-family",
