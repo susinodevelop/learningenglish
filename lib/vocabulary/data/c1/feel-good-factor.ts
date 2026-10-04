@@ -55,6 +55,8 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
         ["willingness", "disposición / voluntad", "Pattern: willingness to do sth.", "the quality of being ready and prepared to do something"],
         ["canvassing", "hacer campaña electoral / pedir apoyo o votos puerta a puerta", "En el texto: came canvassing at my door / I was out canvassing with them.", "the activity of visiting or contacting people to persuade them to support a political party or candidate"],
         ["constituents", "electores / ciudadanos de una circunscripción", "Son las personas representadas por un político en su circunscripción.", "people who live and vote in an area represented by an elected politician"],
+        ["seamstress", "costurera", "En el texto: I found a job as a seamstress.", "a woman whose job is sewing and making or repairing clothes"],
+        ["sew → sewn", "coser → cosido/a", "Sewn es el participio pasado de sew. En el texto: some of the piece is sewn.", "to join, make or repair fabric using a needle and thread; sewn is the past participle of sew"],
       ],
     },
     {
@@ -71,6 +73,7 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
         ["a slave driver", "persona o jefe muy exigente que hace trabajar muchísimo a los demás", "En el texto: The designer can be a bit of a slave driver.", "a person who makes other people work extremely hard"],
         ["be closed off from sth", "quedar excluido de / no tener acceso a algo", "En el texto: able people are closed off from the opportunity of an internship because they cannot afford to travel or live in London.", "to be prevented from having access to an opportunity, place or activity"],
         ["rely on sb/sth", "depender de / contar con alguien o algo", "En el texto aparece como relying on her generosity.", "to need or depend on someone or something in order to be able to continue or succeed"],
+        ["contrary to sth", "contrariamente a / en contra de / contra lo esperado", "En el texto: Contrary to my expectations = contra lo que esperaba.", "opposite to what was expected, believed or stated"],
       ],
     },
     {
@@ -78,6 +81,7 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
       kind: "phrasal",
       entries: [
         ["take on work", "aceptar / asumir trabajo", "En el libro aparece como taken on: I haven't taken on any more paid work.", "to accept work or responsibility and agree to do it"],
+        ["set up sth", "montar / preparar / organizar algo", "En el texto: set up exhibitions = montar/preparar exposiciones.", "to arrange, prepare or establish something so that it is ready to be used or take place"],
       ],
     },
     {
@@ -85,6 +89,7 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
       kind: "idiom",
       entries: [
         ["keep/have your nose to the grindstone", "trabajar muy duro / no parar de trabajar", "El libro usa tanto keep your nose to the grindstone como have our noses to the grindstone.", "to work very hard and continuously"],
+        ["come in handy", "venir bien / resultar útil", "En el texto: my seamstress skills came in handy.", "to be useful or convenient in a particular situation"],
       ],
     },
     {
