@@ -5,7 +5,7 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
     title: "The feel-good factor",
     category: "people",
     level: "C1",
-    summary: "Vocabulario de la Unit 5 sobre money and happiness, word formation con mis-/falsos opuestos y sentence adverbs.",
+    summary: "Vocabulario de la Unit 5 sobre money and happiness, internships and work, word formation con mis-/falsos opuestos y sentence adverbs.",
     sourceUnit: 5,
     source: "Gold C1 Advanced New Edition",
     sections: [
@@ -46,6 +46,29 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
           ["come in for criticism", "recibir críticas", undefined, "to receive criticism or blame"],
           ["come up with sth", "idear / dar con algo", undefined, "to think of or produce an idea, plan or solution"],
           ["take on work", "aceptar / asumir trabajo", "En el libro aparece como taken on: I haven't taken on any more paid work.", "to accept work or responsibility and agree to do it"],
+        ],
+      },
+      {
+        title: "Pages 52–53 · Internships and work — core vocabulary",
+        kind: "core",
+        entries: [
+          ["exploitative", "explotador / abusivo", "En el texto describe unas condiciones laborales que pueden parecer injustas por exigir muchas horas y trabajo gratis.", "taking unfair advantage of someone for your own benefit"],
+          ["willingness", "disposición / voluntad", "Pattern: willingness to do sth.", "the quality of being ready and prepared to do something"],
+        ],
+      },
+      {
+        title: "Pages 52–53 · Internships and work — expressions",
+        kind: "chunks",
+        entries: [
+          ["the build-up to sth", "los preparativos / el periodo previo a algo", "En el texto: the build-up to Fashion Week.", "the period of preparation and increasing activity before an important event"],
+          ["a slave driver", "persona o jefe muy exigente que hace trabajar muchísimo a los demás", "En el texto: The designer can be a bit of a slave driver.", "a person who makes other people work extremely hard"],
+        ],
+      },
+      {
+        title: "Pages 52–53 · Internships and work — idioms",
+        kind: "idiom",
+        entries: [
+          ["keep/have your nose to the grindstone", "trabajar muy duro / no parar de trabajar", "El libro usa tanto keep your nose to the grindstone como have our noses to the grindstone.", "to work very hard and continuously"],
         ],
       },
       {
