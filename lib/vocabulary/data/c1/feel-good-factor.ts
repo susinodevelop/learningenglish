@@ -22,6 +22,7 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
           ["straightforward", "sencillo / claro / directo", undefined, "simple and easy to understand or deal with"],
           ["acquire", "adquirir / obtener", undefined, "to get or obtain something, often gradually or through effort"],
           ["script", "guion", undefined, "the written text of a film, play, broadcast or recording"],
+          ["placement", "prácticas / periodo de prácticas", "En este contexto significa work placement o internship.", "a temporary position in a workplace intended to give someone practical experience"],
         ],
       },
       {
@@ -35,6 +36,7 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
           ["make ends meet", "llegar a fin de mes", undefined, "to have just enough money to pay for the things you need"],
           ["be inclined to do sth", "tender a / estar inclinado a hacer algo", undefined, "to tend to do something or be likely to do it"],
           ["obsess about sth", "obsesionarse con algo", undefined, "to think or worry about something too much"],
+          ["be due to do sth", "estar previsto que / tener previsto hacer algo", "En el libro: My placement was due to come to an end this month.", "to be expected or scheduled to happen or do something at a particular time"],
         ],
       },
       {
