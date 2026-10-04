@@ -70,6 +70,7 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
         ["the build-up to sth", "los preparativos / el periodo previo a algo", "En el texto: the build-up to Fashion Week.", "the period of preparation and increasing activity before an important event"],
         ["a slave driver", "persona o jefe muy exigente que hace trabajar muchísimo a los demás", "En el texto: The designer can be a bit of a slave driver.", "a person who makes other people work extremely hard"],
         ["be closed off from sth", "quedar excluido de / no tener acceso a algo", "En el texto: able people are closed off from the opportunity of an internship because they cannot afford to travel or live in London.", "to be prevented from having access to an opportunity, place or activity"],
+        ["rely on sb/sth", "depender de / contar con alguien o algo", "En el texto aparece como relying on her generosity.", "to need or depend on someone or something in order to be able to continue or succeed"],
       ],
     },
     {
