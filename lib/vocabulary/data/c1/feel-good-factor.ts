@@ -43,6 +43,7 @@ export const c1FeelGoodFactorVocabularyTopic: VocabularyTopic = {
         entries: [
           ["come in for criticism", "recibir críticas", undefined, "to receive criticism or blame"],
           ["come up with sth", "idear / dar con algo", undefined, "to think of or produce an idea, plan or solution"],
+          ["take on work", "aceptar / asumir trabajo", "En el libro aparece como taken on: I haven't taken on any more paid work.", "to accept work or responsibility and agree to do it"],
         ],
       },
       {
