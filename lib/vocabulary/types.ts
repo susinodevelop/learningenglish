@@ -4,6 +4,7 @@ export type VocabularySource =
   | "Grammar and Vocabulary for First and First for Schools"
   | "Gold C1 Advanced New Edition"
   | "Personal C1 vocabulary"
+  | "Personal vocabulary"
   | "User-provided irregular verbs"
   | "User-provided phrasal verbs"
   | "Personal spreadsheet"
