@@ -148,7 +148,7 @@ export const personalImportTopics: VocabularyTopic[] = (["B1", "B2", "C1"] as Vo
   level,
   summary: "Vocabulario personal con acepciones, ejemplos y relaciones.",
   sourceUnit: 45 + index,
-  source: "Personal spreadsheet",
+  source: "Personal vocabulary",
   sections: [{
     title: "Vocabulario personal",
     kind: "core",
@@ -173,7 +173,7 @@ function entryType(type: string): VocabularyEntryType {
   return "word";
 }
 
-/** Preserve the spreadsheet's real examples and relationships after canonical compilation. */
+/** Preserve the personal vocabulary's real examples and relationships after canonical compilation. */
 export function enrichPersonalImport(topics: { slug: string; sections: { entries: VocabularySense[] }[] }[]) {
   for (const [index, level] of (["B1", "B2", "C1"] as VocabularyLevel[]).entries()) {
     const topic = topics.find((item) => item.slug === personalImportSlugs[index]);
