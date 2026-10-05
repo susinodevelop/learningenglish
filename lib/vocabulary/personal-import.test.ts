@@ -3,18 +3,35 @@ import { personalImportRows } from "./data/personal-import";
 import { vocabularySenses } from "./index";
 import { PERSONAL_STUDY_GROUP_ID, resolveStudyGroup, systemStudyGroups } from "../study-groups";
 
-describe("personal spreadsheet vocabulary", () => {
-  it("imports every spreadsheet row with a real example and preserves its level", () => {
+describe("personal vocabulary", () => {
+  it("imports every personal row with a real example and preserves its level", () => {
     const personalSenses = vocabularySenses.filter((sense) =>
       sense.topics.some((slug) => slug.startsWith("personal-added-")),
     );
 
-    expect(personalImportRows).toHaveLength(294);
-    expect(personalSenses).toHaveLength(294);
+    expect(personalImportRows).toHaveLength(301);
+    expect(personalSenses).toHaveLength(301);
     expect(personalSenses.every((sense) => sense.examples.some((example) =>
       example.kind === "usage" && example.en.trim() && example.es.trim(),
     ))).toBe(true);
-    expect(personalSenses.filter((sense) => sense.levels.includes("B1"))).toHaveLength(53);
+    expect(personalSenses.filter((sense) => sense.levels.includes("B1"))).toHaveLength(54);
+  });
+
+  it("includes the latest manually added vocabulary without duplicating existing imports", () => {
+    expect(personalImportRows.filter((row) => row.term === "turmeric")).toHaveLength(1);
+    expect(personalImportRows.filter((row) => row.term === "colander")).toHaveLength(1);
+    expect(personalImportRows.filter((row) => row.term === "sieve")).toHaveLength(1);
+
+    expect(personalImportRows).toEqual(expect.arrayContaining([
+      expect.objectContaining({ term: "coriander" }),
+      expect.objectContaining({ term: "cilantro" }),
+      expect.objectContaining({ term: "washing-up liquid" }),
+      expect.objectContaining({ term: "thus", "relations.synonyms": expect.stringContaining("therefore") }),
+      expect.objectContaining({ term: "drawback", "relations.synonyms": expect.stringContaining("disadvantage") }),
+      expect.objectContaining({ term: "into the bargain", type: "idiom" }),
+      expect.objectContaining({ term: "bargain", "meaning.es": expect.stringContaining("ganga") }),
+      expect.objectContaining({ term: "bear", notes: expect.stringContaining("bear – bore – borne") }),
+    ]));
   });
 
   it("keeps the initial group dynamic and accepts later manual additions", () => {
@@ -23,7 +40,7 @@ describe("personal spreadsheet vocabulary", () => {
     if (!group || group.kind !== "dynamic") throw new Error("Missing personal study group");
 
     const original = resolveStudyGroup(group, vocabularySenses, {});
-    expect(original).toHaveLength(294);
+    expect(original).toHaveLength(301);
     const outside = vocabularySenses.find((sense) => !original.includes(sense));
     expect(outside).toBeDefined();
 
@@ -31,7 +48,7 @@ describe("personal spreadsheet vocabulary", () => {
       ...group,
       filter: { ...group.filter, includeSenseIds: [outside!.senseId] },
     }, vocabularySenses, {});
-    expect(extended).toHaveLength(295);
+    expect(extended).toHaveLength(302);
 
     const withNewWord = resolveStudyGroup({
       ...group,
@@ -41,7 +58,7 @@ describe("personal spreadsheet vocabulary", () => {
         exampleEn: "This is a future entry.", exampleEs: "Esta es una entrada futura.", level: "C1",
       }] },
     }, vocabularySenses, {});
-    expect(withNewWord).toHaveLength(295);
+    expect(withNewWord).toHaveLength(302);
     expect(withNewWord.at(-1)?.examples[0].kind).toBe("usage");
   });
 });
