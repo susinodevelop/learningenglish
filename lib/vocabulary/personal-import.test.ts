@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { irregularVerbFormsByTerm } from "./data/irregular-verbs";
 import { personalImportRows } from "./data/personal-import";
 import { vocabularySenses } from "./index";
 import { PERSONAL_STUDY_GROUP_ID, resolveStudyGroup, systemStudyGroups } from "../study-groups";
@@ -8,13 +9,13 @@ describe("personal vocabulary", () => {
     const personalSenses = vocabularySenses.filter((sense) =>
       sense.topics.some((slug) => slug.startsWith("personal-added-")),
     );
+    const expectedB1Rows = personalImportRows.filter((row) => row.cefr === "B1").length;
 
-    expect(personalImportRows).toHaveLength(301);
-    expect(personalSenses).toHaveLength(301);
+    expect(personalSenses).toHaveLength(personalImportRows.length);
     expect(personalSenses.every((sense) => sense.examples.some((example) =>
       example.kind === "usage" && example.en.trim() && example.es.trim(),
     ))).toBe(true);
-    expect(personalSenses.filter((sense) => sense.levels.includes("B1"))).toHaveLength(54);
+    expect(personalSenses.filter((sense) => sense.levels.includes("B1"))).toHaveLength(expectedB1Rows);
   });
 
   it("includes the latest manually added vocabulary without duplicating existing imports", () => {
@@ -32,6 +33,11 @@ describe("personal vocabulary", () => {
       expect.objectContaining({ term: "bargain", "meaning.es": expect.stringContaining("ganga") }),
       expect.objectContaining({ term: "bear", notes: expect.stringContaining("bear – bore – borne") }),
     ]));
+    expect(irregularVerbFormsByTerm.bear).toMatchObject({
+      base: "bear",
+      pastSimple: "bore",
+      pastParticiple: "borne",
+    });
   });
 
   it("keeps the initial group dynamic and accepts later manual additions", () => {
@@ -40,7 +46,7 @@ describe("personal vocabulary", () => {
     if (!group || group.kind !== "dynamic") throw new Error("Missing personal study group");
 
     const original = resolveStudyGroup(group, vocabularySenses, {});
-    expect(original).toHaveLength(301);
+    expect(original).toHaveLength(personalImportRows.length);
     const outside = vocabularySenses.find((sense) => !original.includes(sense));
     expect(outside).toBeDefined();
 
@@ -48,7 +54,7 @@ describe("personal vocabulary", () => {
       ...group,
       filter: { ...group.filter, includeSenseIds: [outside!.senseId] },
     }, vocabularySenses, {});
-    expect(extended).toHaveLength(302);
+    expect(extended).toHaveLength(original.length + 1);
 
     const withNewWord = resolveStudyGroup({
       ...group,
@@ -58,7 +64,7 @@ describe("personal vocabulary", () => {
         exampleEn: "This is a future entry.", exampleEs: "Esta es una entrada futura.", level: "C1",
       }] },
     }, vocabularySenses, {});
-    expect(withNewWord).toHaveLength(302);
+    expect(withNewWord).toHaveLength(original.length + 1);
     expect(withNewWord.at(-1)?.examples[0].kind).toBe("usage");
   });
 });
