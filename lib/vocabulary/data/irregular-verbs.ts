@@ -136,6 +136,7 @@ const irregularVerbGroups: IrregularVerbGroup[] = [
       ["drive", "drove", "driven", "conducir", "to control and operate a car or other vehicle"],
       ["ride", "rode", "ridden", "montar / ir en", "to travel on a bicycle, motorcycle, horse or similar means of transport"],
       ["rise", "rose", "risen", "subir / elevarse", "to move upwards or become higher"],
+      ["bear", "bore", "borne", "aguantar / soportar", "to tolerate or endure something difficult or unpleasant", "Para el sentido ‘aguantar/soportar’, el participio es borne. Born se usa principalmente al hablar de nacimiento."],
     ],
   },
   {
@@ -217,7 +218,7 @@ export const irregularVerbsVocabularyTopic: VocabularyTopic = {
   title: "Irregular verbs",
   category: "language",
   level: "B2",
-  summary: "70 verbos irregulares organizados por patrones. Base form = forma de diccionario; past simple = pasado terminado; past participle = forma usada con have y en la voz pasiva.",
+  summary: "71 verbos irregulares organizados por patrones. Base form = forma de diccionario; past simple = pasado terminado; past participle = forma usada con have y en la voz pasiva.",
   sourceUnit: 2001,
   source: "User-provided irregular verbs",
   sections,

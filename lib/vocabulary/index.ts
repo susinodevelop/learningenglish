@@ -61,6 +61,7 @@ const compiledVocabulary = compileVocabulary(sourceVocabularyTopics, enrichPerso
 
 const personalVocabularySources = new Set([
   "Personal C1 vocabulary",
+  "Personal vocabulary",
   "User-provided irregular verbs",
   "User-provided phrasal verbs",
   "Personal spreadsheet",
