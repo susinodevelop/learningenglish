@@ -16,7 +16,8 @@ describe("personal vocabulary", () => {
       example.kind === "usage" && example.en.trim() && example.es.trim(),
     ))).toBe(true);
     expect(personalSenses.filter((sense) => sense.levels.includes("B1"))).toHaveLength(expectedB1Rows);
-    expect(personalSenses.every((sense) => sense.provenance.lexicalSelection === "personal")).toBe(true);
+    expect(personalSenses.every((sense) => sense.provenance.sources.includes("Personal vocabulary"))).toBe(true);
+    expect(personalSenses.every((sense) => sense.provenance.lexicalSelection !== "book")).toBe(true);
   });
 
   it("includes the latest manually added vocabulary without duplicating existing imports", () => {
