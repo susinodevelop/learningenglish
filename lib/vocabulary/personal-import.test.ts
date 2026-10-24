@@ -230,9 +230,15 @@ describe("personal vocabulary", () => {
       );
       expect(sense, row.id).toBeDefined();
       if (!sense) continue;
-      const isFilm = row.topics?.includes("film & reviews");
-      expect(sense.topics.some((slug) => (isFilm ? cultureTopics : linkingTopics).has(slug)))
-        .toBe(true);
+      if (row.topics?.includes("film & reviews")) {
+        expect(sense.topics.some((slug) => cultureTopics.has(slug)), row.id).toBe(true);
+      } else if (row.topics?.includes("grammar & linking")) {
+        expect(sense.topics.some((slug) => linkingTopics.has(slug)), row.id).toBe(true);
+      } else {
+        // "just" = fair is general vocabulary, not a linking word.
+        expect(row.id).toBe("just_fair");
+        expect(sense.topics.some((slug) => linkingTopics.has(slug)), row.id).toBe(false);
+      }
       expect(sense.examples).toContainEqual({
         en: row["example.en"], es: row["example.es"], kind: "usage",
       });
