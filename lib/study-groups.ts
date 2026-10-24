@@ -1,3 +1,4 @@
+import { isIdiomSense } from "./vocabulary/idiom-classification";
 import type {
   VocabularyEntryType,
   VocabularyLevel,
@@ -236,7 +237,7 @@ export function resolveStudyGroup(
   const includedIds = new Set(group.filter.includeSenseIds ?? []);
 
   const matched = lexicon.filter((entry) => {
-    if (includedIds.has(entry.senseId)) return true;
+    if (includedIds.has(entry.senseId) || includedIds.has(entry.id) || entry.legacyIds.some((id) => includedIds.has(id))) return true;
     if (
       levels.length > 0 &&
       !entry.levels.some((level) => levels.includes(level))
@@ -260,7 +261,8 @@ export function resolveStudyGroup(
 
     if (
       group.filter.sectionKinds.length > 0 &&
-      !entry.sectionKinds.some((kind) => group.filter.sectionKinds.includes(kind))
+      !entry.sectionKinds.some((kind) => group.filter.sectionKinds.includes(kind)) &&
+      !(group.filter.sectionKinds.includes("idiom") && isIdiomSense(entry))
     ) {
       return false;
     }

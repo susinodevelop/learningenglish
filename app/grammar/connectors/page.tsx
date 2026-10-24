@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connectorContrasts } from "@/lib/grammar/connector-contrasts";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -12,6 +13,7 @@ const sections = [
   { id: "preposiciones", title: "Preposiciones" },
   { id: "conjunciones", title: "Conjunciones" },
   { id: "conectores", title: "Conectores entre frases" },
+  { id: "matices", title: "Like, such as y thereby" },
   { id: "cohesion", title: "Cohesión en un texto" },
   { id: "trampas", title: "Cambridge traps" },
 ];
@@ -83,8 +85,33 @@ export default function ConnectorsPage() {
         <div className={styles.tip}><strong>Puntuación C1</strong><p><em>However, moreover, therefore</em> y otros linking adverbials suelen ir seguidos de coma al inicio de una oración: <span lang="en">The plan is costly. However, it could work.</span> Una coma sola entre dos oraciones completas no basta: usa punto o punto y coma.</p></div>
       </section>
 
+      <section className={styles.section} id="matices" aria-labelledby="matices-title">
+        <div className={styles.heading}>
+          <span className="eyebrow">05 · Cambridge B2 + C1</span>
+          <h2 id="matices-title">Like, such as y thereby: uso y estructura</h2>
+          <p>Compara el significado y la forma antes de traducir «como» o «por tanto». Estos contrastes también están en tu vocabulario personal.</p>
+        </div>
+        <div className={styles.cards}>
+          {connectorContrasts.map((contrast) => (
+            <article className={styles.card} key={contrast.id}>
+              <span className={styles.level}>{contrast.level}</span>
+              <h3>{contrast.title}</h3>
+              <p>{contrast.explanation}</p>
+              <p><code>{contrast.pattern}</code></p>
+              {contrast.examples.map((example) => (
+                <div key={example.en}>
+                  <p lang="en"><code>{example.en}</code></p>
+                  <small>{example.es}</small>
+                </div>
+              ))}
+              <p>{contrast.tip}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className={styles.section} id="cohesion" aria-labelledby="cohesion-title">
-        <div className={styles.heading}><span className="eyebrow">05 · Writing C1</span><h2 id="cohesion-title">Cohesión más allá de moreover</h2><p>Un buen texto también conecta ideas sin repetirlas: referencias claras, sustitución, elipsis y vocabulario relacionado.</p></div>
+        <div className={styles.heading}><span className="eyebrow">06 · Writing C1</span><h2 id="cohesion-title">Cohesión más allá de moreover</h2><p>Un buen texto también conecta ideas sin repetirlas: referencias claras, sustitución, elipsis y vocabulario relacionado.</p></div>
         <div className={styles.cards}>
           <article className={styles.card}><h3>Referencia</h3><p><b>this, these, it, they</b> remiten a algo anterior. Comprueba que el lector sabe a qué se refieren.</p><p lang="en"><code>The policy changed. This reduced complaints.</code></p><small>Cambió la política. Esto redujo las quejas.</small></article>
           <article className={styles.card}><h3>Sustitución y elipsis</h3><p><b>one / so</b> sustituyen información conocida; la elipsis omite lo que se puede recuperar.</p><p lang="en"><code>Do you need a pen? I have one. · I wanted to go, but I couldn&apos;t.</code></p><small>¿Necesitas un bolígrafo? Tengo uno. · Quería ir, pero no pude.</small></article>
@@ -93,7 +120,7 @@ export default function ConnectorsPage() {
       </section>
 
       <section className={styles.section} id="trampas" aria-labelledby="trampas-title">
-        <div className={styles.heading}><span className="eyebrow">06 · Comprueba la forma</span><h2 id="trampas-title">Cambridge traps frecuentes</h2><p>La mayoría de estos errores aparecen al traducir un conector sin mirar qué estructura exige.</p></div>
+        <div className={styles.heading}><span className="eyebrow">07 · Comprueba la forma</span><h2 id="trampas-title">Cambridge traps frecuentes</h2><p>La mayoría de estos errores aparecen al traducir un conector sin mirar qué estructura exige.</p></div>
         <div className={styles.traps}>{traps.map((trap) => <article className={styles.trap} key={trap.wrong}><p><span>Evita</span><del lang="en">{trap.wrong}</del></p><p><span>Usa</span><strong lang="en">{trap.right}</strong></p><small>{trap.why}</small></article>)}</div>
       </section>
 
