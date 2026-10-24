@@ -491,7 +491,7 @@ const personalCultureRows = personalImportRows.filter((row) =>
   ),
 );
 
-export const personalCultureTopics: VocabularyTopic[] = (["B1", "B2", "C1"] as VocabularyLevel[]).map((level, index) => ({
+export const personalCultureTopics: VocabularyTopic[] = (["B1", "B2", "C1"] as VocabularyLevel[]).map((level, index): VocabularyTopic => ({
   slug: personalCultureSlugs[index],
   title: "Cine, crítica y ocio",
   category: "culture",
