@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { irregularVerbFormsByTerm } from "@/lib/vocabulary/data/irregular-verbs";
 import { phrasalVerbDataByTerm } from "@/lib/vocabulary/data/phrasal-verbs";
+import { isIdiomSense } from "@/lib/vocabulary";
 import type {
   VocabularyCategory,
   VocabularyLevel,
@@ -131,7 +132,7 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
         case "chunks":
           return levelSenses.some((sense) => sense.type === "collocation" || sense.sectionKinds.includes("chunks"));
         case "idioms":
-          return levelSenses.some((sense) => sense.topics.includes("c1-idioms"));
+          return levelSenses.some(isIdiomSense);
         case "irregular-verbs":
           return levelSenses.some((sense) => sense.topics.includes("irregular-verbs"));
         case "synonyms":
@@ -255,7 +256,9 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
               const phrasalSense = showingPersonalPhrasalTopic
                 ? lexemeSenses.find((sense) => sense.topics.includes("phrasal-verbs"))
                 : lexemeSenses.find((sense) => sense.type === "phrasal-verb");
+              const topicSense = topicSlug ? lexemeSenses.find((sense) => sense.topics.includes(topicSlug)) : undefined;
               const first = matchingSense
+                ?? topicSense
                 ?? (showingIrregularVerbs ? irregularSense ?? lexemeSenses[0]
                   : showingPhrasalVerbs || showingPersonalPhrasalTopic ? phrasalSense ?? lexemeSenses[0]
                     : lexemeSenses[0]);
