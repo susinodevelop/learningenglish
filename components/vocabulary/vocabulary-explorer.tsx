@@ -93,6 +93,7 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
   const [level, setLevel] = useState<LevelFilter>("all");
   const [view, setView] = useState<ExplorerView>("home");
   const [topicSlug, setTopicSlug] = useState<string>("");
+  const [pagination, setPagination] = useState({ key: "", limit: 240 });
 
   const sensesByLexeme = useMemo(() => {
     const map = new Map<string, VocabularySense[]>();
@@ -111,6 +112,8 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
 
   const normalizedQuery = normalise(query);
   const isSearching = normalizedQuery.length >= 2;
+  const filterKey = JSON.stringify([view, level, topicSlug, normalizedQuery]);
+  const visibleLimit = pagination.key === filterKey ? pagination.limit : 240;
 
   const filteredLexemes = useMemo(() => {
     return lexemes.filter((lexeme) => {
@@ -247,7 +250,7 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
           </header>
 
           <div className={styles.lexemeGrid}>
-            {filteredLexemes.slice(0, 240).map((lexeme) => {
+            {filteredLexemes.slice(0, visibleLimit).map((lexeme) => {
               const lexemeSenses = (sensesByLexeme.get(lexeme.id) ?? []).filter((sense) => level === "all" || sense.levels.includes(level));
               const matchingSense = isSearching
                 ? lexemeSenses.find((sense) => normalise(searchableSenseText(sense)).includes(normalizedQuery))
@@ -293,7 +296,14 @@ export function VocabularyExplorer({ categories, topics, lexemes, senses }: Prop
               );
             })}
           </div>
-          {filteredLexemes.length > 240 ? <p className={styles.limitNote}>Mostrando 240 términos. Usa búsqueda o filtros para afinar.</p> : null}
+          {filteredLexemes.length > visibleLimit ? (
+            <div className={styles.limitNote}>
+              <p>Mostrando {visibleLimit} de {filteredLexemes.length} términos.</p>
+              <button type="button" className="button button-secondary" onClick={() => setPagination({ key: filterKey, limit: visibleLimit + 240 })}>
+                Mostrar más ({Math.min(240, filteredLexemes.length - visibleLimit)} términos)
+              </button>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </section>
