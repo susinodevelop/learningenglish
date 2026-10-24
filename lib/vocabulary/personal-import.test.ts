@@ -250,6 +250,102 @@ describe("personal vocabulary", () => {
     }
   });
 
+  it("validates corrected CEFR levels and distinct senses of of and with", () => {
+    expect(personalImportRows).toHaveLength(328); // 294 spreadsheet + 7 split senses + 27 October additions
+    const expectedLevels: Record<string, string> = {
+      get_in_enter: "B1",
+      get_in_arrive: "B1",
+      privacy: "B2",
+      reckon_think: "B2",
+    };
+    for (const [id, level] of Object.entries(expectedLevels)) {
+      const row = personalImportRows.find((candidate) => candidate.id === id);
+      expect(row?.cefr, id).toBe(level);
+      const sense = vocabularySenses.find((candidate) =>
+        candidate.term === row?.term
+        && candidate.meaning.es === row?.["meaning.es"]
+        && candidate.topics.some((topic) => topic.startsWith("personal-added-")),
+      );
+      expect(sense?.levels, id).toContain(level);
+    }
+
+    const ofIds = ["of", "of_origin", "of_part", "of_contents", "of_material"];
+    const withIds = ["with", "with_instrument", "with_characteristic", "with_relation"];
+    expect(personalImportRows.filter((row) => row.term === "of").map((row) => row.id))
+      .toEqual(ofIds);
+    expect(personalImportRows.filter((row) => row.term === "with").map((row) => row.id))
+      .toEqual(withIds);
+
+    for (const id of [...ofIds, ...withIds]) {
+      const row = personalImportRows.find((candidate) => candidate.id === id);
+      expect(row, id).toBeDefined();
+      expect(row?.topics).toBe("grammar & linking");
+      expect(row?.["relations.patterns"]?.trim()).toBeTruthy();
+      expect(row?.["example.en"].trim()).toBeTruthy();
+      expect(row?.["example.es"].trim()).toBeTruthy();
+      const sense = vocabularySenses.find((candidate) =>
+        candidate.term === row?.term
+        && candidate.meaning.es === row?.["meaning.es"]
+        && candidate.topics.some((topic) => topic.startsWith("personal-added-")),
+      );
+      expect(sense, id).toBeDefined();
+      expect(sense?.topics.some((topic) => topic.startsWith("personal-linking-")), id).toBe(true);
+    }
+
+    const unmade = personalImportRows.find((row) => row.id === "unmade");
+    expect(unmade?.["meaning.en"]).toContain("bed");
+    expect(unmade?.["meaning.es"]).toContain("cama");
+    expect(personalImportRows.find((row) => row.id === "almost")?.["relations.antonyms"])
+      .toBeUndefined();
+    const background = personalImportRows.find((row) => row.id === "against_the_background_of");
+    expect(background?.["meaning.en"]).toContain("context");
+    expect(background?.["meaning.en"]).not.toContain("visual");
+  });
+
+  it("keeps related senses out of confusedWith and puts the fair just in general vocabulary", () => {
+    const wrongSelfRelations = [
+      "saloon_2",
+      "ballerina_dancer",
+      "ballerina_shoe",
+      "marble_stone",
+      "marble_toy",
+      "room_chamber",
+      "chest",
+      "swing_seat",
+      "swing_movement",
+      "nut_fastener",
+      "nut_food",
+      "rave_party",
+      "just_only",
+      "just_fair",
+      "bargain_good_buy",
+      "into_the_bargain",
+    ];
+    for (const id of wrongSelfRelations) {
+      expect(personalImportRows.find((row) => row.id === id)?.["relations.confusedWith"], id)
+        .toBeUndefined();
+    }
+    expect(personalImportRows.find((row) => row.id === "saloon_1")?.["relations.confusedWith"])
+      .toBe("salon");
+    expect(personalImportRows.find((row) => row.id === "room_space")?.["relations.confusedWith"])
+      .toBe("space");
+
+    const justFair = personalImportRows.find((row) => row.id === "just_fair");
+    const justOnly = personalImportRows.find((row) => row.id === "just_only");
+    expect(justFair?.topics).toBe("general vocabulary");
+    expect(justOnly?.topics).toBe("grammar & linking");
+    const fairSense = vocabularySenses.find((sense) =>
+      sense.term === "just" && sense.meaning.es === justFair?.["meaning.es"],
+    );
+    const onlySense = vocabularySenses.find((sense) =>
+      sense.term === "just" && sense.meaning.es === justOnly?.["meaning.es"],
+    );
+    expect(fairSense?.topics.some((topic) => topic.startsWith("personal-linking-"))).toBe(false);
+    expect(onlySense?.topics.some((topic) => topic.startsWith("personal-linking-"))).toBe(true);
+    expect(fairSense?.topics.some((topic) => topic.startsWith("personal-added-"))).toBe(true);
+    expect(onlySense?.topics.some((topic) => topic.startsWith("personal-added-"))).toBe(true);
+  });
+
   it("keeps the initial group dynamic and accepts later manual additions", () => {
     const group = systemStudyGroups.find((candidate) => candidate.id === PERSONAL_STUDY_GROUP_ID);
     expect(group?.kind).toBe("dynamic");
