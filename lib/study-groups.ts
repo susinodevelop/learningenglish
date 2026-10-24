@@ -1,3 +1,4 @@
+import { isIdiomSense } from "./vocabulary";
 import type {
   VocabularyEntryType,
   VocabularyLevel,
@@ -260,7 +261,8 @@ export function resolveStudyGroup(
 
     if (
       group.filter.sectionKinds.length > 0 &&
-      !entry.sectionKinds.some((kind) => group.filter.sectionKinds.includes(kind))
+      !entry.sectionKinds.some((kind) => group.filter.sectionKinds.includes(kind)) &&
+      !(group.filter.sectionKinds.includes("idiom") && isIdiomSense(entry))
     ) {
       return false;
     }
