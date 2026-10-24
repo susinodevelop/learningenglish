@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { irregularVerbFormsByTerm } from "./data/irregular-verbs";
 import { connectorContrasts } from "../grammar/connector-contrasts";
-import { personalImportRows, personalLinkingTopics } from "./data/personal-import";
+import { personalImportRows, personalLinkingTopics, personalCultureTopics } from "./data/personal-import";
 import { vocabularySenses, vocabularyTopics } from "./index";
 import { isIdiomSense } from "./idiom-classification";
 import { PERSONAL_STUDY_GROUP_ID, resolveStudyGroup, systemStudyGroups } from "../study-groups";
@@ -167,6 +167,87 @@ describe("personal vocabulary", () => {
     expect(thereby.pattern).toContain("thereby + -ing");
     expect(thereby.pattern).toContain("Therefore, + clause");
     expect(thereby.examples.every((example) => example.en && example.es)).toBe(true);
+  });
+
+  it("categorises the new film-review phrases and grammar senses without duplicates", () => {
+    const newIds = [
+      "never_fail_to_please_critics",
+      "star_in_film",
+      "just_only",
+      "just_fair",
+      "whether_alternatives",
+      "portray_character",
+      "on_the_edge_of_ones_seat",
+      "throughout_time",
+      "throughout_place",
+      "throughout_adverb",
+    ];
+    const rows = newIds.map((id) => personalImportRows.find((row) => row.id === id));
+    expect(rows.every(Boolean)).toBe(true);
+    expect(new Set(personalImportRows.map((row) => row.id)).size).toBe(personalImportRows.length);
+    expect(rows.map((row) => row?.source_term)).toEqual([
+      "Never fails to please critics", "it stars", "is just", "is just",
+      "whether", "portraying", "on the edge of my seat",
+      "throughout", "throughout", "throughout",
+    ]);
+    expect(personalImportRows.find((row) => row.id === "star_in_film")).toMatchObject({
+      term: "star", type: "verb", "relations.patterns": expect.stringContaining("a film stars"),
+    });
+    expect(personalImportRows.find((row) => row.id === "portray_character")).toMatchObject({
+      term: "portray", type: "verb", "relations.patterns": expect.stringContaining("portray + character"),
+    });
+    expect(personalImportRows.find((row) => row.id === "whether_alternatives")).toMatchObject({
+      term: "whether", type: "conjunction", "relations.patterns": expect.stringContaining("whether to + infinitive"),
+    });
+    expect(personalImportRows.find((row) => row.id === "just_only")).toMatchObject({
+      type: "adverb", "meaning.es": expect.stringContaining("simplemente"),
+    });
+    expect(personalImportRows.find((row) => row.id === "just_fair")).toMatchObject({
+      type: "adjective", "meaning.es": expect.stringContaining("justo"),
+    });
+    expect(personalImportRows.find((row) => row.id === "throughout_time")).toMatchObject({
+      type: "preposition", "relations.patterns": expect.stringContaining("throughout + period"),
+    });
+    expect(personalImportRows.find((row) => row.id === "throughout_place")).toMatchObject({
+      type: "preposition", "relations.patterns": expect.stringContaining("throughout + place"),
+    });
+    expect(personalImportRows.find((row) => row.id === "throughout_adverb")).toMatchObject({
+      type: "adverb",
+    });
+
+    const cultureTopics = new Set(personalCultureTopics.map((topic) => topic.slug));
+    const linkingTopics = new Set(personalLinkingTopics.map((topic) => topic.slug));
+    expect(personalCultureTopics.every((topic) => topic.category === "culture")).toBe(true);
+    for (const row of rows) {
+      expect(row).toBeDefined();
+      if (!row) continue;
+      expect(row["example.en"].trim()).toBeTruthy();
+      expect(row["example.es"].trim()).toBeTruthy();
+      const sense = vocabularySenses.find((candidate) =>
+        candidate.term === row.term
+        && candidate.meaning.es === row["meaning.es"]
+        && candidate.topics.some((slug) => slug.startsWith("personal-added-")),
+      );
+      expect(sense, row.id).toBeDefined();
+      if (!sense) continue;
+      const isFilm = row.topics?.includes("film & reviews");
+      expect(sense.topics.some((slug) => (isFilm ? cultureTopics : linkingTopics).has(slug)))
+        .toBe(true);
+      expect(sense.examples).toContainEqual({
+        en: row["example.en"], es: row["example.es"], kind: "usage",
+      });
+      expect(sense.notes).toContain(row.notes);
+    }
+
+    const edge = vocabularySenses.find((sense) => sense.term === "be on the edge of one's seat");
+    expect(edge).toBeDefined();
+    if (edge) {
+      expect(isIdiomSense(edge)).toBe(true);
+      const idioms = systemStudyGroups.find((group) => group.id === "system-c1-idioms");
+      if (!idioms) throw new Error("Missing C1 idioms group");
+      expect(resolveStudyGroup(idioms, vocabularySenses, {})
+        .some((sense) => sense.senseId === edge.senseId)).toBe(true);
+    }
   });
 
   it("keeps the initial group dynamic and accepts later manual additions", () => {
