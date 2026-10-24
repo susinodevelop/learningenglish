@@ -1814,7 +1814,7 @@
     "topics": "general vocabulary",
     "relations.patterns": "approach + problem/task/subject",
     "relations.synonyms": "tackle; deal with",
-    "notes": "Deal-with-a-problem sense. Headword normalised from “approached” to lemma “approach”; original form preserved in source_term. Do not confuse the ballet dancer sense with the related footwear expression 'ballerina flat'.",
+    "notes": "Deal-with-a-problem sense. Headword normalised from “approached” to lemma “approach”; original form preserved in source_term.",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -1830,8 +1830,7 @@
     "example.es": "Un avestruz puede correr mucho más rápido que la mayoría de las personas.",
     "topics": "nature & wildlife",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW",
-    "notes": "Ballerina (without flat) usually means a female ballet dancer; this entry refers to footwear."
+    "review_status": "REVIEW"
   },
   {
     "id": "rhea",
@@ -1874,8 +1873,7 @@
     "example.en": "The ballerina rehearsed all afternoon before the performance.",
     "example.es": "La bailarina de ballet ensayó toda la tarde antes de la actuación.",
     "topics": "media & culture",
-    "relations.confusedWith": "ballerina flat = flat shoe (separate entry)",
-    "notes": "Separated from the footwear sense.",
+    "notes": "Separated from the footwear sense. Do not confuse the ballet dancer sense with the related footwear expression 'ballerina flat'.",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -1890,8 +1888,7 @@
     "example.en": "She wore black ballerina flats with a simple summer dress.",
     "example.es": "Llevaba unas bailarinas negras con un vestido sencillo de verano.",
     "topics": "media & culture",
-    "relations.confusedWith": "ballerina = ballet dancer (another sense)",
-    "notes": "Footwear sense. The usual English term is “ballerina flat” (often plural “ballerina flats”); “ballerina” alone primarily means a ballet dancer. Original source term preserved.",
+    "notes": "Footwear sense. The usual English term is “ballerina flat” (often plural “ballerina flats”); “ballerina” alone primarily means a ballet dancer. Original source term preserved. Ballerina (without flat) usually refers to a ballet dancer; a ballerina flat is a shoe.",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -2438,8 +2435,7 @@
     "example.es": "La letra «a» es una vocal.",
     "topics": "general vocabulary",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW",
-    "notes": "The same headword marble can also mean a glass playing marble (canica)."
+    "review_status": "REVIEW"
   },
   {
     "id": "grass",
@@ -2453,8 +2449,7 @@
     "example.es": "La hierba seguía mojada por la lluvia.",
     "topics": "nature & wildlife",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW",
-    "notes": "The same headword marble can also mean the decorative stone (mármol)."
+    "review_status": "REVIEW"
   },
   {
     "id": "lawn",
@@ -2495,8 +2490,7 @@
     "example.en": "The floor in the entrance hall is made of marble.",
     "example.es": "El suelo del vestíbulo es de mármol.",
     "topics": "general vocabulary",
-    "relations.confusedWith": "marble = small glass ball (another sense)",
-    "notes": "Stone/material sense.",
+    "notes": "Stone/material sense. The same headword marble can also mean a glass playing marble (canica).",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -2511,8 +2505,7 @@
     "example.en": "The child rolled a marble across the floor.",
     "example.es": "El niño hizo rodar una canica por el suelo.",
     "topics": "general vocabulary",
-    "relations.confusedWith": "marble = decorative stone (another sense)",
-    "notes": "Toy sense.",
+    "notes": "Toy sense. The same headword marble can also mean the decorative stone (mármol).",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -2709,9 +2702,7 @@
     "topics": "general vocabulary",
     "relations.synonyms": "comfortable; snug",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW",
-    "relations.confusedWith": "space",
-    "notes": "Another sense of room refers to a room in a building (habitación)."
+    "review_status": "REVIEW"
   },
   {
     "id": "fast_1",
@@ -2725,8 +2716,7 @@
     "example.es": "Hizo un ayuno de veinticuatro horas.",
     "topics": "general vocabulary",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW",
-    "notes": "Another sense of room is available space (sitio)."
+    "review_status": "REVIEW"
   },
   {
     "id": "fast_2",
@@ -2740,8 +2730,7 @@
     "example.es": "Algunas personas ayunan por motivos religiosos.",
     "topics": "general vocabulary",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW",
-    "notes": "The same word chest can also mean the front part of your body (pecho)."
+    "review_status": "REVIEW"
   },
   {
     "id": "space",
@@ -2770,10 +2759,10 @@
     "example.es": "¿Hay sitio para una persona más en el coche?",
     "topics": "home & places",
     "relations.synonyms": "space",
-    "relations.confusedWith": "space; room = a part of a building (another sense)",
-    "notes": "Available-space sense.",
+    "notes": "Available-space sense. Another sense of room refers to a room in a building (habitación).",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "relations.confusedWith": "space"
   },
   {
     "id": "room_chamber",
@@ -2786,8 +2775,7 @@
     "example.en": "The room has two large windows.",
     "example.es": "La habitación tiene dos ventanas grandes.",
     "topics": "home & places",
-    "relations.confusedWith": "room = available space (another sense)",
-    "notes": "Part-of-a-building sense.",
+    "notes": "Part-of-a-building sense. Another sense of room is available space (sitio).",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -2802,9 +2790,9 @@
     "example.en": "The old letters were kept in a wooden chest.",
     "example.es": "Las cartas antiguas se guardaban en un cofre de madera.",
     "topics": "home & places",
-    "relations.confusedWith": "chest = pecho (another sense)",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "The same word chest can also mean the front part of your body (pecho)."
   },
   {
     "id": "drawer",
@@ -2818,8 +2806,7 @@
     "example.es": "Encontré las llaves en el cajón de arriba.",
     "topics": "home & places",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW",
-    "notes": "The word swing also refers to a swinging movement (balanceo)."
+    "review_status": "REVIEW"
   },
   {
     "id": "chest_of_drawers",
@@ -2833,8 +2820,7 @@
     "example.es": "Su ropa está guardada en una cómoda.",
     "topics": "home & places",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW",
-    "notes": "The word swing also refers to a hanging playground seat (columpio)."
+    "review_status": "REVIEW"
   },
   {
     "id": "mat",
@@ -2878,8 +2864,7 @@
     "example.en": "The children were playing on the swings in the park.",
     "example.es": "Los niños estaban jugando en los columpios del parque.",
     "topics": "general vocabulary",
-    "relations.confusedWith": "swing = swinging movement (another noun sense)",
-    "notes": "Playground-seat sense.",
+    "notes": "Playground-seat sense. The word swing also refers to a swinging movement (balanceo).",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -2895,8 +2880,7 @@
     "example.es": "El lento balanceo de la lámpara hacía que las sombras se movieran.",
     "topics": "general vocabulary",
     "relations.synonyms": "sway; oscillation",
-    "relations.confusedWith": "swing = playground seat (another noun sense)",
-    "notes": "Movement sense.",
+    "notes": "Movement sense. The word swing also refers to a hanging playground seat (columpio).",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -3096,9 +3080,9 @@
     "example.en": "We added sliced courgette to the pasta sauce.",
     "example.es": "Añadimos calabacín en rodajas a la salsa de pasta.",
     "topics": "food & cooking",
+    "relations.confusedWith": "zucchini",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW",
-    "notes": "Another sense of nut is an edible nut (fruto seco)."
+    "review_status": "REVIEW"
   },
   {
     "id": "zucchini",
@@ -3111,9 +3095,9 @@
     "example.en": "Zucchini is the usual American English word for courgette.",
     "example.es": "«Zucchini» es la palabra habitual en inglés americano para «courgette».",
     "topics": "food & cooking",
+    "relations.confusedWith": "courgette",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW",
-    "notes": "Another sense of nut is a metal fastener (tuerca)."
+    "review_status": "REVIEW"
   },
   {
     "id": "bolt_1",
@@ -3157,8 +3141,7 @@
     "example.en": "The bolt is secured with a metal nut.",
     "example.es": "El perno está sujeto con una tuerca metálica.",
     "topics": "general vocabulary",
-    "relations.confusedWith": "nut = edible seed/fruit (another sense)",
-    "notes": "Metal-fastener sense.",
+    "notes": "Metal-fastener sense. Another sense of nut is an edible nut (fruto seco).",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -3173,8 +3156,7 @@
     "example.en": "Nuts are a useful source of healthy fats.",
     "example.es": "Los frutos secos son una buena fuente de grasas saludables.",
     "topics": "general vocabulary",
-    "relations.confusedWith": "nut = metal fastener (another sense)",
-    "notes": "Food sense.",
+    "notes": "Food sense. Another sense of nut is a metal fastener (tuerca).",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
