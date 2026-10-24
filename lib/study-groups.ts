@@ -237,7 +237,7 @@ export function resolveStudyGroup(
   const includedIds = new Set(group.filter.includeSenseIds ?? []);
 
   const matched = lexicon.filter((entry) => {
-    if (includedIds.has(entry.senseId)) return true;
+    if (includedIds.has(entry.senseId) || includedIds.has(entry.id) || entry.legacyIds.some((id) => includedIds.has(id))) return true;
     if (
       levels.length > 0 &&
       !entry.levels.some((level) => levels.includes(level))
