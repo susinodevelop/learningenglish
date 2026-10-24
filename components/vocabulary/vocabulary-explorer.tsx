@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { irregularVerbFormsByTerm } from "@/lib/vocabulary/data/irregular-verbs";
 import { phrasalVerbDataByTerm } from "@/lib/vocabulary/data/phrasal-verbs";
-import { isIdiomSense } from "@/lib/vocabulary";
+import { isIdiomSense } from "@/lib/vocabulary/idiom-classification";
 import type {
   VocabularyCategory,
   VocabularyLevel,
