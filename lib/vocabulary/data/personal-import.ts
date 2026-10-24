@@ -510,7 +510,7 @@ export const personalCultureTopics: VocabularyTopic[] = (["B1", "B2", "C1"] as V
       `personal-import:${row.id}`,
     ]),
   }],
-}));
+})).filter((topic) => topic.sections.some((section) => section.entries.length > 0));
 
 export const personalImportSlugs = ["personal-added-b1", "personal-added-b2", "personal-added-c1"];
 
