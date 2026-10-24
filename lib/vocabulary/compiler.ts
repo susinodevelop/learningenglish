@@ -195,7 +195,7 @@ function makeRelations(
 }
 
 /** Historic v1 ID used by existing localStorage groups/progress. */
-function makeLegacyId(term: string, meaningEs: string) {
+export function makeLegacyId(term: string, meaningEs: string) {
   return `${slugPart(term)}-${shortHash(normaliseVocabularyText(meaningEs))}`;
 }
 
@@ -213,7 +213,7 @@ function makeLexemeId(term: string) {
  * never to the Spanish translation. If a future source creates a collision, add the
  * fifth seed tuple field (`stableKey`) rather than changing existing IDs.
  */
-function makeStableSenseId(
+export function makeStableSenseId(
   term: string,
   sourceUnit: number,
   kind: VocabularySectionKind,
