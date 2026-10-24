@@ -1,4 +1,4 @@
-import { isIdiomSense } from "./vocabulary";
+import { isIdiomSense } from "./vocabulary/idiom-classification";
 import type {
   VocabularyEntryType,
   VocabularyLevel,
