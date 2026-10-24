@@ -10,9 +10,10 @@
     "example.en": "The cowboy walked into the saloon and ordered a drink.",
     "example.es": "El vaquero entró en la cantina y pidió una bebida.",
     "topics": "general vocabulary",
-    "relations.confusedWith": "salon; saloon car",
+    "relations.confusedWith": "salon",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "The same spelling also has a British car sense (saloon/berlina)."
   },
   {
     "id": "saloon_2",
@@ -25,9 +26,9 @@
     "example.en": "They bought a second-hand saloon with a large boot.",
     "example.es": "Compraron una berlina de segunda mano con un maletero grande.",
     "topics": "general vocabulary",
-    "relations.confusedWith": "saloon = bar/public drinking room",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "Other sense of saloon: an American-style drinking establishment."
   },
   {
     "id": "vegetable",
@@ -766,11 +767,77 @@
     "term": "of",
     "type": "preposition",
     "cefr": "B1",
-    "meaning.es": "de/perteneciente a/parte de algo",
-    "meaning.en": "Used to show belonging, relation, origin, content or part of something.",
+    "meaning.es": "de (pertenencia o relación)",
+    "meaning.en": "Used to connect one thing to something it belongs to or is associated with.",
     "example.en": "The roof of the house needs repairing.",
     "example.es": "El tejado de la casa necesita una reparación.",
-    "topics": "general vocabulary",
+    "topics": "grammar & linking",
+    "provenance": "user_import:Vocabulary.xlsx",
+    "review_status": "REVIEW",
+    "relations.patterns": "noun + of + noun (association or belonging)",
+    "notes": "Association/belonging use of of; other meanings (origin, part of a set, contents, material) have separate entries."
+  },
+  {
+    "id": "of_origin",
+    "source_term": "of",
+    "term": "of",
+    "type": "preposition",
+    "cefr": "B1",
+    "meaning.es": "de; de origen",
+    "meaning.en": "Used to say where someone comes from or what their origin is.",
+    "example.en": "She is a writer of Irish origin.",
+    "example.es": "Es una escritora de origen irlandés.",
+    "topics": "grammar & linking",
+    "relations.patterns": "of + place/nationality + origin",
+    "notes": "Origin/background sense.",
+    "provenance": "user_import:Vocabulary.xlsx",
+    "review_status": "REVIEW"
+  },
+  {
+    "id": "of_part",
+    "source_term": "of",
+    "term": "of",
+    "type": "preposition",
+    "cefr": "B1",
+    "meaning.es": "de (parte de un conjunto)",
+    "meaning.en": "Used to say that something or someone is one part or member of a larger whole or group.",
+    "example.en": "One of my friends lives in Madrid.",
+    "example.es": "Uno de mis amigos vive en Madrid.",
+    "topics": "grammar & linking",
+    "relations.patterns": "one/some/most/all + of + group",
+    "notes": "Partitive or group-membership sense.",
+    "provenance": "user_import:Vocabulary.xlsx",
+    "review_status": "REVIEW"
+  },
+  {
+    "id": "of_contents",
+    "source_term": "of",
+    "term": "of",
+    "type": "preposition",
+    "cefr": "B1",
+    "meaning.es": "de (contenido o cantidad)",
+    "meaning.en": "Used to indicate what a container holds or the substance that a measure refers to.",
+    "example.en": "She drank a glass of water.",
+    "example.es": "Bebió un vaso de agua.",
+    "topics": "grammar & linking",
+    "relations.patterns": "container/measure + of + substance",
+    "notes": "Contents or quantity sense, as in a glass of water.",
+    "provenance": "user_import:Vocabulary.xlsx",
+    "review_status": "REVIEW"
+  },
+  {
+    "id": "of_material",
+    "source_term": "of",
+    "term": "of",
+    "type": "preposition",
+    "cefr": "B1",
+    "meaning.es": "de (material del que está hecho algo)",
+    "meaning.en": "Used to show the material or substance from which something is made.",
+    "example.en": "The table is made of wood.",
+    "example.es": "La mesa está hecha de madera.",
+    "topics": "grammar & linking",
+    "relations.patterns": "be made of + material",
+    "notes": "Material sense: 'made of wood' indicates the original material is still recognisable.",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -916,7 +983,7 @@
     "source_term": "get in",
     "term": "get in",
     "type": "phrasal verb",
-    "cefr": "B2",
+    "cefr": "B1",
     "meaning.es": "entrar; subirse",
     "meaning.en": "To enter a place or vehicle.",
     "example.en": "We got in the car and drove away.",
@@ -933,7 +1000,7 @@
     "source_term": "get in",
     "term": "get in",
     "type": "phrasal verb",
-    "cefr": "B2",
+    "cefr": "B1",
     "meaning.es": "llegar",
     "meaning.en": "To arrive at a place, especially home or work.",
     "example.en": "What time did you get in last night?",
@@ -1747,7 +1814,7 @@
     "topics": "general vocabulary",
     "relations.patterns": "approach + problem/task/subject",
     "relations.synonyms": "tackle; deal with",
-    "notes": "Deal-with-a-problem sense. Headword normalised from “approached” to lemma “approach”; original form preserved in source_term.",
+    "notes": "Deal-with-a-problem sense. Headword normalised from “approached” to lemma “approach”; original form preserved in source_term. Do not confuse the ballet dancer sense with the related footwear expression 'ballerina flat'.",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -1763,7 +1830,8 @@
     "example.es": "Un avestruz puede correr mucho más rápido que la mayoría de las personas.",
     "topics": "nature & wildlife",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "Ballerina (without flat) usually means a female ballet dancer; this entry refers to footwear."
   },
   {
     "id": "rhea",
@@ -1969,13 +2037,14 @@
     "term": "unmade",
     "type": "adjective",
     "cefr": "B2",
-    "meaning.es": "sin hacer; deshecho",
-    "meaning.en": "Not made, prepared or arranged; for example, an unmade bed.",
+    "meaning.es": "sin hacer (una cama)",
+    "meaning.en": "Describing a bed whose sheets and covers have not been tidied or arranged after someone slept in it.",
     "example.en": "His bed was still unmade at noon.",
     "example.es": "Su cama seguía sin hacer al mediodía.",
     "topics": "general vocabulary",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "Used especially of a bed: an unmade bed is one whose bedding has not been arranged."
   },
   {
     "id": "breakneck",
@@ -2332,7 +2401,7 @@
     "source_term": "privacy",
     "term": "privacy",
     "type": "noun",
-    "cefr": "B1",
+    "cefr": "B2",
     "meaning.es": "intimidad; privacidad",
     "meaning.en": "The state of being free from unwanted attention or observation by other people.",
     "example.en": "The curtains give us more privacy from the neighbours.",
@@ -2369,7 +2438,8 @@
     "example.es": "La letra «a» es una vocal.",
     "topics": "general vocabulary",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "The same headword marble can also mean a glass playing marble (canica)."
   },
   {
     "id": "grass",
@@ -2383,7 +2453,8 @@
     "example.es": "La hierba seguía mojada por la lluvia.",
     "topics": "nature & wildlife",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "The same headword marble can also mean the decorative stone (mármol)."
   },
   {
     "id": "lawn",
@@ -2638,7 +2709,9 @@
     "topics": "general vocabulary",
     "relations.synonyms": "comfortable; snug",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "relations.confusedWith": "space",
+    "notes": "Another sense of room refers to a room in a building (habitación)."
   },
   {
     "id": "fast_1",
@@ -2652,7 +2725,8 @@
     "example.es": "Hizo un ayuno de veinticuatro horas.",
     "topics": "general vocabulary",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "Another sense of room is available space (sitio)."
   },
   {
     "id": "fast_2",
@@ -2666,7 +2740,8 @@
     "example.es": "Algunas personas ayunan por motivos religiosos.",
     "topics": "general vocabulary",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "The same word chest can also mean the front part of your body (pecho)."
   },
   {
     "id": "space",
@@ -2743,7 +2818,8 @@
     "example.es": "Encontré las llaves en el cajón de arriba.",
     "topics": "home & places",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "The word swing also refers to a swinging movement (balanceo)."
   },
   {
     "id": "chest_of_drawers",
@@ -2757,7 +2833,8 @@
     "example.es": "Su ropa está guardada en una cómoda.",
     "topics": "home & places",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "The word swing also refers to a hanging playground seat (columpio)."
   },
   {
     "id": "mat",
@@ -3019,9 +3096,9 @@
     "example.en": "We added sliced courgette to the pasta sauce.",
     "example.es": "Añadimos calabacín en rodajas a la salsa de pasta.",
     "topics": "food & cooking",
-    "relations.confusedWith": "zucchini",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "Another sense of nut is an edible nut (fruto seco)."
   },
   {
     "id": "zucchini",
@@ -3034,9 +3111,9 @@
     "example.en": "Zucchini is the usual American English word for courgette.",
     "example.es": "«Zucchini» es la palabra habitual en inglés americano para «courgette».",
     "topics": "food & cooking",
-    "relations.confusedWith": "courgette",
     "provenance": "user_import:Vocabulary.xlsx",
-    "review_status": "REVIEW"
+    "review_status": "REVIEW",
+    "notes": "Another sense of nut is a metal fastener (tuerca)."
   },
   {
     "id": "bolt_1",
@@ -3264,11 +3341,61 @@
     "term": "with",
     "type": "preposition",
     "cefr": "B1",
-    "meaning.es": "con",
-    "meaning.en": "Used to show accompaniment, possession, an instrument, a characteristic or a relationship.",
+    "meaning.es": "con (en compañía de)",
+    "meaning.en": "Together with or accompanied by someone or something.",
     "example.en": "She went to the concert with her sister.",
     "example.es": "Fue al concierto con su hermana.",
-    "topics": "general vocabulary",
+    "topics": "grammar & linking",
+    "provenance": "user_import:Vocabulary.xlsx",
+    "review_status": "REVIEW",
+    "relations.patterns": "with + person/group",
+    "notes": "Accompaniment use; instrument, characteristic and relation uses are separate."
+  },
+  {
+    "id": "with_instrument",
+    "source_term": "with",
+    "term": "with",
+    "type": "preposition",
+    "cefr": "B1",
+    "meaning.es": "con; utilizando",
+    "meaning.en": "Used to identify the tool, instrument or material used to do something.",
+    "example.en": "She opened the door with a key.",
+    "example.es": "Abrió la puerta con una llave.",
+    "topics": "grammar & linking",
+    "relations.patterns": "verb + with + instrument/tool",
+    "notes": "Instrument/means use of with.",
+    "provenance": "user_import:Vocabulary.xlsx",
+    "review_status": "REVIEW"
+  },
+  {
+    "id": "with_characteristic",
+    "source_term": "with",
+    "term": "with",
+    "type": "preposition",
+    "cefr": "B1",
+    "meaning.es": "con; que tiene (una característica)",
+    "meaning.en": "Used to describe a person or thing as having a particular feature or part.",
+    "example.en": "A woman with curly hair greeted us.",
+    "example.es": "Una mujer con el pelo rizado nos saludó.",
+    "topics": "grammar & linking",
+    "relations.patterns": "noun + with + feature/characteristic",
+    "notes": "Having a characteristic or feature; different from accompaniment.",
+    "provenance": "user_import:Vocabulary.xlsx",
+    "review_status": "REVIEW"
+  },
+  {
+    "id": "with_relation",
+    "source_term": "with",
+    "term": "with",
+    "type": "preposition",
+    "cefr": "B1",
+    "meaning.es": "con (relación, acuerdo o interacción)",
+    "meaning.en": "Used after certain verbs and adjectives to show the person or thing involved in a relationship, agreement or interaction.",
+    "example.en": "I agree with you about the schedule.",
+    "example.es": "Estoy de acuerdo contigo sobre el horario.",
+    "topics": "grammar & linking",
+    "relations.patterns": "agree with + person; be happy with + result; argue with + person",
+    "notes": "Grammatical relation/complement use; learn the governing verb or adjective together with 'with'.",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -3815,7 +3942,7 @@
     "source_term": "reckoned",
     "term": "reckon",
     "type": "verb",
-    "cefr": "C1",
+    "cefr": "B2",
     "meaning.es": "creer; considerar",
     "meaning.en": "To think or believe something, especially informally.",
     "example.en": "I reckon we'll arrive before eight.",
@@ -4021,7 +4148,6 @@
     "example.en": "We're almost ready to leave.",
     "example.es": "Estamos casi listos para salir.",
     "topics": "general vocabulary",
-    "relations.antonyms": "completely",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
@@ -4061,11 +4187,11 @@
     "type": "phrase",
     "cefr": "B2",
     "meaning.es": "con el trasfondo de; en el contexto de",
-    "meaning.en": "In the context of surrounding events, conditions or visual scenery.",
+    "meaning.en": "In the context of the events, social conditions or situation surrounding something.",
     "example.en": "The story takes place against the background of a major political crisis.",
     "example.es": "La historia transcurre con el trasfondo de una gran crisis política.",
     "topics": "general vocabulary",
-    "notes": "Normalised from source term: the background against",
+    "notes": "Figurative background/context sense; not the literal visual background of a scene. Normalised from source term: the background against",
     "provenance": "user_import:Vocabulary.xlsx",
     "review_status": "REVIEW"
   },
