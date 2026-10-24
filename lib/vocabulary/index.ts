@@ -9,7 +9,7 @@ import { studyWorkVocabularyTopics } from "./data/study-work";
 import { goldC1VocabularyTopics } from "./data/c1";
 import { irregularVerbsVocabularyTopic } from "./data/irregular-verbs";
 import { phrasalVerbsVocabularyTopic } from "./data/phrasal-verbs";
-import { enrichPersonalImport, personalImportTopics, personalLinkingTopics } from "./data/personal-import";
+import { enrichPersonalImport, personalImportTopics, personalLinkingTopics, personalCultureTopics } from "./data/personal-import";
 
 export type {
   VocabularyCategory,
@@ -56,6 +56,7 @@ const sourceVocabularyTopics: VocabularyTopic[] = [
   phrasalVerbsVocabularyTopic,
   ...personalImportTopics,
   ...personalLinkingTopics,
+  ...personalCultureTopics,
 ];
 
 const compiledVocabulary = compileVocabulary(sourceVocabularyTopics, enrichPersonalImport);
