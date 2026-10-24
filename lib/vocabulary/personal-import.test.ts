@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { irregularVerbFormsByTerm } from "./data/irregular-verbs";
-import { personalImportRows } from "./data/personal-import";
-import { vocabularySenses } from "./index";
+import { connectorContrasts } from "../grammar/connector-contrasts";
+import { personalImportRows, personalLinkingTopics } from "./data/personal-import";
+import { isIdiomSense, vocabularySenses, vocabularyTopics } from "./index";
 import { PERSONAL_STUDY_GROUP_ID, resolveStudyGroup, systemStudyGroups } from "../study-groups";
 
 describe("personal vocabulary", () => {
@@ -91,6 +92,80 @@ describe("personal vocabulary", () => {
       expect(sense?.notes).toContain(row.notes);
       expect(sense?.levels).toContain(row.cefr);
     }
+  });
+
+  it("imports rave as a party, an enthusiastic verb and the rave reviews collocation", () => {
+    const selected = ["rave_party", "rave_praise", "rave_reviews"];
+    expect(selected.map((id) => personalImportRows.find((row) => row.id === id)?.term))
+      .toEqual(["rave", "rave", "rave reviews"]);
+    expect(personalImportRows.find((row) => row.id === "rave_party")).toMatchObject({
+      type: "noun", cefr: "B2", "meaning.es": expect.stringContaining("fiesta"),
+    });
+    expect(personalImportRows.find((row) => row.id === "rave_praise")).toMatchObject({
+      type: "verb", cefr: "C1", "relations.patterns": expect.stringContaining("rave about"),
+    });
+    expect(personalImportRows.find((row) => row.id === "rave_reviews")).toMatchObject({
+      cefr: "C1", "relations.collocations": expect.stringContaining("rave reviews"),
+    });
+    for (const id of selected) {
+      const row = personalImportRows.find((candidate) => candidate.id === id);
+      expect(row?.["example.en"].trim()).toBeTruthy();
+      expect(row?.["example.es"].trim()).toBeTruthy();
+      expect(vocabularySenses.some((sense) =>
+        sense.term === row?.term && sense.meaning.es === row?.["meaning.es"]
+        && sense.topics.some((slug) => slug.startsWith("personal-added-")),
+      )).toBe(true);
+    }
+  });
+
+  it("shows personal idioms in the idioms explorer and C1 study group", () => {
+    const idioms = ["practise what you preach", "into the bargain"];
+    const group = systemStudyGroups.find((candidate) => candidate.id === "system-c1-idioms");
+    expect(group?.kind).toBe("dynamic");
+    if (!group || group.kind !== "dynamic") throw new Error("Missing C1 idioms group");
+    const resolved = resolveStudyGroup(group, vocabularySenses, {});
+    for (const term of idioms) {
+      const sense = vocabularySenses.find((candidate) =>
+        candidate.term === term && candidate.topics.some((slug) => slug.startsWith("personal-added-")),
+      );
+      expect(sense, term).toBeDefined();
+      if (!sense) continue;
+      expect(isIdiomSense(sense)).toBe(true); // same predicate used by vocabulary explorer
+      expect(resolved.some((entry) => entry.senseId === sense.senseId)).toBe(true);
+    }
+    expect(resolved.some((sense) => sense.term === "thereby")).toBe(false);
+  });
+
+  it("lists personal linking words under Language & structure without losing the personal group", () => {
+    expect(personalLinkingTopics).toHaveLength(3);
+    for (const topic of personalLinkingTopics) {
+      expect(topic.category).toBe("language");
+      expect(vocabularyTopics.some((item) => item.slug === topic.slug)).toBe(true);
+    }
+    for (const term of ["thereby", "thus", "such as", "like", "therefore"]) {
+      const senses = vocabularySenses.filter((sense) =>
+        sense.term === term && sense.topics.some((slug) => slug.startsWith("personal-added-")),
+      );
+      expect(senses.length, term).toBeGreaterThan(0);
+      expect(senses.every((sense) => sense.topics.some((slug) => slug.startsWith("personal-linking-"))))
+        .toBe(true);
+    }
+    const personal = systemStudyGroups.find((candidate) => candidate.id === PERSONAL_STUDY_GROUP_ID);
+    if (!personal || personal.kind !== "dynamic") throw new Error("Missing personal group");
+    expect(resolveStudyGroup(personal, vocabularySenses, {})).toHaveLength(personalImportRows.length);
+  });
+
+  it("provides visible connector-guide contrasts and Cambridge patterns", () => {
+    expect(connectorContrasts.map((contrast) => contrast.id))
+      .toEqual(["like-such-as", "thereby-therefore"]);
+    const like = connectorContrasts[0];
+    const thereby = connectorContrasts[1];
+    expect(like.pattern).toContain("such as");
+    expect(like.examples.some((example) => example.en.includes("like yours"))).toBe(true);
+    expect(like.examples.some((example) => example.en.includes("such as"))).toBe(true);
+    expect(thereby.pattern).toContain("thereby + -ing");
+    expect(thereby.pattern).toContain("Therefore, + clause");
+    expect(thereby.examples.every((example) => example.en && example.es)).toBe(true);
   });
 
   it("keeps the initial group dynamic and accepts later manual additions", () => {
