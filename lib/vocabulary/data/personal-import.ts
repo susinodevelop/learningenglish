@@ -107,7 +107,6 @@ const extraPersonalImportRows: ImportedRow[] = [
     "example.es": "El piso era amplio, estaba bien situado y, además, era barato.",
     topics: "general vocabulary",
     notes: "Means that something is added to what has already been mentioned.",
-    "relations.confusedWith": "bargain",
   },
   {
     id: "bargain_good_buy",
@@ -122,7 +121,6 @@ const extraPersonalImportRows: ImportedRow[] = [
     topics: "shopping & money",
     "relations.collocations": "a real bargain; pick up a bargain",
     notes: "This entry covers the 'ganga' sense.",
-    "relations.confusedWith": "into the bargain",
   },
   {
     id: "like_similar",
@@ -230,7 +228,6 @@ const extraPersonalImportRows: ImportedRow[] = [
     "example.es": "Fueron a una rave al aire libre en la que actuaban varios DJ de techno.",
     topics: "music & nightlife",
     "relations.collocations": "go to a rave; outdoor rave; rave party",
-    "relations.confusedWith": "rave (verb: praise enthusiastically)",
     notes: "Sustantivo: fiesta, especialmente de música electrónica. No confundir con el verbo rave about ni con el uso de rave en rave reviews.",
   },
   {
@@ -309,7 +306,6 @@ const extraPersonalImportRows: ImportedRow[] = [
     topics: "grammar & linking",
     "relations.patterns": "be + just + noun/adjective; just + verb",
     "relations.synonyms": "only; merely; simply",
-    "relations.confusedWith": "just (fair); just (exactly)",
     notes: "'Is just' no es un verbo compuesto: is = be (tercera persona) + just (adverbio). En 'It is just a comedy', just significa 'simplemente/solo'.",
   },
   {
@@ -322,11 +318,10 @@ const extraPersonalImportRows: ImportedRow[] = [
     "meaning.en": "Fair and morally right, especially when describing a decision, law or treatment.",
     "example.en": "The judge's decision is just and proportionate.",
     "example.es": "La decisión del juez es justa y proporcionada.",
-    topics: "grammar & linking",
+    topics: "general vocabulary",
     "relations.patterns": "be + just (adjective); a just decision; a just society",
     "relations.synonyms": "fair; equitable",
     "relations.antonyms": "unjust; unfair",
-    "relations.confusedWith": "just (only)",
     notes: "'Is just' también puede ser be + just (adjetivo = justo); depende del contexto. No confundir con just = 'solo' como adverbio.",
   },
   {
