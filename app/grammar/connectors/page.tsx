@@ -104,7 +104,7 @@ export default function ConnectorsPage() {
                   <small>{example.es}</small>
                 </div>
               ))}
-              <p><strong>Cambridge trap:</strong> {contrast.tip.replace(/^Cambridge trap:\\s*/, "")}</p>
+              <p>{contrast.tip}</p>
             </article>
           ))}
         </div>
