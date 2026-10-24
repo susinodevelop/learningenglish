@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { irregularVerbFormsByTerm } from "./data/irregular-verbs";
 import { connectorContrasts } from "../grammar/connector-contrasts";
 import { personalImportRows, personalLinkingTopics } from "./data/personal-import";
-import { isIdiomSense, vocabularySenses, vocabularyTopics } from "./index";
+import { vocabularySenses, vocabularyTopics } from "./index";
+import { isIdiomSense } from "./idiom-classification";
 import { PERSONAL_STUDY_GROUP_ID, resolveStudyGroup, systemStudyGroups } from "../study-groups";
 
 describe("personal vocabulary", () => {
