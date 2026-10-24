@@ -1,5 +1,5 @@
 import { compileVocabulary } from "./compiler";
-import type { VocabularyCategory, VocabularyEntryType, VocabularySense, VocabularyTopic } from "./types";
+import type { VocabularyCategory, VocabularyEntryType, VocabularyTopic } from "./types";
 import { worldVocabularyTopics } from "./data/world";
 import { peopleVocabularyTopics } from "./data/people";
 import { cultureVocabularyTopics } from "./data/culture";
@@ -106,11 +106,6 @@ for (const sense of compiledVocabulary.senses) {
   } else if (hasPersonalSource && !hasBookSource) {
     sense.type = personalVocabularyTypeOverrides[sense.term] ?? sense.type;
   }
-}
-
-/** Includes original idiom sections and personal idioms tagged by vocabulary type. */
-export function isIdiomSense(sense: VocabularySense) {
-  return sense.type === "idiom" || sense.sectionKinds.includes("idiom");
 }
 
 /** Learner-facing, rich topics from the source books and personal study material. */
