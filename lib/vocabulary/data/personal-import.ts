@@ -219,6 +219,53 @@ const extraPersonalImportRows: ImportedRow[] = [
     notes: "Idiom: coherencia entre lo que recomiendas y lo que haces. Inglés británico: practise (verbo); inglés americano: practice what you preach.",
   },
   {
+    id: "rave_party",
+    source_term: "rave",
+    term: "rave",
+    type: "noun",
+    cefr: "B2",
+    "meaning.es": "rave; fiesta de música electrónica",
+    "meaning.en": "A large dance party where electronic music is played, often lasting late into the night.",
+    "example.en": "They went to an outdoor rave featuring several techno DJs.",
+    "example.es": "Fueron a una rave al aire libre en la que actuaban varios DJ de techno.",
+    topics: "music & nightlife",
+    "relations.collocations": "go to a rave; outdoor rave; rave party",
+    "relations.confusedWith": "rave (verb: praise enthusiastically)",
+    notes: "Sustantivo: fiesta, especialmente de música electrónica. No confundir con el verbo rave about ni con el uso de rave en rave reviews.",
+  },
+  {
+    id: "rave_praise",
+    source_term: "rave",
+    term: "rave",
+    type: "verb",
+    cefr: "C1",
+    "meaning.es": "hablar maravillas de; elogiar con entusiasmo",
+    "meaning.en": "To speak or write with great enthusiasm and admiration about someone or something.",
+    "example.en": "Critics have been raving about her latest novel.",
+    "example.es": "Los críticos llevan tiempo hablando maravillas de su última novela.",
+    topics: "media & culture",
+    "relations.patterns": "rave about + noun/person; rave over + noun",
+    "relations.synonyms": "praise enthusiastically; enthuse about",
+    "relations.wordFamily": "rave reviews",
+    notes: "Verbo con connotación positiva en el patrón rave about something; otros contextos de rave pueden significar hablar descontroladamente. Relacionado con rave reviews.",
+  },
+  {
+    id: "rave_reviews",
+    source_term: "rave reviews",
+    term: "rave reviews",
+    type: "phrase",
+    cefr: "C1",
+    "meaning.es": "críticas excelentes; reseñas muy elogiosas",
+    "meaning.en": "Extremely positive and enthusiastic reviews of a book, film, show, product or performance.",
+    "example.en": "The new play received rave reviews from theatre critics.",
+    "example.es": "La nueva obra de teatro recibió críticas excelentes de los críticos teatrales.",
+    topics: "media & culture",
+    "relations.collocations": "receive rave reviews; get rave reviews; rave review",
+    "relations.synonyms": "glowing reviews; enthusiastic reviews",
+    "relations.wordFamily": "rave (verb); review",
+    notes: "Collocation: rave funciona como modificador y significa 'muy elogioso', no una fiesta. Singular: a rave review; plural: rave reviews.",
+  },
+  {
     id: "thereby",
     source_term: "thereby",
     term: "thereby",
@@ -248,6 +295,36 @@ export const personalImportRows: ImportedRow[] = [
     : row),
   ...extraPersonalImportRows,
 ];
+
+/** Same personal senses appear under Language & structure without duplicating canonical senses. */
+export const personalLinkingSlugs = ["personal-linking-b1", "personal-linking-b2", "personal-linking-c1"];
+
+const linkingRows = personalImportRows.filter((row) =>
+  row.topics?.split(";").some((topic) =>
+    ["grammar & linking", "linking & discourse"].includes(topic.trim().toLowerCase()),
+  ),
+);
+
+export const personalLinkingTopics: VocabularyTopic[] = (["B1", "B2", "C1"] as VocabularyLevel[]).map((level, index) => ({
+  slug: personalLinkingSlugs[index],
+  title: "Conectores y enlaces",
+  category: "language",
+  level,
+  summary: "Conectores, preposiciones y palabras funcionales de tu vocabulario personal; con traducción, patrones y ejemplos.",
+  sourceUnit: 2051 + index,
+  source: "Personal vocabulary",
+  sections: [{
+    title: "Conectores y vocabulario funcional",
+    kind: "core",
+    entries: linkingRows.filter((row) => row.cefr === level).map((row) => [
+      row.term,
+      row["meaning.es"],
+      row.notes,
+      row["meaning.en"],
+      `personal-import:${row.id}`,
+    ]),
+  }],
+}));
 
 export const personalImportSlugs = ["personal-added-b1", "personal-added-b2", "personal-added-c1"];
 
