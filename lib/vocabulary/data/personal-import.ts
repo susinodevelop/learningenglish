@@ -1,4 +1,5 @@
 import rows from "./personal-import.json";
+import { makeLegacyId, makeStableSenseId } from "../compiler";
 import type { VocabularyEntryType, VocabularyLevel, VocabularySense, VocabularyTopic } from "../types";
 
 type ImportedRow = {
@@ -448,6 +449,35 @@ export const personalImportRows: ImportedRow[] = [
   ...extraPersonalImportRows,
 ];
 
+/**
+ * Historical source identities from the pre-CEFR/translation-correction spreadsheet.
+ * A change of level moves the row to another sourceUnit, which changes its senseId;
+ * a corrected Spanish gloss changes the old v1 (term+translation) identifier.
+ *
+ * Keep these aliases indefinitely for existing saved study groups and progress.
+ * Do not use a new CEFR/sourceUnit or current translation to calculate old IDs.
+ */
+const previousPersonalIdentities: Record<string, { level?: VocabularyLevel; meaningEs?: string }> = {
+  get_in_enter: { level: "B2" },
+  get_in_arrive: { level: "B2" },
+  privacy: { level: "B1" },
+  reckon_think: { level: "C1" },
+  of: { meaningEs: "de/perteneciente a/parte de algo" },
+  with: { meaningEs: "con" },
+  unmade: { meaningEs: "sin hacer; deshecho" },
+};
+
+function historicPersonalIds(row: ImportedRow): string[] {
+  const previous = previousPersonalIdentities[row.id];
+  if (!previous) return [];
+  return [
+    ...(previous.level
+      ? [makeStableSenseId(row.term, 45 + (["B1", "B2", "C1"] as VocabularyLevel[]).indexOf(previous.level), "core", "Vocabulario personal", `personal-import:${row.id}`)]
+      : []),
+    ...(previous.meaningEs ? [makeLegacyId(row.term, previous.meaningEs)] : []),
+  ];
+}
+
 /** Same personal senses appear under Language & structure without duplicating canonical senses. */
 export const personalLinkingSlugs = ["personal-linking-b1", "personal-linking-b2", "personal-linking-c1"];
 
@@ -555,6 +585,7 @@ export function enrichPersonalImport(topics: { slug: string; sections: { entries
       sense.members[0].meaning.en = row["meaning.en"];
       sense.examples = [{ en: row["example.en"], es: row["example.es"], kind: "usage" }];
       sense.type = entryType(row.type);
+      sense.legacyIds = Array.from(new Set([...sense.legacyIds, ...historicPersonalIds(row)]));
       sense.relations = {
         collocations: list(row["relations.collocations"]),
         patterns: list(row["relations.patterns"]),
